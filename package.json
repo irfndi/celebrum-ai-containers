@@ -13,7 +13,8 @@
   },
   "packageManager": "pnpm@10.12.1",
   "scripts": {
-    "build": "pnpm --filter @celebrum-ai/db run build && pnpm --filter @celebrum-ai/shared run build:force && pnpm --filter @celebrum-ai/telegram-bot run build && pnpm --filter @celebrum-ai/web run build && wrangler deploy --dry-run",
+    "build": "pnpm run build:packages && wrangler deploy --dry-run",
+    "build:packages": "pnpm --recursive --stream --filter \"./packages/**\" run build",
     "dev": "./scripts/dev/start-dev.sh",
     "dev:worker": "wrangler dev",
     "dev:web": "./scripts/dev/start-dev.sh web",
