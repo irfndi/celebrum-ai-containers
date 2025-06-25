@@ -1,0 +1,87 @@
+{
+  "name": "cerebrum-ai-monorepo",
+  "version": "0.1.0",
+  "description": "Cerebrum AI Trading Platform - Unified Cloudflare Worker monorepo with Core API, Telegram Bot, and web interfaces",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=22.0.0",
+    "pnpm": ">=10.0.0"
+  },
+  "packageManager": "pnpm@10.12.1",
+  "scripts": {
+    "build": "pnpm --filter @celebrum-ai/db run build && pnpm --filter @celebrum-ai/shared run build:force && pnpm --filter @celebrum-ai/telegram-bot run build && pnpm --filter @celebrum-ai/web run build && wrangler deploy --dry-run",
+    "dev": "./scripts/dev/start-dev.sh",
+    "dev:worker": "wrangler dev",
+    "dev:web": "./scripts/dev/start-dev.sh web",
+    "dev:telegram-bot": "./scripts/dev/start-dev.sh telegram-bot",
+    "dev:db": "./scripts/dev/start-dev.sh db",
+    "dev:all": "./scripts/dev/start-dev.sh all",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:ci": "pnpm run lint && pnpm run typecheck && pnpm run test && pnpm run security:audit",
+    "lint": "pnpm --filter @celebrum-ai/db run lint && pnpm --filter @celebrum-ai/shared run lint && pnpm --filter @celebrum-ai/telegram-bot run lint && pnpm --filter @celebrum-ai/web run lint && oxlint src",
+    "format": "pnpm --filter @celebrum-ai/db run format && pnpm --filter @celebrum-ai/shared run format && pnpm --filter @celebrum-ai/telegram-bot run format && pnpm --filter @celebrum-ai/web run format",
+    "typecheck": "pnpm --filter @celebrum-ai/db run typecheck && pnpm --filter @celebrum-ai/shared run typecheck && pnpm --filter @celebrum-ai/telegram-bot run typecheck && pnpm --filter @celebrum-ai/web run check && tsc --noEmit",
+    "clean": "pnpm --filter @celebrum-ai/db run clean && pnpm --filter @celebrum-ai/shared run clean && pnpm --filter @celebrum-ai/telegram-bot run clean && pnpm --filter @celebrum-ai/web run clean && rm -rf dist",
+    "security:audit": "./scripts/security/audit.sh",
+    "security:audit:fix": "./scripts/security/audit.sh --fix",
+    "security:scan": "./scripts/security/scan.sh",
+    "security:check": "pnpm run security:audit && pnpm run security:scan",
+    "security:report": "./scripts/security/report.sh",
+    "deploy": "./scripts/deploy/deploy.sh",
+    "deploy:worker": "wrangler deploy",
+    "deploy:web": "./scripts/deploy/deploy.sh web",
+    "deploy:telegram-bot": "./scripts/deploy/deploy.sh telegram-bot",
+    "deploy:all": "./scripts/deploy/deploy.sh all",
+    "deploy:prod": "./scripts/deploy/deploy.sh all production",
+    "deploy:staging": "./scripts/deploy/deploy.sh all staging",
+    "deploy:dry": "./scripts/deploy/deploy.sh all --dry-run",
+    "docs": "pnpm --filter @celebrum-ai/shared run docs"
+  },
+  "dependencies": {
+    "@celebrum-ai/db": "workspace:*",
+    "@celebrum-ai/shared": "workspace:*",
+    "@cloudflare/containers": "^0.0.13",
+    "@hono/node-server": "^1.14.4",
+    "drizzle-orm": "^0.44.2",
+    "hono": "^4.8.3"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.29.5",
+    "@cloudflare/vitest-pool-workers": "^0.8.46",
+    "@cloudflare/workers-types": "^4.20250620.0",
+    "@types/node": "^24.0.4",
+    "@typescript-eslint/eslint-plugin": "^8.35.0",
+    "@typescript-eslint/parser": "^8.35.0",
+    "eslint": "^9.29.0",
+    "eslint-plugin-security": "^3.0.1",
+    "oxlint": "^1.3.0",
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4",
+    "wrangler": "^4.21.2"
+  },
+  "keywords": [
+    "monorepo",
+    "arbitrage",
+    "trading-platform",
+    "rust",
+    "wasm",
+    "cloudflare-worker",
+    "telegram-bot",
+    "typescript",
+    "pnpm-workspace"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/irfan-dev/cerebrum-ai.git"
+  },
+  "author": "Cerebrum AI Team",
+  "license": "UNLICENSED",
+  "publishConfig": {
+    "access": "restricted"
+  }
+}

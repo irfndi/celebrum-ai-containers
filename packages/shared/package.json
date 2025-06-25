@@ -1,0 +1,65 @@
+{
+  "name": "@celebrum-ai/shared",
+  "version": "0.1.0",
+  "description": "Shared types, utilities, and configurations for Celebrum AI services",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "dependencies": {
+    "@celebrum-ai/db": "workspace:*",
+    "zod": "^3.25.67"
+  },
+  "scripts": {
+    "build": "tsc --build",
+    "build:force": "tsc --build --force",
+    "build:watch": "tsc --build --watch",
+    "dev": "tsc --build --watch",
+    "test": "vitest --run",
+    "test:watch": "vitest --watch",
+    "test:coverage": "vitest --coverage",
+    "lint": "oxlint src",
+    "lint:fix": "oxlint src --fix",
+    "format": "echo 'Using oxlint for formatting'",
+    "format:check": "oxlint src",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist node_modules"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250620.0",
+    "@types/node": "catalog:",
+    "tsup": "^8.5.0",
+    "typescript": "catalog:",
+    "vitest": "^3.2.4"
+  },
+  "keywords": [
+    "shared",
+    "types",
+    "utilities",
+    "config",
+    "constants",
+    "errors",
+    "validation",
+    "middleware",
+    "typescript",
+    "arbitrage",
+    "trading"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/username/celebrum-ai.git",
+    "directory": "packages/shared"
+  }
+}

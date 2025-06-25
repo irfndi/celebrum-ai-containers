@@ -1,0 +1,72 @@
+# Node.js dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Logs
+logs/
+@logs/
+*.log
+*.log.*
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Build output
+dist/
+build/
+out/
+
+# IDE files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.cursor/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Git
+
+#tests
+mypy_cache/
+__pycache__/
+coverage/
+
+# Rust build artifacts
+target/
+
+.wrangler/
+tarpaulin-report.html
+
+*.env
+.env.example
+.env.*
+
+test_results
+
+# Added by Task Master AI
+logs
+dev-debug.log
+# Dependency directories
+# Editor directories and files
+.idea
+.vscode
+# OS specific
+# Added by Claude Task Master
+
+.security-reports
+
+# Task files
+# tasks.json
+# tasks/ 
+
+.temporary-code/

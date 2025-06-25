@@ -1,0 +1,61 @@
+{
+  "name": "@celebrum-ai/db",
+  "version": "0.1.0",
+  "description": "Database layer with TypeScript + Drizzle ORM for ArbEdge",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./schema": {
+      "types": "./dist/schema/index.d.ts",
+      "import": "./dist/schema/index.js"
+    },
+    "./migrations": {
+      "types": "./dist/migrations/index.d.ts",
+      "import": "./dist/migrations/index.js"
+    },
+    "./utils": {
+      "types": "./dist/utils/index.d.ts",
+      "import": "./dist/utils/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc --build",
+    "dev": "tsup --watch",
+    "lint": "oxlint .",
+    "lint:fix": "oxlint . --fix",
+    "typecheck": "tsc --noEmit",
+    "generate": "drizzle-kit generate",
+    "migrate": "drizzle-kit migrate",
+    "studio": "drizzle-kit studio",
+    "push": "drizzle-kit push",
+    "drop": "drizzle-kit drop",
+    "check": "drizzle-kit check",
+    "up": "drizzle-kit up"
+  },
+  "dependencies": {
+    "@cloudflare/workers-types": "^4.20250620.0",
+    "drizzle-orm": "catalog:",
+    "tslib": "^2.8.1"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.3",
+    "drizzle-kit": "catalog:",
+    "oxlint": "^1.2.0",
+    "tsup": "^8.5.0",
+    "typescript": "^5.8.3"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "keywords": [
+    "database",
+    "drizzle",
+    "typescript",
+    "cloudflare",
+    "d1",
+    "sqlite"
+  ]
+}

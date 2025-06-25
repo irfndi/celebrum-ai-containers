@@ -1,0 +1,42 @@
+{
+  "name": "@celebrum-ai/telegram-bot",
+  "description": "Telegram bot for Celebrum AI trading platform",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@9.0.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc --build",
+    "dev": "tsc --build --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest",
+    "test:coverage": "vitest --coverage",
+    "lint": "oxlint src",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@celebrum-ai/shared": "workspace:*",
+    "@celebrum-ai/db": "workspace:*"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "catalog:",
+    "typescript": "catalog:",
+    "tsup": "catalog:",
+    "vitest": "catalog:",
+    "oxlint": "catalog:"
+  },
+  "peerDependencies": {
+    "@cloudflare/workers-types": "*"
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "composite": true,
+    "incremental": true,
+    "tsBuildInfoFile": "./tsconfig.tsbuildinfo",
+    "types": [
+      "node"
+    ],
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ],
+      "@shared/*": [
+        "../shared/dist/*"
+      ],
+      "@celebrum-ai/shared": [
+        "../shared/dist/index"
+      ],
+      "@celebrum-ai/shared/*": [
+        "../shared/dist/*"
+      ],
+      "@celebrum-ai/db": [
+        "../db/dist/index"
+      ],
+      "@celebrum-ai/db/*": [
+        "../db/dist/*"
+      ]
+    }
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "**/*.test.ts",
+    "**/*.spec.ts"
+  ],
+  "references": [
+    {
+      "path": "../shared"
+    },
+    {
+      "path": "../db"
+    }
+  ]
+}

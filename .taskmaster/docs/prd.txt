@@ -1,0 +1,64 @@
+# Celebrum AI - Code Restructuring and CI/CD Setup
+
+## Project Overview
+Celebrum AI is an Arbitrage + Technical Analysis + AI platform for crypto trading opportunities. The project has been restructured from an old repository and needs code cleanup, dependency fixes, and proper CI/CD setup.
+
+## Current State
+- Code has been copied from old repository
+- Project structure includes: database/, telegram-bot/, website/, container_src/
+- Uses pnpm workspaces with TypeScript and Go
+- Cloudflare Workers containerized environment
+- Missing imports and dependencies need resolution
+- CI/CD scripts need adjustment for new repository structure
+
+## Requirements
+
+### 1. Code Restructuring and Import Fixes
+- Analyze all copied code for missing imports
+- Fix dependency issues between packages
+- Ensure proper module resolution across workspaces
+- Validate TypeScript configurations
+- Check Go module dependencies
+- Test all package builds individually
+
+### 2. Local CI/CD Script Updates
+- Review and update Makefile commands
+- Ensure all build scripts work with new structure
+- Update package.json scripts across workspaces
+- Validate development workflow commands
+- Test local build and deployment processes
+
+### 3. GitHub CI/CD Configuration
+- Update GitHub Actions workflows for new repository
+- Configure CI for monorepo structure with pnpm
+- Set up proper build matrix for different components
+- Configure deployment pipelines for Cloudflare
+- Add proper testing and linting workflows
+
+### 4. CI Validation
+- Ensure 'make ci' command passes successfully
+- All tests must pass
+- All linting checks must pass
+- All builds must complete successfully
+- No dependency or import errors
+
+### 5. Branch Management
+- Create new 'develop' branch from main
+- Set up proper Git workflow
+- Configure branch protection rules
+- Establish development workflow
+
+## Success Criteria
+- All code compiles without errors
+- No missing imports or dependency issues
+- Local CI passes completely
+- GitHub CI is properly configured
+- 'make ci' command succeeds
+- 'develop' branch is created and functional
+- All components can be built and deployed independently
+
+## Technical Constraints
+- Must maintain pnpm workspace structure
+- Must support Cloudflare Workers deployment
+- Must preserve existing TypeScript and Go architecture
+- Must maintain compatibility with existing Docker setup
