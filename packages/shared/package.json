@@ -23,8 +23,8 @@
     "zod": "^3.25.67"
   },
   "scripts": {
-    "build": "tsc --build",
-    "build:force": "tsc --build --force",
+    "build": "tsup",
+    "build:force": "tsup",
     "build:watch": "tsc --build --watch",
     "dev": "tsc --build --watch",
     "test": "vitest --run",
