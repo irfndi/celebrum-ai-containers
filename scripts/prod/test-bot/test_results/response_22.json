@@ -1,0 +1,1 @@
+{"success":true,"data":{"analysis_id":"76d47f41-b25a-43a7-8375-371edd192dfe","processing_time_ms":150,"request":{"exchanges":["binance","bybit"],"pair":"BTC/USDT"},"result":{"confidence":0.75,"market_sentiment":"bullish","recommended_action":"hold","risk_level":"medium"},"timestamp":"<timestamp>","user_id":"superadmin_1082762347"},"error":null,"timestamp":"<timestamp>"}

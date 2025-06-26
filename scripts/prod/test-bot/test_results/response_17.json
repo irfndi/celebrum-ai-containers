@@ -1,0 +1,1 @@
+{"success":true,"data":{"arbitrage_threshold":"0.001","exchanges":"binance,bybit,okx,bitget","features":{"ai_enabled":true,"pipelines_enabled":true,"telegram_enabled":true,"vectorize_enabled":true},"max_concurrent_users":10000,"rate_limits":{"api_calls_per_minute":1000,"opportunities_per_hour":100},"timestamp":1748432098},"error":null,"timestamp":1748432098}

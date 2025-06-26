@@ -1,0 +1,11 @@
+node_modules
+.temporary-code
+.security-reports
+.wrangler
+
+.env
+dist
+.astro
+.vscode
+
+mcp.json

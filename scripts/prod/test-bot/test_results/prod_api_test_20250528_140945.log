@@ -1,0 +1,187 @@
+[0;35m🚀 Starting ArbEdge Production API Tests (Pro User with Admin Privileges)[0m
+[0;35mBase URL: https://arb-edge.irfandimarsya.workers.dev[0m
+[0;35mPro User ID: super_admin_1082762347[0m
+[0;35mTimestamp: 20250528_140945[0m
+========================================
+[1;33m📋 HEALTH CHECK TESTS[0m
+[0;34m[TEST 1] Basic Health Check[0m
+[0;32m✅ Status Code: 200 (Expected: 200)[0m
+[0;32m✅ Response Validation: PASSED[0m
+[1;33mResponse Preview:[0m
+{"success":true,"data":{"service":"ArbEdge API","status":"healthy","version":"1.0.0"},"error":null,"timestamp":1748416186}
+----------------------------------------
+[0;34m[TEST 2] Detailed Health Check[0m
+[0;32m✅ Status Code: 200 (Expected: 200)[0m
+[0;32m✅ Response Validation: PASSED[0m
+[1;33mResponse Preview:[0m
+{"success":true,"data":{"services":{"ai_service":"online","d1_database":"online","exchange_service":"online","kv_store":"online","telegram_service":"online"},"status":"healthy","timestamp":1748416186},"error":null,"timestamp":1748416186}
+----------------------------------------
+[1;33m🔐 PRO USER AUTHENTICATION TESTS[0m
+[0;34m[TEST 3] Super Admin Profile Access[0m
+[0;31m❌ Status Code: 404 (Expected: 200)[0m
+[1;33mResponse Preview:[0m
+{"success":false,"data":null,"error":"User profile not found","timestamp":1748416187}
+----------------------------------------
+[0;34m[TEST 4] Super Admin Preferences[0m
+[0;32m✅ Status Code: 200 (Expected: 200)[0m
+[1;33mResponse Preview:[0m
+{"success":true,"data":{"auto_trading_enabled":false,"max_entry_size_usdt":1000.0,"max_leverage":10,"min_entry_size_usdt":10.0,"notification_preferences":{"max_notifications_per_hour":10,"min_profit_threshold_usdt":5.0,"push_executions":true,"push_opportunities":true,"push_risk_alerts":true,"push_sy
+----------------------------------------
+[1;33m🗄️ D1 DATABASE INTEGRATION TESTS[0m
+[0;34m[TEST 5] Get All Users from D1[0m
+[0;32m✅ Status Code: 200 (Expected: 200)[0m
+[0;32m✅ Response Validation: PASSED[0m
+[1;33mResponse Preview:[0m
+{"success":true,"data":{"timestamp":1748416187,"total_count":1,"users":[{"account_status":"active","created_at":"2025-05-24 17:39:09","last_login_at":"2025-05-24 17:39:09","subscription_tier":"pro","telegram_id":1082762347,"user_id":"superadmin_1082762347","username":"theprofcrypto"}]},"error":null,
+----------------------------------------
+[0;34m[TEST 6] Get User Sessions from D1[0m
+[0;32m✅ Status Code: 200 (Expected: 200)[0m
+[0;32m✅ Response Validation: PASSED[0m
+[1;33mResponse Preview:[0m
+{"success":true,"data":{"active_sessions":[],"session_count":0,"timestamp":1748416187},"error":null,"timestamp":1748416187}
+----------------------------------------
+[0;34m[TEST 7] Get Opportunities from D1[0m
+[0;32m✅ Status Code: 200 (Expected: 200)[0m
+[0;32m✅ Response Validation: PASSED[0m
+[1;33mResponse Preview:[0m
+{"success":true,"data":{"opportunities":[],"timestamp":1748416187,"total_count":0},"error":null,"timestamp":1748416187}
+----------------------------------------
+[0;34m[TEST 8] Get User Profiles from D1[0m
+[0;32m✅ Status Code: 200 (Expected: 200)[0m
+[0;32m✅ Response Validation: PASSED[0m
+[1;33mResponse Preview:[0m
+{"success":true,"data":{"timestamp":1748416188,"total_count":1,"user_profiles":[{"accountBalanceUsdt":0.0,"apiKeys":[],"betaExpiresAt":null,"configuration":{"autoTradingEnabled":false,"excludedPairs":[],"maxEntrySizeUsdt":1000.0,"maxLeverage":10,"minEntrySizeUsdt":50.0,"notificationPreferences":{"ma
+----------------------------------------
+[1;33m💰 SUPER ADMIN OPPORTUNITY ACCESS TESTS[0m
+[0;34m[TEST 9] List Opportunities - Super Admin[0m
+[0;32m✅ Status Code: 200 (Expected: 200)[0m
+[0;32m✅ Response Validation: PASSED[0m
+[1;33mResponse Preview:[0m
+{"success":true,"data":{"count":0,"opportunities":[],"timestamp":1748416188,"user_id":"super_admin_1082762347"},"error":null,"timestamp":1748416188}
+----------------------------------------
+[0;34m[TEST 10] Premium Features Access - Super Admin[0m
+[0;32m✅ Status Code: 200 (Expected: 200)[0m
+[0;32m✅ Response Validation: PASSED[0m
+[1;33mResponse Preview:[0m
+{"success":true,"data":{"count":0,"opportunities":[],"timestamp":1748416188,"user_id":"super_admin_1082762347"},"error":null,"timestamp":1748416188}
+----------------------------------------
+[0;34m[TEST 11] Advanced Opportunities - Super Admin[0m
+[0;32m✅ Status Code: 200 (Expected: 200)[0m
+[0;32m✅ Response Validation: PASSED[0m
+[1;33mResponse Preview:[0m
+{"success":true,"data":{"count":0,"opportunities":[],"timestamp":1748416189,"user_id":"super_admin_1082762347"},"error":null,"timestamp":1748416189}
+----------------------------------------
+[1;33m📊 SUPER ADMIN ANALYTICS ACCESS TESTS[0m
+[0;34m[TEST 12] Dashboard Analytics - Super Admin[0m
+[0;32m✅ Status Code: 200 (Expected: 200)[0m
+[0;32m✅ Response Validation: PASSED[0m
+[1;33mResponse Preview:[0m
+{"success":true,"data":{"executed_trades":0,"fallback":true,"success_rate":0.0,"total_opportunities":0,"total_pnl":0.0},"error":null,"timestamp":1748416189}
+----------------------------------------
+[0;34m[TEST 13] System Analytics - Super Admin[0m
+[0;31m❌ Status Code: 500 (Expected: 200)[0m
+[1;33mResponse Preview:[0m
+<!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-US"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en-US"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js ie8 oldie" lang="en-US"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en-US"> <!
+----------------------------------------
+[0;34m[TEST 14] User Analytics - Super Admin[0m
+[0;32m✅ Status Code: 200 (Expected: 200)[0m
+[0;32m✅ Response Validation: PASSED[0m
+[1;33mResponse Preview:[0m
+{"success":true,"data":{"active_users":0,"fallback_mode":true,"premium_users":0,"timestamp":1748416190,"total_users":0},"error":null,"timestamp":1748416190}
+----------------------------------------
+[0;34m[TEST 15] Performance Analytics - Super Admin[0m
+[0;32m✅ Status Code: 200 (Expected: 200)[0m
+[0;32m✅ Response Validation: PASSED[0m
+[1;33mResponse Preview:[0m
+{"success":true,"data":{"avg_execution_time":0.0,"service_unavailable":true,"success_rate":0.0,"total_volume":0.0},"error":null,"timestamp":1748416190}
+----------------------------------------
+[1;33m👑 SUPER ADMIN MANAGEMENT TESTS[0m
+[0;34m[TEST 16] User Management Access[0m
+[0;32m✅ Status Code: 200 (Expected: 200)[0m
+[0;32m✅ Response Validation: PASSED[0m
+[1;33mResponse Preview:[0m
+{"success":true,"data":{"available_actions":["view_user_details","update_subscription","suspend_user","delete_user","reset_password"],"timestamp":1748416190,"user_statistics":{"active_users":0,"suspended_users":0,"total_users":0}},"error":null,"timestamp":1748416190}
+----------------------------------------
+[0;34m[TEST 17] System Configuration Access[0m
+[0;32m✅ Status Code: 200 (Expected: 200)[0m
+[1;33mResponse Preview:[0m
+{"success":true,"data":{"arbitrage_threshold":"0.001","exchanges":"binance,bybit,okx,bitget","features":{"ai_enabled":true,"pipelines_enabled":true,"telegram_enabled":true,"vectorize_enabled":true},"max_concurrent_users":10000,"rate_limits":{"api_calls_per_minute":1000,"opportunities_per_hour":100},
+----------------------------------------
+[0;34m[TEST 18] Invitation Code Management[0m
+[0;32m✅ Status Code: 200 (Expected: 200)[0m
+[1;33mResponse Preview:[0m
+{"success":true,"data":{"invitations":[],"timestamp":1748416190,"total_count":0},"error":null,"timestamp":1748416190}
+----------------------------------------
+[1;33m🏦 EXCHANGE API INTEGRATION TESTS[0m
+[0;34m[TEST 19] Exchange Balance - Super Admin[0m
+[0;32m✅ Status Code: 200 (Expected: 200)[0m
+[1;33mResponse Preview:[0m
+{"success":true,"data":{"available_balance":0.0,"currency":"USDT","error":"Profile not found","reserved_balance":0.0,"total_balance_usdt":0.0},"error":null,"timestamp":1748416191}
+----------------------------------------
+[0;34m[TEST 20] Exchange Markets - Super Admin[0m
+[0;31m❌ Status Code: 500 (Expected: 200)[0m
+[1;33mResponse Preview:[0m
+<!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-US"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en-US"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js ie8 oldie" lang="en-US"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en-US"> <!
+----------------------------------------
+[0;34m[TEST 21] Exchange Opportunities - Super Admin[0m
+[0;32m✅ Status Code: 200 (Expected: 200)[0m
+[1;33mResponse Preview:[0m
+{"success":true,"data":{"count":0,"min_profit_threshold":0.005,"timestamp":1748416191,"trading_opportunities":[]},"error":null,"timestamp":1748416191}
+----------------------------------------
+[1;33m🤖 AI INTELLIGENCE SERVICE TESTS[0m
+[0;34m[TEST 22] AI Market Analysis - Super Admin[0m
+[0;32m✅ Status Code: 200 (Expected: 200)[0m
+[1;33mResponse Preview:[0m
+{"success":true,"data":{"analysis_id":"917504df-5201-4a07-bae5-822070143170","processing_time_ms":150,"request":{"exchanges":["binance","bybit"],"pair":"BTC/USDT"},"result":{"confidence":0.75,"market_sentiment":"bullish","recommended_action":"hold","risk_level":"medium"},"timestamp":1748416191,"user
+----------------------------------------
+[0;34m[TEST 23] AI Risk Assessment - Super Admin[0m
+[0;32m✅ Status Code: 200 (Expected: 200)[0m
+[1;33mResponse Preview:[0m
+{"success":true,"data":{"assessment":{"max_recommended_exposure":0.1,"overall_risk_score":0.65,"recommendations":["Consider reducing position size","Monitor market volatility closely","Diversify across uncorrelated assets"],"risk_factors":[{"factor":"market_volatility","score":0.7,"weight":0.3},{"fa
+----------------------------------------
+[1;33m🤖 TELEGRAM BOT INTEGRATION TESTS[0m
+[0;34m[TEST 24] Telegram Start Command - Super Admin[0m
+[0;32m✅ Status Code: 200 (Expected: 200)[0m
+[1;33mResponse Preview:[0m
+Malformed webhook handled gracefully
+----------------------------------------
+[0;34m[TEST 25] Telegram Opportunities Command - Super Admin[0m
+[0;32m✅ Status Code: 200 (Expected: 200)[0m
+[1;33mResponse Preview:[0m
+Malformed webhook handled gracefully
+----------------------------------------
+[0;34m[TEST 26] Telegram Admin Stats Command - Super Admin[0m
+[0;32m✅ Status Code: 200 (Expected: 200)[0m
+[1;33mResponse Preview:[0m
+Malformed webhook handled gracefully
+----------------------------------------
+[1;33m⚡ PERFORMANCE TESTS[0m
+[0;34mTesting concurrent requests with super admin[0m
+[0;32m✅ 20 concurrent requests completed in 0s[0m
+[1;33m🚨 ERROR HANDLING TESTS[0m
+[0;34m[TEST 27] Invalid JSON Payload[0m
+[0;31m❌ Status Code: 500 (Expected: 400)[0m
+[1;33mResponse Preview:[0m
+INTERNAL SERVER ERROR
+----------------------------------------
+[0;34m[TEST 28] Non-existent Endpoint[0m
+[0;32m✅ Status Code: 404 (Expected: 404)[0m
+[0;31m❌ Response Validation: FAILED[0m
+[1;33mResponse Preview:[0m
+Endpoint not found
+----------------------------------------
+========================================
+[0;35m📊 PRODUCTION TEST SUMMARY[0m
+[0;32m✅ Passed: 23[0m
+[0;31m❌ Failed: 5[0m
+[0;34m📋 Total: 28[0m
+[0;31m💥 Some production tests failed. Check the logs for details.[0m
+[1;33m⚠️ Review failed tests before proceeding with deployment[0m
