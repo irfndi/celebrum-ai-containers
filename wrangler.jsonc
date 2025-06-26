@@ -35,8 +35,17 @@
   },
   "migrations": [
     {
-      "new_sqlite_classes": ["CelebrumContainer"],
+      "new_sqlite_classes": ["MyContainer"],
       "tag": "v1"
+    },
+    {
+      "renamed_classes": [
+        {
+          "from": "MyContainer",
+          "to": "CelebrumContainer"
+        }
+      ],
+      "tag": "v2"
     }
   ]
 }

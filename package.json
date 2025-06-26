@@ -10,6 +10,7 @@
     "deploy:alchemy:staging": "tsx scripts/deploy-alchemy.ts staging",
     "deploy:alchemy:dev": "tsx scripts/deploy-alchemy.ts development",
     "deploy:alchemy:dry-run": "tsx scripts/deploy-alchemy.ts production --dry-run",
+    "deploy:fallback": "./scripts/deploy/deploy-with-fallback.sh",
     "dev": "wrangler dev",
     "dev:worker": "wrangler dev",
     "dev:web": "astro dev --root src/web",
