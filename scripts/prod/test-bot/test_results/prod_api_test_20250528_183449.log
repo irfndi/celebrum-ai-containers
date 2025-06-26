@@ -1,0 +1,123 @@
+[0;35m🚀 Starting ArbEdge Production API Tests (Super Admin Only)[0m
+[0;35mBase URL: https://arb-edge.irfandimarsya.workers.dev[0m
+[0;35mSuper Admin User ID: superadmin_1082762347[0m
+[0;35mTimestamp: 20250528_183449[0m
+========================================
+[1;33m📋 HEALTH CHECK TESTS[0m
+[0;34m[TEST 1] Basic Health Check[0m
+[0;32m✅ Status Code: 200 (Expected: 200)[0m
+[0;32m✅ Response Validation: PASSED[0m
+[1;33mResponse Preview:[0m
+{"success":true,"data":{"service":"ArbEdge API","status":"healthy","version":"1.0.0"},"error":null,"timestamp":1748432090}
+----------------------------------------
+[0;34m[TEST 2] Detailed Health Check[0m
+[0;32m✅ Status Code: 200 (Expected: 200)[0m
+[0;32m✅ Response Validation: PASSED[0m
+[1;33mResponse Preview:[0m
+{"success":true,"data":{"services":{"ai_service":"online","d1_database":"online","exchange_service":"online","kv_store":"online","telegram_service":"online"},"status":"healthy","timestamp":1748432091},"error":null,"timestamp":1748432091}
+----------------------------------------
+[1;33m🔐 SUPER ADMIN AUTHENTICATION TESTS[0m
+[0;34m[TEST 3] Super Admin Profile Access[0m
+[0;32m✅ Status Code: 200 (Expected: 200)[0m
+[0;31m❌ Response Validation: FAILED[0m
+[1;33mResponse Preview:[0m
+{"success":true,"data":{"account_balance_usdt":0.0,"configuration":{"autoTradingEnabled":false,"excludedPairs":[],"maxEntrySizeUsdt":1000.0,"maxLeverage":10,"minEntrySizeUsdt":50.0,"notificationPreferences":{"maxNotificationsPerHour":10,"minProfitThresholdUsdt":1.0,"pushExecutions":true,"pushOpportu
+----------------------------------------
+[0;34m[TEST 4] Super Admin Preferences[0m
+[0;32m✅ Status Code: 200 (Expected: 200)[0m
+[1;33mResponse Preview:[0m
+{"success":true,"data":{"auto_trading_enabled":false,"max_entry_size_usdt":1000.0,"max_leverage":10,"min_entry_size_usdt":10.0,"notification_preferences":{"max_notifications_per_hour":10,"min_profit_threshold_usdt":5.0,"push_executions":true,"push_opportunities":true,"push_risk_alerts":true,"push_sy
+----------------------------------------
+[1;33m🗄️ D1 DATABASE INTEGRATION TESTS[0m
+[0;34m[TEST 5] Get All Users from D1[0m
+[0;32m✅ Status Code: 200 (Expected: 200)[0m
+[0;31m❌ Response Validation: FAILED[0m
+[1;33mResponse Preview:[0m
+{"success":true,"data":{"timestamp":1748432093,"total_count":1,"users":[{"account_status":"active","created_at":"2025-05-24 17:39:09","last_login_at":"2025-05-24 17:39:09","subscription_tier":"pro","telegram_id":1082762347,"user_id":"superadmin_1082762347","username":"theprofcrypto"}]},"error":null,
+----------------------------------------
+[0;34m[TEST 6] Get User Sessions from D1[0m
+[0;32m✅ Status Code: 200 (Expected: 200)[0m
+[0;31m❌ Response Validation: FAILED[0m
+[1;33mResponse Preview:[0m
+{"success":true,"data":{"active_sessions":[],"session_count":0,"timestamp":1748432093},"error":null,"timestamp":1748432093}
+----------------------------------------
+[0;34m[TEST 7] Get Opportunities from D1[0m
+[0;32m✅ Status Code: 200 (Expected: 200)[0m
+[0;31m❌ Response Validation: FAILED[0m
+[1;33mResponse Preview:[0m
+{"success":true,"data":{"opportunities":[],"timestamp":1748432094,"total_count":0},"error":null,"timestamp":1748432094}
+----------------------------------------
+[0;34m[TEST 8] Get User Profiles from D1[0m
+[0;32m✅ Status Code: 200 (Expected: 200)[0m
+[0;31m❌ Response Validation: FAILED[0m
+[1;33mResponse Preview:[0m
+{"success":true,"data":{"timestamp":1748432094,"total_count":1,"user_profiles":[{"accountBalanceUsdt":0.0,"apiKeys":[],"betaExpiresAt":null,"configuration":{"autoTradingEnabled":false,"excludedPairs":[],"maxEntrySizeUsdt":1000.0,"maxLeverage":10,"minEntrySizeUsdt":50.0,"notificationPreferences":{"ma
+----------------------------------------
+[1;33m💰 SUPER ADMIN OPPORTUNITY ACCESS TESTS[0m
+[0;34m[TEST 9] List Opportunities - Super Admin[0m
+[0;32m✅ Status Code: 200 (Expected: 200)[0m
+[0;31m❌ Response Validation: FAILED[0m
+[1;33mResponse Preview:[0m
+{"success":true,"data":{"count":0,"opportunities":[],"timestamp":1748432095,"user_id":"superadmin_1082762347"},"error":null,"timestamp":1748432095}
+----------------------------------------
+[0;34m[TEST 10] Premium Features Access - Super Admin[0m
+[0;32m✅ Status Code: 200 (Expected: 200)[0m
+[0;31m❌ Response Validation: FAILED[0m
+[1;33mResponse Preview:[0m
+{"success":true,"data":{"count":0,"opportunities":[],"timestamp":1748432095,"user_id":"superadmin_1082762347"},"error":null,"timestamp":1748432095}
+----------------------------------------
+[0;34m[TEST 11] Advanced Opportunities - Super Admin[0m
+[0;32m✅ Status Code: 200 (Expected: 200)[0m
+[0;31m❌ Response Validation: FAILED[0m
+[1;33mResponse Preview:[0m
+{"success":true,"data":{"count":0,"opportunities":[],"timestamp":1748432096,"user_id":"superadmin_1082762347"},"error":null,"timestamp":1748432096}
+----------------------------------------
+[1;33m📊 SUPER ADMIN ANALYTICS ACCESS TESTS[0m
+[0;34m[TEST 12] Dashboard Analytics - Super Admin[0m
+[0;32m✅ Status Code: 200 (Expected: 200)[0m
+[0;32m✅ Response Validation: PASSED[0m
+[1;33mResponse Preview:[0m
+{"success":true,"data":{"executed_trades":0,"fallback":true,"success_rate":0.0,"total_opportunities":0,"total_pnl":0.0},"error":null,"timestamp":1748432096}
+----------------------------------------
+[0;34m[TEST 13] System Analytics - Super Admin[0m
+[0;32m✅ Status Code: 200 (Expected: 200)[0m
+[0;32m✅ Response Validation: PASSED[0m
+[1;33mResponse Preview:[0m
+{"success":true,"data":{"active_users":0,"health_status":{"errors":["Session service error: Failed to get session count: D1: D1Error {\n    cause: JsValue(Error: no such table: user_sessions: SQLITE_ERROR\n    Error: no such table: user_sessions: SQLITE_ERROR\n        at D1DatabaseSessionAlwaysPrima
+----------------------------------------
+[0;34m[TEST 14] User Analytics - Super Admin[0m
+[0;32m✅ Status Code: 200 (Expected: 200)[0m
+[0;32m✅ Response Validation: PASSED[0m
+[1;33mResponse Preview:[0m
+{"success":true,"data":{"active_users":0,"fallback_mode":true,"premium_users":0,"timestamp":1748432097,"total_users":0},"error":null,"timestamp":1748432097}
+----------------------------------------
+[0;34m[TEST 15] Performance Analytics - Super Admin[0m
+[0;32m✅ Status Code: 200 (Expected: 200)[0m
+[0;32m✅ Response Validation: PASSED[0m
+[1;33mResponse Preview:[0m
+{"success":true,"data":{"avg_execution_time":0.0,"service_unavailable":true,"success_rate":0.0,"total_volume":0.0},"error":null,"timestamp":1748432097}
+----------------------------------------
+[1;33m👑 SUPER ADMIN MANAGEMENT TESTS[0m
+[0;34m[TEST 16] User Management Access[0m
+[0;32m✅ Status Code: 200 (Expected: 200)[0m
+[0;31m❌ Response Validation: FAILED[0m
+[1;33mResponse Preview:[0m
+{"success":true,"data":{"available_actions":["view_user_details","update_subscription","suspend_user","delete_user","reset_password"],"timestamp":1748432097,"user_statistics":{"active_users":0,"suspended_users":0,"total_users":0}},"error":null,"timestamp":1748432097}
+----------------------------------------
+[0;34m[TEST 17] System Configuration Access[0m
+[0;32m✅ Status Code: 200 (Expected: 200)[0m
+[1;33mResponse Preview:[0m
+{"success":true,"data":{"arbitrage_threshold":"0.001","exchanges":"binance,bybit,okx,bitget","features":{"ai_enabled":true,"pipelines_enabled":true,"telegram_enabled":true,"vectorize_enabled":true},"max_concurrent_users":10000,"rate_limits":{"api_calls_per_minute":1000,"opportunities_per_hour":100},
+----------------------------------------
+[0;34m[TEST 18] Invitation Code Management[0m
+[0;32m✅ Status Code: 200 (Expected: 200)[0m
+[1;33mResponse Preview:[0m
+{"success":true,"data":{"invitations":[],"timestamp":1748432098,"total_count":0},"error":null,"timestamp":1748432098}
+----------------------------------------
+[1;33m🏦 EXCHANGE API INTEGRATION TESTS[0m
+[0;34m[TEST 19] Exchange Balance - Super Admin[0m
+[0;32m✅ Status Code: 200 (Expected: 200)[0m
+[1;33mResponse Preview:[0m
+{"success":true,"data":{"available_balance":0.0,"currency":"USDT","reserved_balance":0.0,"total_balance_usdt":0.0},"error":null,"timestamp":1748432098}
+----------------------------------------
+[0;34m[TEST 20] Exchange Markets - Super Admin[0m

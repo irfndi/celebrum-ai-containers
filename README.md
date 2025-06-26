@@ -1,86 +1,53 @@
-# Celebrum AI
+# Containers Starter
 
-Arbitrage + Technical Analysis + AI platform for crypto trading opportunities.
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/cloudflare/templates/tree/main/containers-template)
 
-## Overview
+![Containers Template Preview](https://imagedelivery.net/_yJ02hpOMj_EnGvsU2aygw/5aba1fb7-b937-46fd-fa67-138221082200/public)
 
-Celebrum AI is a comprehensive trading platform that combines:
-- **Arbitrage Detection**: Real-time price difference analysis across exchanges
-- **Technical Analysis**: Advanced charting and indicator analysis
-- **AI-Powered Signals**: Machine learning models for trading opportunities
-- **Multi-Interface Access**: Web dashboard, Telegram bot, and API
-- **Automated Trading**: Manual and automated execution capabilities
+<!-- dash-content-start -->
 
-## Architecture
+This is a [Container](https://developers.cloudflare.com/containers/) starter template.
 
-The platform consists of multiple components:
+It demonstrates basic Container coniguration, launching and routing to individual container, load balancing over multiple container, running basic hooks on container status changes.
 
+<!-- dash-content-end -->
+
+Outside of this repo, you can start a new project with this template using [C3](https://developers.cloudflare.com/pages/get-started/c3/) (the `create-cloudflare` CLI):
+
+```bash
+npm create cloudflare@latest -- --template=cloudflare/templates/containers-template
 ```
-celebrum-ai/
-├── src/                 # Cloudflare Worker (API Gateway)
-├── container_src/       # Go container (Trading Engine)
-├── database/           # Database & Infrastructure (TS)
-├── telegram-bot/       # Telegram Bot Interface (TS)
-├── website/           # Web Dashboard (Next.js)
-└── Makefile          # Development commands
-```
-
-## Tech Stack
-
-- **API Gateway**: Cloudflare Workers (TypeScript)
-- **Trading Engine**: Go containers for high-performance execution
-- **Database**: PostgreSQL with Drizzle ORM, Redis for caching
-- **Web Interface**: Next.js 14 with React 18
-- **Bot Interface**: Telegram bot with Telegraf
-- **Package Management**: pnpm workspaces
 
 ## Getting Started
 
-### Prerequisites
-
-- Node.js 18+
-- pnpm 9+
-- Go 1.24+
-- Docker (for containers)
-- PostgreSQL
-- Redis
-
-### Installation
+First, run:
 
 ```bash
-# Install all dependencies
-make install
-
-# Or install individually
+npm install
+# or
+yarn install
+# or
 pnpm install
-cd database && pnpm install
-cd telegram-bot && pnpm install
-cd website && pnpm install
+# or
+bun install
 ```
 
-### Development
+Then run the development server (using the package manager of your choice):
 
 ```bash
-# Start main API gateway
-make dev
-
-# Start individual components
-cd database && pnpm run dev
-cd telegram-bot && pnpm run dev
-cd website && pnpm run dev
+npm run dev
 ```
 
-### Available Commands
+Open [http://localhost:8787](http://localhost:8787) with your browser to see the result.
 
-```bash
-make help          # Show all available commands
-make install       # Install dependencies
-make dev          # Start development server
-make typecheck    # Run TypeScript checking
-make lint         # Run linting
-make format       # Format code
-make deploy       # Deploy to Cloudflare
-```
+You can start editing your Worker by modifying `src/index.ts` and you can start
+editing your Container by editing the content of `container_src`.
+
+## Deploying To Production
+
+| Command          | Action                                |
+| :--------------- | :------------------------------------ |
+| `npm run deploy` | Deploy your application to Cloudflare |
 
 ## Learn More
 

@@ -40,5 +40,5 @@
     "skipLibCheck": true
   },
   "exclude": ["test"],
-  "include": ["worker-configuration.d.ts", "src/**/*.ts", "packages/telegram-bot/tests/integration/start-command.test.ts"]
+  "include": ["worker-configuration.d.ts", "src/**/*.ts"]
 }

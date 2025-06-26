@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"net/url"
 	"os"
 )
 
@@ -12,21 +11,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	message := os.Getenv("MESSAGE")
 	instanceId := os.Getenv("CLOUDFLARE_DEPLOYMENT_ID")
 
-	urlToParse := r.URL.Query().Get("url")
-	if urlToParse == "" {
-		fmt.Fprintf(w, "Hi, I'm a container and this is my message: \"%s\", my instance ID is: %s, path: %s. Provide a `url` query parameter to parse a different URL.", message, instanceId, r.URL.Path)
-		return
-	}
-
-	// Parse the URL to ensure it's valid
-	log.Printf("Parsing URL: %s", urlToParse)
-	parsedURL, err := url.Parse(urlToParse)
-	if err != nil {
-		http.Error(w, fmt.Sprintf("Error parsing URL '%s': %v", urlToParse, err), http.StatusBadRequest)
-		return
-	}
-
-	fmt.Fprintf(w, "Hi, I'm a container and this is my message: \"%s\", my instance ID is: %s, parsed path from '%s' is: %s", message, instanceId, urlToParse, parsedURL.Path)
+	fmt.Fprintf(w, "Hi, I'm a container and this is my message: \"%s\", my instance ID is: %s", message, instanceId)
 }
 
 func errorHandler(w http.ResponseWriter, r *http.Request) {
