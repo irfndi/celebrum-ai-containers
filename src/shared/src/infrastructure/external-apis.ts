@@ -252,12 +252,18 @@ export class ApiClient {
     const timeoutId = setTimeout(() => controller.abort(), timeout);
 
     try {
-      const response = await fetch(url.toString(), {
+      const fetchOptions: RequestInit = {
         method: config.method,
         headers,
-        body,
         signal: controller.signal,
-      });
+      };
+      
+      // Only add body for non-GET requests
+      if (config.method !== 'GET' && body) {
+        fetchOptions.body = body;
+      }
+      
+      const response = await fetch(url.toString(), fetchOptions);
 
       clearTimeout(timeoutId);
 

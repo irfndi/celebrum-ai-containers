@@ -22,7 +22,12 @@
     }
   },
   "include": [
-    "src/**/*"
+    "src/**/*",
+    "../shared/src/config/feature-flag-manager.ts",
+    "../shared/src/middleware/rbac.ts",
+    "../shared/src/middleware/router.ts",
+    "../shared/src/infrastructure/cron.ts",
+    "../shared/src/routes/api-access-manager.ts"
   ],
   "exclude": [
     "node_modules",

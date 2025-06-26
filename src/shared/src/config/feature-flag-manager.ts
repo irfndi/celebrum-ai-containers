@@ -514,8 +514,7 @@ export class FeatureFlagManager {
   /**
    * Get role restrictions for a feature
    */
-  private getRoleRestrictions(featureKey: string): UserRoleType[] | null {
-    const restrictions = this.checkRoleAccess.toString();
+  private getRoleRestrictions(_featureKey: string): UserRoleType[] | null {
     // Extract role restrictions from the method - simplified for demo
     return null;
   }
@@ -523,8 +522,7 @@ export class FeatureFlagManager {
   /**
    * Get tier restrictions for a feature
    */
-  private getTierRestrictions(featureKey: string): SubscriptionTierType[] | null {
-    const restrictions = this.checkTierAccess.toString();
+  private getTierRestrictions(_featureKey: string): SubscriptionTierType[] | null {
     // Extract tier restrictions from the method - simplified for demo
     return null;
   }

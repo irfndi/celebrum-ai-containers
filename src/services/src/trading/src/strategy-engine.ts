@@ -154,9 +154,8 @@ export class StrategyEngine {
     }
   }
 
-  private async executeMeanReversionStrategy(strategy: TradingStrategy, marketData: any): Promise<TradingSignal[]> {
+  private async executeMeanReversionStrategy(_strategy: TradingStrategy, _marketData: any): Promise<TradingSignal[]> {
     const signals: TradingSignal[] = [];
-    const { period, threshold } = strategy.parameters;
 
     // TODO: Implement mean reversion logic
     // This would involve:
@@ -164,12 +163,12 @@ export class StrategyEngine {
     // 2. Compare current price to MA
     // 3. Generate buy/sell signals based on deviation
 
+
     return signals;
   }
 
-  private async executeMomentumStrategy(strategy: TradingStrategy, marketData: any): Promise<TradingSignal[]> {
+  private async executeMomentumStrategy(_strategy: TradingStrategy, _marketData: any): Promise<TradingSignal[]> {
     const signals: TradingSignal[] = [];
-    const { rsiPeriod, rsiOverbought, rsiOversold } = strategy.parameters;
 
     // TODO: Implement momentum logic
     // This would involve:
@@ -180,15 +179,16 @@ export class StrategyEngine {
     return signals;
   }
 
-  private async executeArbitrageStrategy(strategy: TradingStrategy, marketData: any): Promise<TradingSignal[]> {
+  private async executeArbitrageStrategy(_strategy: TradingStrategy, _marketData: any): Promise<TradingSignal[]> {
     const signals: TradingSignal[] = [];
-    const { minSpread } = strategy.parameters;
 
     // TODO: Implement arbitrage logic
     // This would involve:
     // 1. Compare prices across exchanges
     // 2. Identify arbitrage opportunities
     // 3. Generate buy/sell signals for profitable spreads
+    // 4. calculate APY / Hourly rate
+    // 5. extend that to trade services (require users add API and API valid)
 
     return signals;
   }

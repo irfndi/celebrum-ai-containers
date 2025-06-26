@@ -6,7 +6,6 @@
 import { 
   initializeHandlers, 
   processTelegramUpdate, 
-  getHandler,
   getAllHandlers 
 } from '../../src/handlers/index';
 import { TelegramUpdate, TelegramWebhookContext } from '../../src/types/index';
@@ -28,7 +27,7 @@ const mockEnv = {
 const mockContext: TelegramWebhookContext = {
   env: mockEnv,
   request: new Request('https://example.com'), // Mock Request object
-  waitUntil: (promise: Promise<any>) => {
+  waitUntil: (_promise: Promise<any>) => {
     // In real Cloudflare Workers, this extends the execution context
     // For testing, we can just log or ignore
     console.log('waitUntil called with promise');

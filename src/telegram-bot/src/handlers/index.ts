@@ -5,6 +5,7 @@ import type {
   TelegramWebhookContext
 } from '../types/index';
 import { extractCommand, isRateLimited, getChatId, getUserId } from '../utils/index';
+import { SessionService, UserService } from '@celebrum-ai/shared';
 
 // Command handlers registry
 export const TELEGRAM_HANDLERS = new Map<string, TelegramHandler>();
@@ -162,8 +163,6 @@ export async function processCallbackQuery(
   }
 }
 
-import { SessionService, UserService } from '@celebrum-ai/shared';
-
 // Initialize default handlers
 export function initializeHandlers(): void {
   // Start command
@@ -212,9 +211,9 @@ export function initializeHandlers(): void {
   registerHandler({
     command: 'help',
     description: 'Show available commands',
-    handler: async (update, context) => {
+    handler: async (update, _context) => {
       const chatId = getChatId(update);
-      const userId = getUserId(update);
+      const _userId = getUserId(update);
       if (!chatId) return null;
 
       let helpText = `🤖 <b>ArbEdge Bot Commands</b>\n\n`;
@@ -249,7 +248,7 @@ export function initializeHandlers(): void {
   registerHandler({
     command: 'opportunities',
     description: 'View arbitrage opportunities',
-    handler: async (update, context) => {
+    handler: async (update, _context) => {
       const chatId = getChatId(update);
       const userId = getUserId(update);
       if (!chatId) return null;
@@ -292,7 +291,7 @@ export function initializeHandlers(): void {
   registerHandler({
     command: 'balance',
     description: 'Check account balance and P&L',
-    handler: async (update, context) => {
+    handler: async (update, _context) => {
       const chatId = getChatId(update);
       const userId = getUserId(update);
       if (!chatId) return null;
@@ -323,7 +322,7 @@ export function initializeHandlers(): void {
   registerHandler({
     command: 'profile',
     description: 'View and manage your profile',
-    handler: async (update, context) => {
+    handler: async (update, _context) => {
       const chatId = getChatId(update);
       const userId = getUserId(update);
       const username = update.message?.from?.username;
@@ -357,7 +356,7 @@ export function initializeHandlers(): void {
   registerHandler({
     command: 'settings',
     description: 'Configure trading preferences',
-    handler: async (update, context) => {
+    handler: async (update, _context) => {
       const chatId = getChatId(update);
       const userId = getUserId(update);
       if (!chatId) return null;
@@ -388,7 +387,7 @@ export function initializeHandlers(): void {
   registerHandler({
     command: 'status',
     description: 'Check bot status',
-    handler: async (update, context) => {
+    handler: async (update, _context) => {
       const chatId = getChatId(update);
       if (!chatId) return null;
 

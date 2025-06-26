@@ -7,11 +7,7 @@ import type {
   RiskLevelType,
   PositionSizingMethodType
 } from '@celebrum-ai/shared';
-import {
-  UserRole,
-  RiskLevel,
-  PositionSizingMethod
-} from '@celebrum-ai/shared';
+
 
 /**
  * Trading Configuration Manager for managing user trading settings and risk management
@@ -68,7 +64,7 @@ export class TradingConfigManager {
   async createDefaultTradingConfig(
     userId: string,
     role: UserRoleType,
-    subscriptionTier: SubscriptionTierType
+    _subscriptionTier: SubscriptionTierType
   ): Promise<TradingConfig> {
     // Determine default risk level based on role
     let defaultRiskLevel: RiskLevelType = 'medium';

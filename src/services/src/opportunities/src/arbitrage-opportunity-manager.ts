@@ -2,9 +2,7 @@ import type {
   UserRoleType,
   SubscriptionTierType,
   OpportunityLimits,
-  RBACOperationResult,
-  Opportunity,
-  ArbitrageOpportunity
+  RBACOperationResult
 } from '@celebrum-ai/shared';
 
 /**
@@ -608,7 +606,7 @@ export class ArbitrageOpportunityManager {
       const statsKey = `rbac:opportunity_stats:${userId}`;
       const stats = await this.env.CELEBRUM_KV?.get(statsKey, 'json') || { total: 0, successful: 0 };
       return stats.total;
-    } catch (error) {
+    } catch {
       return 0;
     }
   }
@@ -621,7 +619,7 @@ export class ArbitrageOpportunityManager {
       const statsKey = `rbac:opportunity_stats:${userId}`;
       const stats = await this.env.CELEBRUM_KV?.get(statsKey, 'json') || { total: 0, successful: 0 };
       return stats.successful;
-    } catch (error) {
+    } catch {
       return 0;
     }
   }

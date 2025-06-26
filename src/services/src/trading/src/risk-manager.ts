@@ -1,7 +1,7 @@
 // Risk management and position sizing
 
 import type { Env } from '@celebrum-ai/shared';
-import type { Portfolio, Position, RiskLimits } from './portfolio-manager';
+import type { Portfolio, RiskLimits } from './portfolio-manager';
 
 export interface RiskMetrics {
   portfolioRisk: number;

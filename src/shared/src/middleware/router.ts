@@ -1,8 +1,5 @@
 import { Hono } from 'hono';
 import type { Env } from '@celebrum-ai/shared';
-import { UserService, SessionService } from '@celebrum-ai/shared';
-import type { User, NewUser } from '@celebrum-ai/db/schema';
-import { sql } from 'drizzle-orm';
 import { handleTelegramUpdate } from '@celebrum-ai/telegram-bot';
 
 /**

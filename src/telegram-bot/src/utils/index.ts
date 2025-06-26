@@ -1,9 +1,7 @@
 import type { 
   TelegramBotResponse, 
-  TelegramIntegrationConfig,
   TelegramUpdate,
-  TelegramApiResponse,
-  TelegramMessage
+  TelegramApiResponse
 } from '../types/index';
 
 // Telegram API utilities

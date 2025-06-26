@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { UserService, SessionService } from '@celebrum-ai/shared';
 import type { User, NewUser } from '@celebrum-ai/db/schema';
 
@@ -38,7 +38,7 @@ class MockD1Database {
   private nextId = 1;
 
   // Drizzle-style methods
-  insert(table: any) {
+  insert(_table: any) {
     return {
       values: (data: any) => {
         return {
@@ -73,9 +73,9 @@ class MockD1Database {
 
   select() {
     return {
-      from: (table: any) => {
+      from: (_table: any) => {
         return {
-          where: (condition: any) => {
+          where: (_condition: any) => {
             return {
               limit: (count: number) => {
                 // For telegram_id lookup - simplified for testing
@@ -90,11 +90,11 @@ class MockD1Database {
     };
   }
 
-  update(table: any) {
+  update(_table: any) {
     return {
       set: (data: any) => {
         return {
-          where: (condition: any) => {
+          where: (_condition: any) => {
             return {
               returning: async () => {
                 // Find and update user (simplified)
@@ -117,9 +117,9 @@ class MockD1Database {
     };
   }
 
-  delete(table: any) {
+  delete(_table: any) {
     return {
-      where: (condition: any) => {
+      where: (_condition: any) => {
         return {
           returning: async () => {
             const users = Array.from(this.users.values());
@@ -189,7 +189,7 @@ class MockD1Database {
           return { success: false };
         },
         returning: () => ({
-          then: (callback: (result: User[]) => void) => {
+          execute: (callback: (result: User[]) => void) => {
             const user = Array.from(this.users.values()).pop();
             callback(user ? [user] : []);
           }
@@ -363,13 +363,12 @@ describe('/start Command Implementation', () => {
 
     it('should replace old session when creating new one', async () => {
       // Create first session
-      const firstSession = await sessionService.createSession(existingUser);
+      await sessionService.createSession(existingUser);
       
       // Create second session (should replace first)
       const secondSession = await sessionService.createSession(existingUser);
       
       // First session should be replaced
-      const retrievedFirstSession = await sessionService.getSession(firstSession.id);
       const retrievedSecondSession = await sessionService.getSession(secondSession.id);
       
       expect(retrievedSecondSession).toBeDefined();

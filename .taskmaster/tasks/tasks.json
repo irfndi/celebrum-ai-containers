@@ -1,0 +1,83 @@
+{
+  "version": "1.0.0",
+  "metadata": {
+    "created": "2025-01-27",
+    "lastModified": "2025-01-27",
+    "totalTasks": 5
+  },
+  "tags": {
+    "master": {
+      "name": "master",
+      "description": "Main development tasks",
+      "created": "2025-01-27",
+      "tasks": [
+        {
+          "id": "1",
+          "title": "Integrate Alchemy.run for Cloudflare Container Management",
+          "description": "Set up Alchemy.run to manage our Cloudflare containers infrastructure using TypeScript-based cloud orchestration",
+          "status": "pending",
+          "priority": "medium",
+          "created": "2025-01-27",
+          "lastModified": "2025-01-27",
+          "details": "1) Install and configure Alchemy.run in our project\n2) Set up container definitions using Alchemy's TypeScript API\n3) Configure bindings for our existing D1 database and other Cloudflare services\n4) Create deployment scripts that leverage Alchemy's orchestration capabilities\n5) Test the integration with our current Cloudflare Workers setup\n\nReferences:\n- Alchemy.run: https://alchemy.run/\n- Cloudflare Containers: https://developers.cloudflare.com/containers/llms-full.txt",
+          "testStrategy": "Create integration tests to verify Alchemy.run can successfully deploy and manage our Cloudflare containers, test database bindings, and validate deployment scripts",
+          "dependencies": [],
+          "subtasks": []
+        },
+        {
+          "id": "2",
+          "title": "Feature Flag System Implementation",
+          "description": "Create a JSON-based feature flag system for dynamic feature toggling without deployment",
+          "status": "pending",
+          "priority": "high",
+          "created": "2025-01-27",
+          "lastModified": "2025-01-27",
+          "details": "1) Create feature_flags.json configuration file\n2) Implement FeatureFlagService with runtime toggling\n3) Add support for user-specific and global flags\n4) Create admin interface for flag management\n5) Add middleware for feature flag checks\n6) Implement easy disable mechanism for post-beta features\n7) Add feature flag validation and error handling",
+          "testStrategy": "Unit tests for FeatureFlagService, integration tests for flag toggling, E2E tests for admin interface",
+          "dependencies": [],
+          "subtasks": []
+        },
+        {
+          "id": "3",
+          "title": "Landing Page with Astro",
+          "description": "Create a simple, modern landing page using existing Astro setup for beta launch",
+          "status": "pending",
+          "priority": "high",
+          "created": "2025-01-27",
+          "lastModified": "2025-01-27",
+          "details": "1) Design clean, professional layout showcasing Celebrum AI\n2) Add call-to-action for beta access\n3) Implement responsive design for mobile and desktop\n4) Optimize for fast loading times with Astro's static generation\n5) Integrate with invitation system\n6) Add SEO meta tags and structured data\n7) Implement analytics tracking",
+          "testStrategy": "Visual regression tests, performance tests, mobile responsiveness tests, SEO validation",
+          "dependencies": ["2"],
+          "subtasks": []
+        },
+        {
+          "id": "4",
+          "title": "Authentication Flow (/start)",
+          "description": "Implement secure user onboarding with session management and invitation code validation",
+          "status": "pending",
+          "priority": "high",
+          "created": "2025-01-27",
+          "lastModified": "2025-01-27",
+          "details": "1) Implement session validation and creation\n2) Create user registration and login flows\n3) Add invitation code validation (beta-only feature)\n4) Implement secure token management\n5) Integrate with existing database schema\n6) Update Telegram bot /start command integration\n7) Add proper error handling and user feedback",
+          "testStrategy": "Unit tests for auth services, integration tests for session management, E2E tests for complete flow",
+          "dependencies": ["2", "5"],
+          "subtasks": []
+        },
+        {
+          "id": "5",
+          "title": "Invitation System",
+          "description": "Create invitation code system for controlled beta access with admin management",
+          "status": "pending",
+          "priority": "high",
+          "created": "2025-01-27",
+          "lastModified": "2025-01-27",
+          "details": "1) Create invitation code generation (superadmin/admin only)\n2) Implement code validation and redemption\n3) Add usage tracking and limits\n4) Create admin dashboard for invitation management\n5) Implement easy disable mechanism for post-beta\n6) Integrate with user registration flow\n7) Add invitation analytics and reporting",
+          "testStrategy": "Unit tests for invitation service, integration tests for code validation, admin interface tests",
+          "dependencies": ["2"],
+          "subtasks": []
+        }
+      ]
+    }
+  },
+  "currentTag": "master"
+}

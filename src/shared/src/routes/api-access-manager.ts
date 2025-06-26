@@ -1,12 +1,8 @@
 import type { Env } from '@celebrum-ai/shared';
 import {
-  UserRoleType,
-  SubscriptionTierType,
   ApiAccess,
   RBACOperationResult,
-  ExchangeIdType,
-  UserRole,
-  SubscriptionTier
+  ExchangeIdType
 } from '@celebrum-ai/shared';
 
 type ExchangeApi = {
@@ -417,7 +413,6 @@ export class ApiAccessManager {
       }
 
       const now = Date.now();
-      const windowMs = window === 'hourly' ? 60 * 60 * 1000 : 24 * 60 * 60 * 1000;
       const limit = window === 'hourly' ? apiAccess.limits.hourlyRequestLimit : apiAccess.limits.dailyRequestLimit;
       const used = window === 'hourly' ? apiAccess.usage.hourlyRequests : apiAccess.usage.dailyRequests;
       
