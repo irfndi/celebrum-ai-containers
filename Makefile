@@ -323,6 +323,8 @@ clean-worker: ## Clean worker build artifacts
 # Type checking commands
 typecheck: ## Run TypeScript type checking for all packages
 	@echo "🔍 Running TypeScript type checking..."
+	@echo "🔨 Building database package first..."
+	@pnpm --filter @celebrum-ai/db run build
 	@pnpm run typecheck
 
 typecheck-db: ## Run TypeScript type checking for database package
