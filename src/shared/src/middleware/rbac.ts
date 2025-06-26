@@ -8,12 +8,12 @@ import type {
   ApiAccess,
   UserAccessSummary,
   StrategyLimits
-} from '@celebrum-ai/shared';
+} from '../types';
 import {
   UserRole,
   Permission,
   SubscriptionTier
-} from '@celebrum-ai/shared';
+} from '../types';
 
 /**
  * Comprehensive RBAC Service for ArbEdge

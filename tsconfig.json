@@ -55,6 +55,6 @@
       "@celebrum-ai/web/*": ["./src/web/src/*"]
     }
   },
-  "exclude": ["test"],
+  "exclude": ["test", ".temporary-code", "node_modules", "dist"],
   "include": ["worker-configuration.d.ts", "src/**/*.ts"]
 }

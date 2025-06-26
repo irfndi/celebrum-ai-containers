@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import type { Env } from '@celebrum-ai/shared';
+import type { Env } from '../types';
 import { handleTelegramUpdate } from '@celebrum-ai/telegram-bot';
 
 /**

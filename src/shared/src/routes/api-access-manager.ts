@@ -1,9 +1,9 @@
-import type { Env } from '@celebrum-ai/shared';
+import type { Env } from '../types';
 import {
   ApiAccess,
   RBACOperationResult,
   ExchangeIdType
-} from '@celebrum-ai/shared';
+} from '../types';
 
 type ExchangeApi = {
   exchangeId: string;
