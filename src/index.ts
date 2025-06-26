@@ -36,7 +36,6 @@ export class CelebrumContainer extends Container {
 const app = new Hono<{
   Bindings: { 
     CELEBRUM_STORAGE: DurableObjectNamespace<CelebrumAIStorage>;
-    CELEBRUM_CONTAINER: DurableObjectNamespace<CelebrumContainer>;
     ALCHEMY_MANAGED?: string;
     CONTAINER_VERSION?: string;
     DEPLOYMENT_STRATEGY?: string;
@@ -105,9 +104,8 @@ app.get("/storage/:id", async (c) => {
 // Route requests to a specific container instance using the container ID
 app.get("/container/:id", async (c) => {
   const id = c.req.param("id");
-  const containerId = c.env.CELEBRUM_CONTAINER.idFromName(`/container/${id}`);
-  const container = c.env.CELEBRUM_CONTAINER.get(containerId);
-  return await container.fetch(c.req.raw);
+  // Container functionality will be handled by the CelebrumContainer class
+  return new Response(`Container ${id} endpoint - functionality to be implemented`, { status: 200 });
 });
 
 export default app;

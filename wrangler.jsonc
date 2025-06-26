@@ -15,44 +15,24 @@
     "CONTAINER_VERSION": "1.0.0",
     "DEPLOYMENT_STRATEGY": "alchemy"
   },
-  "containers": {
-    "bindings": [
-      {
-        "name": "CELEBRUM_CONTAINER",
-        "image": "celebrum-ai-container",
-        "build": {
-          "dockerfile": "Dockerfile",
-          "context": "container_src"
-        }
-      }
-    ]
-  },
   "durable_objects": {
     "bindings": [
       {
-        "name": "CELEBRUM_STORAGE",
         "class_name": "CelebrumAIStorage",
-        "script_name": "celebrum-ai-containers"
+        "name": "CELEBRUM_STORAGE"
       },
       {
-        "name": "CELEBRUM_CONTAINER",
         "class_name": "CelebrumContainer",
-        "script_name": "celebrum-ai-containers"
+        "name": "CELEBRUM_CONTAINER"
       }
     ]
   },
-  "migrations": [
-     {
-       "tag": "v1",
-       "new_classes": ["CelebrumAIStorage"]
-     },
-     {
-       "tag": "v2",
-       "new_classes": ["CelebrumContainer"]
-     },
-     {
-       "tag": "v3",
-       "deleted_classes": ["CelebrumContainer"]
-     }
-   ]
+
+  "containers": [
+    {
+      "name": "celebrum-ai-container",
+      "class_name": "CelebrumContainer",
+      "image": "./Dockerfile"
+    }
+  ]
 }
