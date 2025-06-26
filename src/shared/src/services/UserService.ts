@@ -1,10 +1,10 @@
 import type { User, NewUser } from '@celebrum-ai/db/schema';
-import { UserQueries } from '@celebrum-ai/db';
+import { UserQueries, type Database } from '@celebrum-ai/db';
 
 export class UserService {
   private userQueries: UserQueries;
 
-  constructor(db: any) {
+  constructor(db: Database) {
     this.userQueries = new UserQueries(db);
   }
 

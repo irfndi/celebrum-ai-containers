@@ -106,7 +106,7 @@ export abstract class MarketDataSource {
   /**
    * Make an authenticated HTTP request
    */
-  protected async makeRequest(endpoint: string, params?: Record<string, any>): Promise<any> {
+  protected async makeRequest(endpoint: string, params?: Record<string, unknown>): Promise<unknown> {
     if (!this.canMakeRequest()) {
       throw new Error(`Rate limit exceeded for ${this.config.name}`);
     }
@@ -183,7 +183,7 @@ export class BinanceDataSource extends MarketDataSource {
   }
 
   async getTicker(symbol: string): Promise<MarketDataPoint> {
-    const data = await this.makeRequest(this.config.endpoints.ticker, { symbol });
+    const data = await this.makeRequest(this.config.endpoints.ticker, { symbol }) as any;
     
     return {
       symbol: data.symbol,
@@ -201,7 +201,7 @@ export class BinanceDataSource extends MarketDataSource {
   }
 
   async getOrderBook(symbol: string, depth: number = 100): Promise<OrderBookData> {
-    const data = await this.makeRequest(this.config.endpoints.orderbook, { symbol, limit: depth });
+    const data = await this.makeRequest(this.config.endpoints.orderbook, { symbol, limit: depth }) as any;
     
     return {
       symbol,
@@ -215,39 +215,42 @@ export class BinanceDataSource extends MarketDataSource {
   async getTrades(symbol: string, limit: number = 500): Promise<TradeData[]> {
     const data = await this.makeRequest(this.config.endpoints.trades, { symbol, limit });
     
-    return data.map((trade: any) => ({
-      id: trade.id.toString(),
-      symbol,
-      exchange: 'binance',
-      price: parseFloat(trade.price),
-      quantity: parseFloat(trade.qty),
-      side: trade.isBuyerMaker ? 'sell' : 'buy',
-      timestamp: new Date(trade.time).toISOString(),
-    }));
+    return (data as unknown[]).map((trade: unknown) => {
+      const tradeObj = trade as { id: number; price: string; qty: string; isBuyerMaker: boolean; time: number };
+      return {
+        id: tradeObj.id.toString(),
+        symbol,
+        exchange: 'binance',
+        price: parseFloat(tradeObj.price),
+        quantity: parseFloat(tradeObj.qty),
+        side: tradeObj.isBuyerMaker ? 'sell' : 'buy',
+        timestamp: new Date(tradeObj.time).toISOString(),
+      };
+    });
   }
 
   async getCandles(symbol: string, interval: string, limit: number = 500): Promise<CandleData[]> {
-    const data = await this.makeRequest(this.config.endpoints.candles, { symbol, interval, limit });
+    const data = await this.makeRequest(this.config.endpoints.candles, { symbol, interval, limit }) as any;
     
-    return data.map((candle: any[]) => ({
+    return data.map((candle: unknown[]) => ({
       symbol,
       exchange: 'binance',
       interval,
-      open: parseFloat(candle[1]),
-      high: parseFloat(candle[2]),
-      low: parseFloat(candle[3]),
-      close: parseFloat(candle[4]),
-      volume: parseFloat(candle[5]),
-      timestamp: new Date(candle[0]).toISOString(),
-      trades: candle[8],
+      open: parseFloat((candle as string[])[1]),
+      high: parseFloat((candle as string[])[2]),
+      low: parseFloat((candle as string[])[3]),
+      close: parseFloat((candle as string[])[4]),
+      volume: parseFloat((candle as string[])[5]),
+      timestamp: new Date((candle as string[])[0]).toISOString(),
+      trades: (candle as string[])[8],
     }));
   }
 
   async getSymbols(): Promise<string[]> {
-    const data = await this.makeRequest(this.config.endpoints.symbols);
+    const data = await this.makeRequest(this.config.endpoints.symbols) as any;
     return data.symbols
-      .filter((symbol: any) => symbol.status === 'TRADING')
-      .map((symbol: any) => symbol.symbol);
+      .filter((symbol: unknown) => (symbol as { status: string }).status === 'TRADING')
+      .map((symbol: unknown) => (symbol as { symbol: string }).symbol);
   }
 
   getName(): string {
@@ -290,7 +293,7 @@ export class CoinbaseDataSource extends MarketDataSource {
 
   async getTicker(symbol: string): Promise<MarketDataPoint> {
     const endpoint = this.config.endpoints.ticker.replace('{symbol}', symbol);
-    const data = await this.makeRequest(endpoint);
+    const data = await this.makeRequest(endpoint) as any;
     
     return {
       symbol,
@@ -305,7 +308,7 @@ export class CoinbaseDataSource extends MarketDataSource {
 
   async getOrderBook(symbol: string, depth: number = 50): Promise<OrderBookData> {
     const endpoint = this.config.endpoints.orderbook.replace('{symbol}', symbol);
-    const data = await this.makeRequest(endpoint, { level: 2 });
+    const data = await this.makeRequest(endpoint, { level: 2 }) as any;
     
     return {
       symbol,
@@ -318,22 +321,22 @@ export class CoinbaseDataSource extends MarketDataSource {
 
   async getTrades(symbol: string, limit: number = 100): Promise<TradeData[]> {
     const endpoint = this.config.endpoints.trades.replace('{symbol}', symbol);
-    const data = await this.makeRequest(endpoint);
+    const data = await this.makeRequest(endpoint) as any;
     
-    return data.slice(0, limit).map((trade: any) => ({
-      id: trade.trade_id.toString(),
+    return data.slice(0, limit).map((trade: unknown) => ({
+      id: (trade as { trade_id: string }).trade_id.toString(),
       symbol,
       exchange: 'coinbase',
-      price: parseFloat(trade.price),
-      quantity: parseFloat(trade.size),
-      side: trade.side,
-      timestamp: trade.time,
+      price: parseFloat((trade as { price: string }).price),
+      quantity: parseFloat((trade as { size: string }).size),
+      side: (trade as { side: string }).side,
+      timestamp: (trade as { time: string }).time,
     }));
   }
 
   async getCandles(symbol: string, interval: string, limit: number = 300): Promise<CandleData[]> {
     const endpoint = this.config.endpoints.candles.replace('{symbol}', symbol);
-    const data = await this.makeRequest(endpoint, { granularity: this.mapInterval(interval) });
+    const data = await this.makeRequest(endpoint, { granularity: this.mapInterval(interval) }) as any;
     
     return data.slice(0, limit).map((candle: number[]) => ({
       symbol,
@@ -349,10 +352,10 @@ export class CoinbaseDataSource extends MarketDataSource {
   }
 
   async getSymbols(): Promise<string[]> {
-    const data = await this.makeRequest(this.config.endpoints.symbols);
+    const data = await this.makeRequest(this.config.endpoints.symbols) as any;
     return data
-      .filter((product: any) => product.status === 'online')
-      .map((product: any) => product.id);
+      .filter((product: unknown) => (product as { status: string }).status === 'online')
+      .map((product: unknown) => (product as { id: string }).id);
   }
 
   getName(): string {
@@ -398,7 +401,7 @@ export class KrakenDataSource extends MarketDataSource {
   }
 
   async getTicker(symbol: string): Promise<MarketDataPoint> {
-    const data = await this.makeRequest(this.config.endpoints.ticker, { pair: symbol });
+    const data = await this.makeRequest(this.config.endpoints.ticker, { pair: symbol }) as any;
     const tickerData = data.result[symbol];
     
     return {
@@ -415,7 +418,7 @@ export class KrakenDataSource extends MarketDataSource {
   }
 
   async getOrderBook(symbol: string, depth: number = 100): Promise<OrderBookData> {
-    const data = await this.makeRequest(this.config.endpoints.orderbook, { pair: symbol, count: depth });
+    const data = await this.makeRequest(this.config.endpoints.orderbook, { pair: symbol, count: depth }) as any;
     const bookData = data.result[symbol];
     
     return {
@@ -428,17 +431,17 @@ export class KrakenDataSource extends MarketDataSource {
   }
 
   async getTrades(symbol: string, limit: number = 1000): Promise<TradeData[]> {
-    const data = await this.makeRequest(this.config.endpoints.trades, { pair: symbol });
+    const data = await this.makeRequest(this.config.endpoints.trades, { pair: symbol }) as any;
     const trades = data.result[symbol];
     
-    return trades.slice(0, limit).map((trade: any[], index: number) => ({
+    return trades.slice(0, limit).map((trade: unknown[], index: number) => ({
       id: `${symbol}-${index}`,
       symbol,
       exchange: 'kraken',
-      price: parseFloat(trade[0]),
-      quantity: parseFloat(trade[1]),
-      side: trade[3] === 'b' ? 'buy' : 'sell',
-      timestamp: new Date(trade[2] * 1000).toISOString(),
+      price: parseFloat((trade as unknown as string[])[0]),
+      quantity: parseFloat((trade as unknown as string[])[1]),
+      side: (trade as unknown as string[])[3] === 'b' ? 'buy' : 'sell',
+      timestamp: new Date(parseFloat((trade as unknown as string[])[2]) * 1000).toISOString(),
     }));
   }
 
@@ -446,7 +449,7 @@ export class KrakenDataSource extends MarketDataSource {
     const data = await this.makeRequest(this.config.endpoints.candles, { 
       pair: symbol, 
       interval: this.mapInterval(interval) 
-    });
+    }) as any;
     const candles = data.result[symbol];
     
     return candles.slice(0, limit).map((candle: number[]) => ({
@@ -464,7 +467,7 @@ export class KrakenDataSource extends MarketDataSource {
   }
 
   async getSymbols(): Promise<string[]> {
-    const data = await this.makeRequest(this.config.endpoints.symbols);
+    const data = await this.makeRequest(this.config.endpoints.symbols) as any;
     return Object.keys(data.result);
   }
 

@@ -31,7 +31,7 @@ export interface TradingSignal {
   timeframe: string;
   strategy: string;
   reasoning: string[];
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
   createdAt: string;
   expiresAt: string;
 }
@@ -81,7 +81,7 @@ export interface BacktestTrade {
   pnlPercent: number;
   fees: number;
   reason: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface EquityPoint {
@@ -152,7 +152,7 @@ export interface Trade {
   fee: number;
   feeCurrency: string;
   timestamp: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface PortfolioPerformance {
@@ -223,7 +223,7 @@ export interface TradingStrategy {
   timeframe: string;
   symbols: string[];
   exchanges: string[];
-  parameters: Record<string, any>;
+  parameters: Record<string, unknown>;
   rules: {
     entry: TradingRule[];
     exit: TradingRule[];
@@ -245,7 +245,7 @@ export interface TradingRule {
   action: string;
   priority: number;
   isEnabled: boolean;
-  parameters?: Record<string, any>;
+  parameters?: Record<string, unknown>;
 }
 
 export interface StrategyPerformance {

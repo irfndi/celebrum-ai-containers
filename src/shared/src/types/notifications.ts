@@ -4,7 +4,7 @@ export interface Notification {
   type: NotificationType;
   title: string;
   message: string;
-  data?: Record<string, any>;
+  data?: Record<string, unknown>;
   channels: NotificationChannel[];
   priority: 'low' | 'normal' | 'high' | 'urgent';
   status: 'pending' | 'sent' | 'delivered' | 'failed' | 'read';
@@ -107,7 +107,7 @@ export interface NotificationQueue {
   notificationId: string;
   channel: NotificationChannel;
   recipient: string; // email, phone, chat_id, etc.
-  payload: Record<string, any>;
+  payload: Record<string, unknown>;
   status: 'queued' | 'processing' | 'sent' | 'failed' | 'cancelled';
   priority: number; // Higher number = higher priority
   scheduledAt: string;
@@ -128,12 +128,12 @@ export interface NotificationDelivery {
   recipient: string;
   status: 'delivered' | 'failed' | 'bounced' | 'complained';
   providerId?: string; // External service message ID
-  providerResponse?: Record<string, any>;
+  providerResponse?: Record<string, unknown>;
   deliveredAt?: string;
   openedAt?: string;
   clickedAt?: string;
   error?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   createdAt: string;
 }
 
@@ -222,11 +222,11 @@ export interface NotificationRule {
       max: number;
       window: string; // '1h', '1d', etc.
     };
-    filters?: Record<string, any>;
+    filters?: Record<string, unknown>;
   };
   actions: {
     type: 'suppress' | 'redirect' | 'modify' | 'escalate';
-    parameters: Record<string, any>;
+    parameters: Record<string, unknown>;
   }[];
   priority: number;
   isActive: boolean;
@@ -239,7 +239,7 @@ export interface NotificationEvent {
   type: NotificationType;
   source: string; // Service or component that triggered the event
   userId?: string;
-  data: Record<string, any>;
+  data: Record<string, unknown>;
   metadata?: {
     correlationId?: string;
     sessionId?: string;
@@ -278,12 +278,12 @@ export interface NotificationCampaign {
   template: {
     type: NotificationType;
     channels: NotificationChannel[];
-    content: Record<NotificationChannel, any>;
+    content: Record<NotificationChannel, unknown>;
   };
   targeting: {
     userIds?: string[];
     segments?: string[];
-    filters?: Record<string, any>;
+    filters?: Record<string, unknown>;
   };
   schedule?: {
     startAt: string;

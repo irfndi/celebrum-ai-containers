@@ -1,4 +1,5 @@
 import type {
+  Env,
   UserRoleType,
   SubscriptionTierType,
   TradingConfig,
@@ -7,12 +8,13 @@ import type {
   OpportunityLimits,
   ApiAccess,
   UserAccessSummary,
-  StrategyLimits
+  StrategyLimits,
+  TierLimits
 } from '../types';
 import {
   UserRole,
-  Permission,
-  SubscriptionTier
+  SubscriptionTier,
+  Permission
 } from '../types';
 
 /**
@@ -20,12 +22,12 @@ import {
  * Manages user roles, permissions, API access, trading configurations, and feature flags
  */
 export class RBACService {
-  private env: any;
+  private env: Env;
   private rolePermissions: Map<UserRoleType, string[]>;
-  private tierLimits: Map<SubscriptionTierType, any>;
+  private tierLimits: Map<SubscriptionTierType, unknown>;
   private featureFlags: Map<string, boolean>;
 
-  constructor(env: any) {
+  constructor(env: Env) {
     this.env = env;
     this.rolePermissions = new Map();
     this.tierLimits = new Map();
@@ -173,8 +175,12 @@ export class RBACService {
   /**
    * Get tier limits for subscription
    */
-  getTierLimits(tier: SubscriptionTierType): any {
-    return this.tierLimits.get(tier) || this.tierLimits.get(SubscriptionTier.FREE);
+  getTierLimits(tier: SubscriptionTierType): TierLimits {
+    const limits = this.tierLimits.get(tier) || this.tierLimits.get(SubscriptionTier.FREE);
+    if (!limits) {
+      throw new Error('No tier limits found for any subscription tier');
+    }
+    return limits as TierLimits;
   }
 
   /**
@@ -245,7 +251,7 @@ export class RBACService {
   /**
    * Get or create API access configuration
    */
-  private async getOrCreateApiAccess(userId: string, role: UserRoleType, limits: any): Promise<ApiAccess> {
+  private async getOrCreateApiAccess(userId: string, role: UserRoleType, limits: TierLimits): Promise<ApiAccess> {
     const key = `rbac:api_access:${userId}`;
     
     try {
@@ -264,10 +270,10 @@ export class RBACService {
       exchangeApis: [],
       aiApis: [],
       limits: {
-        maxExchangeApis: limits.maxExchangeApis,
-        maxAiApis: limits.maxAiApis,
-        dailyRequestLimit: limits.dailyRequestLimit,
-        hourlyRequestLimit: limits.hourlyRequestLimit
+        maxExchangeApis: (limits as { maxExchangeApis: number }).maxExchangeApis,
+        maxAiApis: (limits as { maxAiApis: number }).maxAiApis,
+        dailyRequestLimit: (limits as { dailyRequestLimit: number }).dailyRequestLimit,
+        hourlyRequestLimit: (limits as { hourlyRequestLimit: number }).hourlyRequestLimit
       },
       usage: {
         dailyRequests: 0,
@@ -289,7 +295,7 @@ export class RBACService {
   /**
    * Get or create trading configuration
    */
-  private async getOrCreateTradingConfig(userId: string, role: UserRoleType, limits: any): Promise<TradingConfig | undefined> {
+  private async getOrCreateTradingConfig(userId: string, role: UserRoleType, limits: TierLimits): Promise<TradingConfig | undefined> {
     // Only create trading config for roles that can trade
     if (!this.hasPermission(role, Permission.TRADE_MANUAL) && !this.hasPermission(role, Permission.TRADE_AUTO)) {
       return undefined;
@@ -322,8 +328,8 @@ export class RBACService {
       userId,
       role,
       percentagePerTrade: role === UserRole.FREE ? 2 : role === UserRole.PRO ? 5 : 10,
-      maxConcurrentTrades: limits.maxConcurrentTrades,
-      maxLeverage: limits.maxLeverage,
+      maxConcurrentTrades: (limits as { maxConcurrentTrades: number }).maxConcurrentTrades,
+      maxLeverage: (limits as { maxLeverage: number }).maxLeverage,
       riskTolerance: 'medium',
       autoTradingEnabled: this.hasPermission(role, Permission.TRADE_AUTO),
       manualTradingEnabled: this.hasPermission(role, Permission.TRADE_MANUAL),

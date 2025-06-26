@@ -2,7 +2,7 @@
  * External API management and HTTP client utilities
  */
 
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   data: T;
   status: number;
   statusText: string;
@@ -14,7 +14,7 @@ export class ApiError extends Error {
   status?: number;
   code?: string;
   response?: {
-    data: any;
+    data: unknown;
     status: number;
     statusText: string;
   };
@@ -25,7 +25,7 @@ export class ApiError extends Error {
     status?: number;
     code?: string;
     response?: {
-      data: any;
+      data: unknown;
       status: number;
       statusText: string;
     };
@@ -44,8 +44,8 @@ export interface RequestConfig {
   url: string;
   method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
   headers?: Record<string, string>;
-  params?: Record<string, any>;
-  data?: any;
+  params?: Record<string, unknown>;
+  data?: unknown;
   timeout?: number;
   retries?: number;
   retryDelay?: number;
@@ -144,7 +144,7 @@ export class ApiClient {
   /**
    * Make an HTTP request
    */
-  async request<T = any>(config: RequestConfig): Promise<ApiResponse<T>> {
+  async request<T = unknown>(config: RequestConfig): Promise<ApiResponse<T>> {
     // Merge with default config
     const finalConfig = this.mergeConfig(config);
 
@@ -185,7 +185,7 @@ export class ApiClient {
         
         // Apply response interceptor
         return this.config.interceptors?.response 
-          ? await this.config.interceptors.response(response)
+          ? await this.config.interceptors.response(response) as ApiResponse<T>
           : response;
       } catch (error) {
         lastError = error as ApiError;
@@ -380,23 +380,23 @@ export class ApiClient {
   }
 
   // Convenience methods
-  async get<T = any>(url: string, config?: Partial<RequestConfig>): Promise<ApiResponse<T>> {
+  async get<T = unknown>(url: string, config?: Partial<RequestConfig>): Promise<ApiResponse<T>> {
     return this.request<T>({ ...config, url, method: 'GET' });
   }
 
-  async post<T = any>(url: string, data?: any, config?: Partial<RequestConfig>): Promise<ApiResponse<T>> {
+  async post<T = unknown>(url: string, data?: unknown, config?: Partial<RequestConfig>): Promise<ApiResponse<T>> {
     return this.request<T>({ ...config, url, method: 'POST', data });
   }
 
-  async put<T = any>(url: string, data?: any, config?: Partial<RequestConfig>): Promise<ApiResponse<T>> {
+  async put<T = unknown>(url: string, data?: unknown, config?: Partial<RequestConfig>): Promise<ApiResponse<T>> {
     return this.request<T>({ ...config, url, method: 'PUT', data });
   }
 
-  async patch<T = any>(url: string, data?: any, config?: Partial<RequestConfig>): Promise<ApiResponse<T>> {
+  async patch<T = unknown>(url: string, data?: unknown, config?: Partial<RequestConfig>): Promise<ApiResponse<T>> {
     return this.request<T>({ ...config, url, method: 'PATCH', data });
   }
 
-  async delete<T = any>(url: string, config?: Partial<RequestConfig>): Promise<ApiResponse<T>> {
+  async delete<T = unknown>(url: string, config?: Partial<RequestConfig>): Promise<ApiResponse<T>> {
     return this.request<T>({ ...config, url, method: 'DELETE' });
   }
 }
@@ -438,7 +438,7 @@ export class ExternalApiManager {
   /**
    * Make a request using a specific client
    */
-  async request<T = any>(clientName: string, config: RequestConfig): Promise<ApiResponse<T>> {
+  async request<T = unknown>(clientName: string, config: RequestConfig): Promise<ApiResponse<T>> {
     const client = this.clients.get(clientName);
     if (!client) {
       throw new Error(`API client '${clientName}' not found`);

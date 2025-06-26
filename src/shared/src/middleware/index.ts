@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import type { z } from 'zod';
 import { AppError, ValidationError, AuthenticationError, RateLimitError } from '../errors';
 import { formatValidationErrors } from '../validation';
 import { API } from '../config';
@@ -238,7 +238,7 @@ export const validateMiddleware = <T>(schema: z.ZodSchema<T>, target: 'body' | '
       }
       
       // Replace the original data with validated data
-      (req as any)[target] = result.data;
+      (req as unknown as Record<string, unknown>)[target] = result.data;
       next();
     } catch (error) {
       next(error as Error);

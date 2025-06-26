@@ -1,4 +1,4 @@
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   success: boolean;
   data?: T;
   error?: string;
@@ -21,7 +21,7 @@ export interface PaginatedResponse<T> extends ApiResponse<T[]> {
 export interface ApiError {
   code: string;
   message: string;
-  details?: Record<string, any>;
+  details?: Record<string, unknown>;
   timestamp: string;
   requestId?: string;
 }
@@ -36,7 +36,7 @@ export interface RateLimitInfo {
 export interface WebhookPayload {
   id: string;
   type: string;
-  data: Record<string, any>;
+  data: Record<string, unknown>;
   timestamp: string;
   signature?: string;
 }
@@ -49,13 +49,13 @@ export interface CreatePortfolioRequest {
   baseCurrency: string;
   type: 'live' | 'paper' | 'backtest';
   exchange: string;
-  settings?: Record<string, any>;
+  settings?: Record<string, unknown>;
 }
 
 export interface UpdatePortfolioRequest {
   name?: string;
   description?: string;
-  settings?: Record<string, any>;
+  settings?: Record<string, unknown>;
 }
 
 export interface CreateOrderRequest {
@@ -84,11 +84,11 @@ export interface CreateStrategyRequest {
   timeframe: string;
   symbols: string[];
   exchanges: string[];
-  parameters: Record<string, any>;
+  parameters: Record<string, unknown>;
   rules: {
-    entry: any[];
-    exit: any[];
-    riskManagement: any[];
+    entry: unknown[];
+    exit: unknown[];
+    riskManagement: unknown[];
   };
   isPublic: boolean;
 }
@@ -99,11 +99,11 @@ export interface UpdateStrategyRequest {
   timeframe?: string;
   symbols?: string[];
   exchanges?: string[];
-  parameters?: Record<string, any>;
+  parameters?: Record<string, unknown>;
   rules?: {
-    entry?: any[];
-    exit?: any[];
-    riskManagement?: any[];
+    entry?: unknown[];
+    exit?: unknown[];
+    riskManagement?: unknown[];
   };
   isActive?: boolean;
   isPublic?: boolean;
@@ -116,7 +116,7 @@ export interface BacktestRequest {
   startDate: string;
   endDate: string;
   initialCapital: number;
-  parameters?: Record<string, any>;
+  parameters?: Record<string, unknown>;
 }
 
 export interface CreateAlertRequest {
@@ -163,7 +163,7 @@ export interface FilterOptions {
   type?: string;
   exchange?: string;
   symbol?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export interface WebhookRegistrationRequest {
@@ -215,7 +215,7 @@ export interface ErrorResponse {
   error: {
     code: string;
     message: string;
-    details?: Record<string, any>;
+    details?: Record<string, unknown>;
   };
   timestamp: string;
   requestId?: string;

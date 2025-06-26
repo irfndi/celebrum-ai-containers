@@ -28,6 +28,7 @@
     "build:services": "tsc --project src/services/tsconfig.json",
     "build:web": "astro check --root src/web && astro build --root src/web",
     "test": "vitest --run",
+    "test:ci": "vitest --run",
     "test:watch": "vitest --watch",
     "test:coverage": "vitest --coverage",
     "typecheck": "tsc --noEmit",
@@ -62,7 +63,7 @@
     "tsx": "^4.20.3",
     "typescript": "5.8.3",
     "vitest": "^3.2.4",
-    "wrangler": "^4.20.5"
+    "wrangler": "^4.22.0"
   },
   "cloudflare": {
     "label": "Containers Starter",

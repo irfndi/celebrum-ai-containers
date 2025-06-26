@@ -1,11 +1,6 @@
 #!/usr/bin/env tsx
 
-import { execSync } from 'child_process';
-import path from 'path';
-import fs from 'fs';
-
-// Import Alchemy configuration
-import alchemyConfig from '../alchemy.config.js';
+import { execSync } from 'node:child_process';
 
 interface DeploymentOptions {
   environment: 'development' | 'staging' | 'production';

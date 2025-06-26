@@ -1,4 +1,4 @@
-import {
+import type {
   UserRoleType,
   SubscriptionTierType,
   RBACOperationResult
@@ -9,11 +9,11 @@ import {
  * Handles feature toggles, A/B testing, and role-based feature access
  */
 export class FeatureFlagManager {
-  private env: any;
-  private flagCache: Map<string, any>;
-  private defaultFlags: Map<string, any>;
+  private env: unknown;
+  private flagCache: Map<string, unknown>;
+  private defaultFlags: Map<string, unknown>;
 
-  constructor(env: any) {
+  constructor(env: unknown) {
     this.env = env;
     this.flagCache = new Map();
     this.defaultFlags = new Map();
@@ -155,7 +155,7 @@ export class FeatureFlagManager {
       };
 
       const key = `rbac:global_flag:${featureKey}`;
-      await this.env.CELEBRUM_KV?.put(key, JSON.stringify(flagData), {
+      await (this.env as any).CELEBRUM_KV?.put(key, JSON.stringify(flagData), {
         expirationTtl: 365 * 24 * 60 * 60 // 1 year
       });
 
@@ -202,7 +202,7 @@ export class FeatureFlagManager {
       };
 
       const key = `rbac:user_flag:${userId}:${featureKey}`;
-      await this.env.CELEBRUM_KV?.put(key, JSON.stringify(flagData), {
+      await (this.env as any).CELEBRUM_KV?.put(key, JSON.stringify(flagData), {
         expirationTtl: 90 * 24 * 60 * 60 // 90 days
       });
 
@@ -243,7 +243,7 @@ export class FeatureFlagManager {
   ): Promise<RBACOperationResult> {
     try {
       const key = `rbac:user_flag:${userId}:${featureKey}`;
-      await this.env.CELEBRUM_KV?.delete(key);
+      await (this.env as any).CELEBRUM_KV?.delete(key);
 
       // Remove from cache
       this.flagCache.delete(`user:${userId}:${featureKey}`);
@@ -305,10 +305,10 @@ export class FeatureFlagManager {
   /**
    * Get feature flag configuration and metadata
    */
-  async getFeatureFlagConfig(featureKey: string): Promise<any> {
+  async getFeatureFlagConfig(featureKey: string): Promise<unknown> {
     try {
       const globalKey = `rbac:global_flag:${featureKey}`;
-      const globalFlag = await this.env.CELEBRUM_KV?.get(globalKey, 'json');
+      const globalFlag = await (this.env as any).CELEBRUM_KV?.get(globalKey, 'json') as any;
       
       const config = {
         key: featureKey,
@@ -332,10 +332,10 @@ export class FeatureFlagManager {
   /**
    * Get feature flag usage statistics
    */
-  async getFeatureFlagStats(featureKey: string): Promise<any> {
+  async getFeatureFlagStats(featureKey: string): Promise<unknown> {
     try {
       const statsKey = `rbac:flag_stats:${featureKey}`;
-      const stats = await this.env.CELEBRUM_KV?.get(statsKey, 'json') || {
+      const stats = await (this.env as any).CELEBRUM_KV?.get(statsKey, 'json') as any || {
         totalChecks: 0,
         enabledChecks: 0,
         disabledChecks: 0,
@@ -364,7 +364,7 @@ export class FeatureFlagManager {
   ): Promise<void> {
     try {
       const statsKey = `rbac:flag_stats:${featureKey}`;
-      const stats = await this.env.CELEBRUM_KV?.get(statsKey, 'json') || {
+      const stats = await (this.env as any).CELEBRUM_KV?.get(statsKey, 'json') as any || {
         totalChecks: 0,
         enabledChecks: 0,
         disabledChecks: 0,
@@ -385,7 +385,7 @@ export class FeatureFlagManager {
       
       stats.lastChecked = Date.now();
       
-      await this.env.CELEBRUM_KV?.put(statsKey, JSON.stringify(stats), {
+      await (this.env as any).CELEBRUM_KV?.put(statsKey, JSON.stringify(stats), {
         expirationTtl: 30 * 24 * 60 * 60 // 30 days
       });
     } catch (error) {
@@ -401,12 +401,12 @@ export class FeatureFlagManager {
       // Check cache first
       const cacheKey = `global:${featureKey}`;
       if (this.flagCache.has(cacheKey)) {
-        return this.flagCache.get(cacheKey);
+        return this.flagCache.get(cacheKey) as boolean | null;
       }
 
       // Get from KV store
       const key = `rbac:global_flag:${featureKey}`;
-      const flagData = await this.env.CELEBRUM_KV?.get(key, 'json');
+      const flagData = await (this.env as any).CELEBRUM_KV?.get(key, 'json') as any;
       
       if (flagData) {
         this.flagCache.set(cacheKey, flagData.enabled);
@@ -428,12 +428,12 @@ export class FeatureFlagManager {
       // Check cache first
       const cacheKey = `user:${userId}:${featureKey}`;
       if (this.flagCache.has(cacheKey)) {
-        return this.flagCache.get(cacheKey);
+        return this.flagCache.get(cacheKey) as boolean | null;
       }
 
       // Get from KV store
       const key = `rbac:user_flag:${userId}:${featureKey}`;
-      const flagData = await this.env.CELEBRUM_KV?.get(key, 'json');
+      const flagData = await (this.env as any).CELEBRUM_KV?.get(key, 'json') as any;
       
       if (flagData) {
         this.flagCache.set(cacheKey, flagData.enabled);
@@ -451,7 +451,7 @@ export class FeatureFlagManager {
    * Get default feature flag value
    */
   private getDefaultFlag(featureKey: string): boolean {
-    return this.defaultFlags.get(featureKey) || false;
+    return (this.defaultFlags.get(featureKey) as boolean) || false;
   }
 
   /**
@@ -552,10 +552,10 @@ export class FeatureFlagManager {
   private async getNextVersion(featureKey: string): Promise<number> {
     try {
       const versionKey = `rbac:flag_version:${featureKey}`;
-      const currentVersion = await this.env.CELEBRUM_KV?.get(versionKey) || '0';
+      const currentVersion = await (this.env as any).CELEBRUM_KV?.get(versionKey) || '0';
       const nextVersion = parseInt(currentVersion) + 1;
       
-      await this.env.CELEBRUM_KV?.put(versionKey, nextVersion.toString(), {
+      await (this.env as any).CELEBRUM_KV?.put(versionKey, nextVersion.toString(), {
         expirationTtl: 365 * 24 * 60 * 60
       });
       
@@ -588,7 +588,7 @@ export class FeatureFlagManager {
       };
 
       const logKey = `rbac:flag_log:${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      await this.env.CELEBRUM_KV?.put(logKey, JSON.stringify(logEntry), {
+      await (this.env as any).CELEBRUM_KV?.put(logKey, JSON.stringify(logEntry), {
         expirationTtl: 90 * 24 * 60 * 60 // 90 days
       });
     } catch (error) {

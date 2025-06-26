@@ -1,5 +1,5 @@
-import type { Env } from '../types';
-import {
+import type {
+  Env,
   ApiAccess,
   RBACOperationResult,
   ExchangeIdType
@@ -438,7 +438,7 @@ export class ApiAccessManager {
   /**
    * Get user's API access summary
    */
-  async getApiAccessSummary(userId: string): Promise<any | null> {
+  async getApiAccessSummary(userId: string): Promise<unknown | null> {
     try {
       const key = `rbac:api_access:${userId}`;
       const apiAccess = await this.env.CELEBRUM_KV?.get(key, 'json') as ApiAccess;

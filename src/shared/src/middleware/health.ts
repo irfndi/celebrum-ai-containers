@@ -2,7 +2,7 @@
  * Health check middleware for monitoring system status
  */
 
-import { Env } from '../types';
+import type { Env } from '../types';
 
 /**
  * Health status types
@@ -17,7 +17,7 @@ export interface ServiceHealth {
   responseTime?: number;
   lastCheck: string;
   error?: string;
-  details?: Record<string, any>;
+  details?: Record<string, unknown>;
 }
 
 /**
@@ -203,7 +203,7 @@ export class HealthCheck {
       // Simple query to test database connectivity
       const result = await env.DB.prepare('SELECT 1 as test').first();
       
-      if (!result || (result as any).test !== 1) {
+      if (!result || (result as unknown as { test: number }).test !== 1) {
         throw new Error('Database query test failed');
       }
 
@@ -243,7 +243,7 @@ export class HealthCheck {
       }
 
       const data = await response.json();
-      if (data && typeof data === 'object' && 'ok' in data && !(data as any).ok) {
+      if (data && typeof data === 'object' && 'ok' in data && !(data as unknown as { ok: boolean }).ok) {
         throw new Error('Telegram API response not ok');
       }
 
@@ -269,7 +269,7 @@ export class HealthCheck {
     const startTime = Date.now();
     try {
       // Check if OpenAI API key is available in env or as a custom property
-      const openaiApiKey = (env as any).OPENAI_API_KEY;
+      const openaiApiKey = (env as unknown as { OPENAI_API_KEY?: string }).OPENAI_API_KEY;
       
       if (!openaiApiKey) {
         return {

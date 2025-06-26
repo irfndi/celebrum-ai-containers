@@ -3,7 +3,7 @@ import type { Env } from '../types';
 export interface RateLimitConfig {
   windowMs: number;     // Time window in milliseconds
   maxRequests: number;  // Maximum requests per window
-  keyGenerator?: (c: any) => string; // Custom key generator
+  keyGenerator?: (c: unknown) => string; // Custom key generator
   skipSuccessfulRequests?: boolean;
   skipFailedRequests?: boolean;
   message?: string;
@@ -37,8 +37,8 @@ export class RateLimiter {
    * Rate limiting middleware
    */
   middleware() {
-    return async (c: any, next: () => Promise<void>) => {
-      const env = c.env as Env;
+    return async (c: unknown, next: () => Promise<void>) => {
+      const env = (c as { env: Env }).env;
       
       if (!env.CELEBRUM_KV) {
         console.warn('KV store not available, skipping rate limiting');
@@ -46,17 +46,18 @@ export class RateLimiter {
         return;
       }
 
-      const key = this.config.keyGenerator(c);
+      const key = this.config.keyGenerator ? this.config.keyGenerator(c) : this.defaultKeyGenerator(c);
       const rateLimitInfo = await this.checkRateLimit(env, key);
 
       // Set rate limit headers
-      c.header('X-RateLimit-Limit', rateLimitInfo.limit.toString());
-      c.header('X-RateLimit-Remaining', rateLimitInfo.remaining.toString());
-      c.header('X-RateLimit-Reset', rateLimitInfo.reset.toString());
+      const cWithHeader = c as { header: (name: string, value: string) => void };
+      cWithHeader.header('X-RateLimit-Limit', rateLimitInfo.limit.toString());
+      cWithHeader.header('X-RateLimit-Remaining', rateLimitInfo.remaining.toString());
+      cWithHeader.header('X-RateLimit-Reset', rateLimitInfo.reset.toString());
 
       if (rateLimitInfo.remaining < 0) {
         if (rateLimitInfo.retryAfter) {
-          c.header('Retry-After', rateLimitInfo.retryAfter.toString());
+          cWithHeader.header('Retry-After', rateLimitInfo.retryAfter.toString());
         }
         
         return this.createRateLimitResponse(rateLimitInfo);
@@ -66,9 +67,10 @@ export class RateLimiter {
       await next();
 
       // Update rate limit counter (unless configured to skip)
+      const cWithRes = c as { res: { status: number } };
       const shouldSkip = (
-        (this.config.skipSuccessfulRequests && c.res.status < 400) ||
-        (this.config.skipFailedRequests && c.res.status >= 400)
+        (this.config.skipSuccessfulRequests && cWithRes.res.status < 400) ||
+        (this.config.skipFailedRequests && cWithRes.res.status >= 400)
       );
 
       if (!shouldSkip) {
@@ -134,7 +136,7 @@ export class RateLimiter {
   /**
    * Default key generator using IP address
    */
-  private defaultKeyGenerator(c: any): string {
+  private defaultKeyGenerator(c: unknown): string {
     const ip = this.getClientId(c);
     return `ip:${ip}`;
   }
@@ -142,7 +144,7 @@ export class RateLimiter {
   /**
    * Get client identifier (IP address)
    */
-  private getClientId(c: any): string {
+  private getClientId(c: unknown): string {
     // Try various headers to get the real IP
     const headers = [
       'CF-Connecting-IP',
@@ -152,7 +154,7 @@ export class RateLimiter {
     ];
 
     for (const header of headers) {
-      const value = c.req.header(header);
+      const value = (c as { req: { header: (name: string) => string | undefined } }).req.header(header);
       if (value) {
         // Handle comma-separated IPs (X-Forwarded-For can have multiple IPs)
         return value.split(',')[0].trim();

@@ -2,18 +2,18 @@
  * Cache management utilities for Cloudflare KV and other storage backends
  */
 
-export interface CacheEntry<T = any> {
+export interface CacheEntry<T = unknown> {
   value: T;
   timestamp: number;
   ttl?: number;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface CacheOptions {
   ttl?: number; // Time to live in seconds
   namespace?: string;
   compress?: boolean;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface CacheStats {
@@ -38,8 +38,8 @@ export interface CacheConfig {
  * Abstract cache interface for different storage backends
  */
 export abstract class CacheBackend {
-  abstract get<T = any>(key: string): Promise<T | null>;
-  abstract set<T = any>(key: string, value: T, options?: CacheOptions): Promise<void>;
+  abstract get<T = unknown>(key: string): Promise<T | null>;
+  abstract set<T = unknown>(key: string, value: T, options?: CacheOptions): Promise<void>;
   abstract delete(key: string): Promise<boolean>;
   abstract exists(key: string): Promise<boolean>;
   abstract clear(pattern?: string): Promise<number>;
@@ -54,7 +54,7 @@ export class CloudflareKVBackend extends CacheBackend {
     super();
   }
 
-  async get<T = any>(key: string): Promise<T | null> {
+  async get<T = unknown>(key: string): Promise<T | null> {
     try {
       const value = await this.kv.get(key, 'json');
       return value as T;
@@ -64,9 +64,9 @@ export class CloudflareKVBackend extends CacheBackend {
     }
   }
 
-  async set<T = any>(key: string, value: T, options?: CacheOptions): Promise<void> {
+  async set<T = unknown>(key: string, value: T, options?: CacheOptions): Promise<void> {
     try {
-      const kvOptions: any = {};
+      const kvOptions: Record<string, unknown> = {};
       
       if (options?.ttl) {
         kvOptions.expirationTtl = options.ttl;
@@ -123,7 +123,7 @@ export class CloudflareKVBackend extends CacheBackend {
 
   async keys(pattern?: string): Promise<string[]> {
     try {
-      const listOptions: any = {};
+      const listOptions: Record<string, unknown> = {};
       if (pattern) {
         listOptions.prefix = pattern;
       }
@@ -141,9 +141,9 @@ export class CloudflareKVBackend extends CacheBackend {
  * In-memory cache backend for development/testing
  */
 export class MemoryBackend extends CacheBackend {
-  private cache = new Map<string, { value: any; expires?: number; metadata?: Record<string, any> }>();
+  private cache = new Map<string, { value: unknown; expires?: number; metadata?: Record<string, unknown> }>();
 
-  async get<T = any>(key: string): Promise<T | null> {
+  async get<T = unknown>(key: string): Promise<T | null> {
     const entry = this.cache.get(key);
     
     if (!entry) {
@@ -159,8 +159,8 @@ export class MemoryBackend extends CacheBackend {
     return entry.value as T;
   }
 
-  async set<T = any>(key: string, value: T, options?: CacheOptions): Promise<void> {
-    const entry: any = { value };
+  async set<T = unknown>(key: string, value: T, options?: CacheOptions): Promise<void> {
+    const entry: { value: T; expires?: number; metadata?: Record<string, unknown> } = { value };
     
     if (options?.ttl) {
       entry.expires = Date.now() + (options.ttl * 1000);
@@ -253,7 +253,7 @@ export class CacheManager {
   /**
    * Get a value from cache
    */
-  async get<T = any>(key: string): Promise<T | null> {
+  async get<T = unknown>(key: string): Promise<T | null> {
     try {
       const normalizedKey = this.normalizeKey(key);
       const value = await this.backend.get<T>(normalizedKey);
@@ -280,7 +280,7 @@ export class CacheManager {
   /**
    * Set a value in cache
    */
-  async set<T = any>(key: string, value: T, options?: CacheOptions): Promise<void> {
+  async set<T = unknown>(key: string, value: T, options?: CacheOptions): Promise<void> {
     try {
       this.validateKey(key);
       this.validateValue(value);
@@ -346,7 +346,7 @@ export class CacheManager {
   /**
    * Get or set a value (cache-aside pattern)
    */
-  async getOrSet<T = any>(
+  async getOrSet<T = unknown>(
     key: string,
     factory: () => Promise<T>,
     options?: CacheOptions
@@ -364,7 +364,7 @@ export class CacheManager {
   /**
    * Set multiple values at once
    */
-  async setMany<T = any>(entries: Array<{ key: string; value: T; options?: CacheOptions }>): Promise<void> {
+  async setMany<T = unknown>(entries: Array<{ key: string; value: T; options?: CacheOptions }>): Promise<void> {
     const promises = entries.map(({ key, value, options }) => this.set(key, value, options));
     await Promise.all(promises);
   }
@@ -372,7 +372,7 @@ export class CacheManager {
   /**
    * Get multiple values at once
    */
-  async getMany<T = any>(keys: string[]): Promise<Array<{ key: string; value: T | null }>> {
+  async getMany<T = unknown>(keys: string[]): Promise<Array<{ key: string; value: T | null }>> {
     const promises = keys.map(async (key) => ({
       key,
       value: await this.get<T>(key),
@@ -480,7 +480,7 @@ export class CacheManager {
   /**
    * Validate cache value
    */
-  private validateValue(value: any): void {
+  private validateValue(value: unknown): void {
     if (value === undefined) {
       throw new Error('Cache value cannot be undefined');
     }
@@ -505,13 +505,13 @@ export class CacheManager {
  */
 export function cached(options?: {
   ttl?: number;
-  keyGenerator?: (...args: any[]) => string;
+  keyGenerator?: (...args: unknown[]) => string;
   cacheManager?: CacheManager;
 }) {
-  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+  return function (target: unknown, propertyKey: string, descriptor: PropertyDescriptor) {
     const originalMethod = descriptor.value;
     
-    descriptor.value = async function (...args: any[]) {
+    descriptor.value = async function (...args: unknown[]) {
       const cacheManager = options?.cacheManager || globalCacheManager;
       
       if (!cacheManager) {
@@ -521,7 +521,7 @@ export function cached(options?: {
       // Generate cache key
       const key = options?.keyGenerator 
         ? options.keyGenerator(...args)
-        : `${target.constructor.name}.${propertyKey}:${JSON.stringify(args)}`;
+        : `${(target as any).constructor.name}.${propertyKey}:${JSON.stringify(args)}`;
       
       // Try to get from cache
       const cached = await cacheManager.get(key);

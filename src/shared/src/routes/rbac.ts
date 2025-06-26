@@ -8,7 +8,7 @@ export interface Permission {
   description: string;
   resource: string;
   action: string;
-  conditions?: Record<string, any>;
+  conditions?: Record<string, unknown>;
 }
 
 export interface Role {
@@ -36,7 +36,7 @@ export interface AccessContext {
   resource: string;
   action: string;
   resourceId?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export class RBACManager {

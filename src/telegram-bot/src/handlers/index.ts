@@ -6,6 +6,7 @@ import type {
 } from '../types/index';
 import { extractCommand, isRateLimited, getChatId, getUserId } from '../utils/index';
 import { SessionService, UserService } from '@celebrum-ai/shared';
+import { createDb } from '@celebrum-ai/db';
 
 // Command handlers registry
 export const TELEGRAM_HANDLERS = new Map<string, TelegramHandler>();
@@ -176,7 +177,7 @@ export function initializeHandlers(): void {
 
       if (!chatId || !from) return null;
 
-      const userService = new UserService(context.env.DB);
+      const userService = new UserService(createDb(context.env.DB));
       const telegramId = from.id.toString();
       let user = await userService.findUserByTelegramId(telegramId);
 

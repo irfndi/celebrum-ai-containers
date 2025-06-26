@@ -115,7 +115,7 @@ export interface PriceAlert {
   createdAt: string;
   triggeredAt?: string;
   notificationMethod: 'telegram' | 'email' | 'webhook';
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface MarketIndicator {
@@ -126,7 +126,7 @@ export interface MarketIndicator {
   value: number | Record<string, number>;
   signal?: 'buy' | 'sell' | 'neutral';
   timestamp: string;
-  parameters: Record<string, any>;
+  parameters: Record<string, unknown>;
 }
 
 export interface MarketSentiment {
@@ -164,7 +164,7 @@ export interface MarketEvent {
   source: string;
   sourceUrl?: string;
   tags: string[];
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface LiquidityData {

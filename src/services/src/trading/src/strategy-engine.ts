@@ -6,7 +6,7 @@ export interface TradingStrategy {
   id: string;
   name: string;
   description: string;
-  parameters: Record<string, any>;
+  parameters: Record<string, unknown>;
   enabled: boolean;
   riskLevel: 'low' | 'medium' | 'high';
   expectedReturn: number;
@@ -119,7 +119,7 @@ export class StrategyEngine {
     return this.getAllStrategies().filter(strategy => strategy.enabled);
   }
 
-  async generateSignals(marketData: any): Promise<TradingSignal[]> {
+  async generateSignals(marketData: unknown): Promise<TradingSignal[]> {
     const signals: TradingSignal[] = [];
     const enabledStrategies = this.getEnabledStrategies();
 
@@ -140,7 +140,7 @@ export class StrategyEngine {
     return signals;
   }
 
-  private async executeStrategy(strategy: TradingStrategy, marketData: any): Promise<TradingSignal[]> {
+  private async executeStrategy(strategy: TradingStrategy, marketData: unknown): Promise<TradingSignal[]> {
     switch (strategy.id) {
       case 'mean_reversion':
         return this.executeMeanReversionStrategy(strategy, marketData);
@@ -154,7 +154,7 @@ export class StrategyEngine {
     }
   }
 
-  private async executeMeanReversionStrategy(_strategy: TradingStrategy, _marketData: any): Promise<TradingSignal[]> {
+  private async executeMeanReversionStrategy(_strategy: TradingStrategy, _marketData: unknown): Promise<TradingSignal[]> {
     const signals: TradingSignal[] = [];
 
     // TODO: Implement mean reversion logic
@@ -167,7 +167,7 @@ export class StrategyEngine {
     return signals;
   }
 
-  private async executeMomentumStrategy(_strategy: TradingStrategy, _marketData: any): Promise<TradingSignal[]> {
+  private async executeMomentumStrategy(_strategy: TradingStrategy, _marketData: unknown): Promise<TradingSignal[]> {
     const signals: TradingSignal[] = [];
 
     // TODO: Implement momentum logic
@@ -179,7 +179,7 @@ export class StrategyEngine {
     return signals;
   }
 
-  private async executeArbitrageStrategy(_strategy: TradingStrategy, _marketData: any): Promise<TradingSignal[]> {
+  private async executeArbitrageStrategy(_strategy: TradingStrategy, _marketData: unknown): Promise<TradingSignal[]> {
     const signals: TradingSignal[] = [];
 
     // TODO: Implement arbitrage logic
@@ -261,7 +261,7 @@ export class StrategyEngine {
     return false;
   }
 
-  updateStrategyParameters(strategyId: string, parameters: Record<string, any>): boolean {
+  updateStrategyParameters(strategyId: string, parameters: Record<string, unknown>): boolean {
     const strategy = this.strategies.get(strategyId);
     if (strategy) {
       strategy.parameters = { ...strategy.parameters, ...parameters };

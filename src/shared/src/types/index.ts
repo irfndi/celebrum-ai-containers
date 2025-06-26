@@ -2,6 +2,11 @@
  * Type definitions for the Celebrum AI platform
  */
 
+// @celebrum-ai/shared - Shared Types
+import { z } from 'zod';
+import type { D1Database, KVNamespace, DurableObjectNamespace } from '@cloudflare/workers-types';
+import type { Container } from '@cloudflare/containers';
+
 // API types
 export * from './api';
 
@@ -31,11 +36,6 @@ export * from './user';
 
 // Notification types
 export * from './notifications';
-
-// @celebrum-ai/shared - Shared Types
-import { z } from 'zod';
-import type { D1Database, KVNamespace, DurableObjectNamespace } from '@cloudflare/workers-types';
-import type { Container } from '@cloudflare/containers';
 
 export interface Env {
   // Database
@@ -384,6 +384,20 @@ export const StrategyLimitsSchema = z.object({
   concurrentBacktests: z.number(),
 });
 
+export const TierLimitsSchema = z.object({
+  maxExchangeApis: z.number(),
+  maxAiApis: z.number(),
+  dailyRequestLimit: z.number(),
+  hourlyRequestLimit: z.number(),
+  maxConcurrentTrades: z.number(),
+  maxLeverage: z.number(),
+  maxStrategies: z.number(),
+  maxActiveStrategies: z.number(),
+  maxConcurrentBacktests: z.number(),
+  dailyOpportunityLimit: z.number(),
+  hourlyOpportunityLimit: z.number(),
+});
+
 export const UserAccessSummarySchema = z.object({
   userId: z.string(),
   role: z.enum(['free', 'pro', 'ultra', 'admin', 'superadmin']),
@@ -407,13 +421,13 @@ export const TechnicalStrategySchema = z.object({
   isActive: z.boolean().default(false),
   indicators: z.array(z.object({
     name: z.string(),
-    parameters: z.record(z.any()),
+    parameters: z.record(z.unknown()),
     timeframe: z.string(),
   })),
   conditions: z.array(z.object({
     type: z.enum(['entry', 'exit', 'stop_loss', 'take_profit']),
     logic: z.string(),
-    parameters: z.record(z.any()),
+    parameters: z.record(z.unknown()),
   })),
   riskManagement: RiskManagementConfigSchema,
   backtestResults: z.array(z.object({
@@ -434,7 +448,7 @@ export const TechnicalStrategySchema = z.object({
 export const RBACOperationResultSchema = z.object({
   success: z.boolean(),
   message: z.string(),
-  data: z.any().optional(),
+  data: z.unknown().optional(),
   timestamp: z.number(),
   errors: z.array(z.string()).optional(),
 });
@@ -445,6 +459,7 @@ export type TradingConfig = z.infer<typeof TradingConfigSchema>;
 export type ApiAccess = z.infer<typeof ApiAccessSchema>;
 export type OpportunityLimits = z.infer<typeof OpportunityLimitsSchema>;
 export type StrategyLimits = z.infer<typeof StrategyLimitsSchema>;
+export type TierLimits = z.infer<typeof TierLimitsSchema>;
 export type UserAccessSummary = z.infer<typeof UserAccessSummarySchema>;
 export type TechnicalStrategy = z.infer<typeof TechnicalStrategySchema>;
 export type RBACOperationResult = z.infer<typeof RBACOperationResultSchema>;
@@ -598,7 +613,7 @@ export interface CloudflareEnv {
 export interface RateLimitConfig {
   windowMs: number;
   maxRequests: number;
-  keyGenerator?: (request: any) => string;
+  keyGenerator?: (request: unknown) => string;
   skipSuccessfulRequests?: boolean;
 }
 
@@ -615,7 +630,7 @@ export interface ErrorResponse {
   message: string;
   errorId: string;
   timestamp: string;
-  details?: Record<string, any>;
+  details?: Record<string, unknown>;
 }
 
 // Health Check Types
@@ -632,7 +647,7 @@ export interface HealthCheckResponse {
   responseTime: string;
   version: string;
   environment: string;
-  checks: Record<string, any>;
+  checks: Record<string, unknown>;
   uptime: string;
   worker?: {
     region: string;

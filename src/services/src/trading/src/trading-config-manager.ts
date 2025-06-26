@@ -14,10 +14,10 @@ import type {
  * Handles position sizing, leverage limits, risk tolerance, and trading permissions
  */
 export class TradingConfigManager {
-  private env: any;
+  private env: unknown;
   private defaultRiskProfiles: Map<RiskLevelType, Partial<RiskManagementConfig>>;
 
-  constructor(env: any) {
+  constructor(env: unknown) {
     this.env = env;
     this.defaultRiskProfiles = new Map();
     this.initializeRiskProfiles();
@@ -138,7 +138,7 @@ export class TradingConfigManager {
   ): Promise<RBACOperationResult> {
     try {
       const key = `rbac:trading_config:${userId}`;
-      const existingConfig = await this.env.ArbEdgeKV.get(key, 'json') as TradingConfig;
+      const existingConfig = await (this.env as any).ArbEdgeKV.get(key, 'json') as TradingConfig;
       
       if (!existingConfig) {
         return {
@@ -163,7 +163,7 @@ export class TradingConfigManager {
       };
 
       // Store updated configuration
-      await this.env.ArbEdgeKV.put(key, JSON.stringify(updatedConfig), {
+      await (this.env as any).ArbEdgeKV.put(key, JSON.stringify(updatedConfig), {
         expirationTtl: 86400
       });
 
@@ -192,7 +192,7 @@ export class TradingConfigManager {
   ): Promise<RBACOperationResult> {
     try {
       const key = `rbac:trading_config:${userId}`;
-      const existingConfig = await this.env.ArbEdgeKV.get(key, 'json') as TradingConfig;
+      const existingConfig = await (this.env as any).ArbEdgeKV.get(key, 'json') as TradingConfig;
       
       if (!existingConfig) {
         return {
@@ -222,7 +222,7 @@ export class TradingConfigManager {
       };
 
       // Store updated configuration
-      await this.env.ArbEdgeKV.put(key, JSON.stringify(updatedConfig), {
+      await (this.env as any).ArbEdgeKV.put(key, JSON.stringify(updatedConfig), {
         expirationTtl: 86400
       });
 
@@ -248,7 +248,7 @@ export class TradingConfigManager {
   async getTradingConfig(userId: string): Promise<TradingConfig | null> {
     try {
       const key = `rbac:trading_config:${userId}`;
-      const config = await this.env.ArbEdgeKV.get(key, 'json');
+      const config = await (this.env as any).ArbEdgeKV.get(key, 'json');
       return config as TradingConfig | null;
     } catch (error) {
       console.error('Failed to get trading configuration:', error);
@@ -521,25 +521,25 @@ export class TradingConfigManager {
    */
   private validateRiskManagementForTrade(
     riskConfig: RiskManagementConfig,
-    tradeRequest: any
+    tradeRequest: unknown
   ): { errors: string[]; warnings: string[] } {
     const errors: string[] = [];
     const warnings: string[] = [];
 
     // Check stop loss requirement
-    if (riskConfig.stopLossRequired && !tradeRequest.stopLoss) {
+    if (riskConfig.stopLossRequired && !(tradeRequest as any).stopLoss) {
       errors.push('Stop loss is required for this risk profile');
     }
 
     // Check take profit recommendation
-    if (riskConfig.takeProfitRecommended && !tradeRequest.takeProfit) {
+    if (riskConfig.takeProfitRecommended && !(tradeRequest as any).takeProfit) {
       warnings.push('Take profit is recommended for this risk profile');
     }
 
     // Validate risk-reward ratio if both stop loss and take profit are provided
-    if (tradeRequest.stopLoss && tradeRequest.takeProfit && tradeRequest.price) {
-      const risk = Math.abs(tradeRequest.price - tradeRequest.stopLoss);
-      const reward = Math.abs(tradeRequest.takeProfit - tradeRequest.price);
+    if ((tradeRequest as any).stopLoss && (tradeRequest as any).takeProfit && (tradeRequest as any).price) {
+      const risk = Math.abs((tradeRequest as any).price - (tradeRequest as any).stopLoss);
+      const reward = Math.abs((tradeRequest as any).takeProfit - (tradeRequest as any).price);
       const riskRewardRatio = reward / risk;
 
       if (riskRewardRatio < riskConfig.riskRewardRatioMin) {

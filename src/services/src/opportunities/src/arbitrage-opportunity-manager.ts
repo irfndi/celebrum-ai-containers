@@ -11,11 +11,11 @@ import type {
  * Handles opportunity validation, rate limiting, and access control
  */
 export class ArbitrageOpportunityManager {
-  private env: any;
+  private env: unknown;
   private opportunityCache: Map<string, ArbitrageOpportunity[]>;
-  private userOpportunityHistory: Map<string, any[]>;
+  private userOpportunityHistory: Map<string, unknown[]>;
 
-  constructor(env: any) {
+  constructor(env: unknown) {
     this.env = env;
     this.opportunityCache = new Map();
     this.userOpportunityHistory = new Map();
@@ -42,7 +42,7 @@ export class ArbitrageOpportunityManager {
 
     // Store in KV
     const key = `rbac:opportunity_limits:${userId}`;
-    await this.env.CELEBRUM_KV?.put(key, JSON.stringify(opportunityLimits), {
+    await (this.env as any).CELEBRUM_KV?.put(key, JSON.stringify(opportunityLimits), {
       expirationTtl: 86400 // 24 hours
     });
 
@@ -55,7 +55,7 @@ export class ArbitrageOpportunityManager {
   async getOpportunityLimits(userId: string): Promise<OpportunityLimits | null> {
     try {
       const key = `rbac:opportunity_limits:${userId}`;
-      const limits = await this.env.CELEBRUM_KV?.get(key, 'json');
+      const limits = await (this.env as any).CELEBRUM_KV?.get(key, 'json');
       return limits as OpportunityLimits | null;
     } catch (error) {
       console.error('Failed to get opportunity limits:', error);
@@ -115,7 +115,7 @@ export class ArbitrageOpportunityManager {
 
         // Store updated limits
         const key = `rbac:opportunity_limits:${userId}`;
-        await this.env.CELEBRUM_KV?.put(key, JSON.stringify(limits), {
+        await (this.env as any).CELEBRUM_KV?.put(key, JSON.stringify(limits), {
           expirationTtl: 86400
         });
       }
@@ -184,13 +184,13 @@ export class ArbitrageOpportunityManager {
       };
 
       const executionKey = `rbac:opportunity_execution:${userId}:${Date.now()}`;
-      await this.env.CELEBRUM_KV?.put(executionKey, JSON.stringify(executionRecord), {
+      await (this.env as any).CELEBRUM_KV?.put(executionKey, JSON.stringify(executionRecord), {
         expirationTtl: 7 * 24 * 60 * 60 // 7 days
       });
 
       // Update limits
       const limitsKey = `rbac:opportunity_limits:${userId}`;
-      await this.env.CELEBRUM_KV?.put(limitsKey, JSON.stringify(limits), {
+      await (this.env as any).CELEBRUM_KV?.put(limitsKey, JSON.stringify(limits), {
         expirationTtl: 86400
       });
 
@@ -292,16 +292,16 @@ export class ArbitrageOpportunityManager {
 
       // Store alert
       const alertKey = `rbac:opportunity_alert:${alertId}`;
-      await this.env.CELEBRUM_KV?.put(alertKey, JSON.stringify(alert), {
+      await (this.env as any).CELEBRUM_KV?.put(alertKey, JSON.stringify(alert), {
         expirationTtl: 30 * 24 * 60 * 60 // 30 days
       });
 
       // Add to user's alert list
       const userAlertsKey = `rbac:user_alerts:${userId}`;
-      const existingAlerts = await this.env.CELEBRUM_KV?.get(userAlertsKey, 'json') || [];
+      const existingAlerts = await (this.env as any).CELEBRUM_KV?.get(userAlertsKey, 'json') || [];
       existingAlerts.push(alertId);
       
-      await this.env.CELEBRUM_KV?.put(userAlertsKey, JSON.stringify(existingAlerts), {
+      await (this.env as any).CELEBRUM_KV?.put(userAlertsKey, JSON.stringify(existingAlerts), {
         expirationTtl: 30 * 24 * 60 * 60
       });
 
@@ -327,15 +327,15 @@ export class ArbitrageOpportunityManager {
   /**
    * Get user's opportunity alerts
    */
-  async getUserOpportunityAlerts(userId: string): Promise<any[]> {
+  async getUserOpportunityAlerts(userId: string): Promise<unknown[]> {
     try {
       const userAlertsKey = `rbac:user_alerts:${userId}`;
-      const alertIds = await this.env.CELEBRUM_KV?.get(userAlertsKey, 'json') || [];
+      const alertIds = await (this.env as any).CELEBRUM_KV?.get(userAlertsKey, 'json') || [];
       
       const alerts = [];
       for (const alertId of alertIds) {
         const alertKey = `rbac:opportunity_alert:${alertId}`;
-        const alert = await this.env.CELEBRUM_KV?.get(alertKey, 'json');
+        const alert = await (this.env as any).CELEBRUM_KV?.get(alertKey, 'json');
         if (alert) {
           alerts.push(alert);
         }
@@ -374,7 +374,7 @@ export class ArbitrageOpportunityManager {
 
       // Store updated limits
       const key = `rbac:opportunity_limits:${userId}`;
-      await this.env.CELEBRUM_KV?.put(key, JSON.stringify(updatedLimits), {
+      await (this.env as any).CELEBRUM_KV?.put(key, JSON.stringify(updatedLimits), {
         expirationTtl: 86400
       });
 
@@ -425,7 +425,7 @@ export class ArbitrageOpportunityManager {
   ): Promise<void> {
     try {
       const lastResetKey = `rbac:opportunity_reset:${userId}`;
-      const lastReset = await this.env.CELEBRUM_KV?.get(lastResetKey, 'json') || {
+      const lastReset = await (this.env as any).CELEBRUM_KV?.get(lastResetKey, 'json') || {
         dailyReset: 0,
         hourlyReset: 0
       };
@@ -455,13 +455,13 @@ export class ArbitrageOpportunityManager {
 
       if (needsUpdate) {
         // Update reset timestamps
-        await this.env.CELEBRUM_KV?.put(lastResetKey, JSON.stringify(lastReset), {
+        await (this.env as any).CELEBRUM_KV?.put(lastResetKey, JSON.stringify(lastReset), {
           expirationTtl: 86400
         });
 
         // Update limits
         const limitsKey = `rbac:opportunity_limits:${userId}`;
-        await this.env.CELEBRUM_KV?.put(limitsKey, JSON.stringify(limits), {
+        await (this.env as any).CELEBRUM_KV?.put(limitsKey, JSON.stringify(limits), {
           expirationTtl: 86400
         });
       }
@@ -476,7 +476,7 @@ export class ArbitrageOpportunityManager {
   private async getOpportunitiesFromCache(role: UserRoleType): Promise<ArbitrageOpportunity[]> {
     try {
       const cacheKey = `opportunities_cache:${role}`;
-      const cached = await this.env.CELEBRUM_KV?.get(cacheKey, 'json');
+      const cached = await (this.env as any).CELEBRUM_KV?.get(cacheKey, 'json');
       return cached ? cached.opportunities : [];
     } catch (error) {
       console.error('Failed to get opportunities from cache:', error);
@@ -495,7 +495,7 @@ export class ArbitrageOpportunityManager {
         timestamp: Date.now()
       };
       
-      await this.env.CELEBRUM_KV?.put(cacheKey, JSON.stringify(cacheData), {
+      await (this.env as any).CELEBRUM_KV?.put(cacheKey, JSON.stringify(cacheData), {
         expirationTtl: 300 // 5 minutes
       });
     } catch (error) {
@@ -560,23 +560,23 @@ export class ArbitrageOpportunityManager {
   /**
    * Apply user-defined filters to opportunities
    */
-  private applyFilters(opportunities: ArbitrageOpportunity[], filters: any): ArbitrageOpportunity[] {
+  private applyFilters(opportunities: ArbitrageOpportunity[], filters: unknown): ArbitrageOpportunity[] {
     return opportunities.filter(opp => {
-      if (filters.minProfitPercent && opp.profit_percentage < filters.minProfitPercent) {
+      if ((filters as any).minProfitPercent && opp.profit_percentage < (filters as any).minProfitPercent) {
         return false;
       }
       
       // Risk filtering removed as ArbitrageOpportunity schema doesn't include risk property
       // Risk can be calculated from confidence_score if needed
       
-      if (filters.exchanges && filters.exchanges.length > 0) {
-        if (!filters.exchanges.includes(opp.exchange_a) && !filters.exchanges.includes(opp.exchange_b)) {
+      if ((filters as any).exchanges && (filters as any).exchanges.length > 0) {
+        if (!(filters as any).exchanges.includes(opp.exchange_a) && !(filters as any).exchanges.includes(opp.exchange_b)) {
           return false;
         }
       }
       
-      if (filters.symbols && filters.symbols.length > 0) {
-        if (!filters.symbols.includes(opp.symbol)) {
+      if ((filters as any).symbols && (filters as any).symbols.length > 0) {
+        if (!(filters as any).symbols.includes(opp.symbol)) {
           return false;
         }
       }
@@ -605,7 +605,7 @@ export class ArbitrageOpportunityManager {
   private async getTotalExecutions(userId: string): Promise<number> {
     try {
       const statsKey = `rbac:opportunity_stats:${userId}`;
-      const stats = await this.env.CELEBRUM_KV?.get(statsKey, 'json') || { total: 0, successful: 0 };
+      const stats = await (this.env as any).CELEBRUM_KV?.get(statsKey, 'json') || { total: 0, successful: 0 };
       return stats.total;
     } catch {
       return 0;
@@ -618,7 +618,7 @@ export class ArbitrageOpportunityManager {
   private async getSuccessfulExecutions(userId: string): Promise<number> {
     try {
       const statsKey = `rbac:opportunity_stats:${userId}`;
-      const stats = await this.env.CELEBRUM_KV?.get(statsKey, 'json') || { total: 0, successful: 0 };
+      const stats = await (this.env as any).CELEBRUM_KV?.get(statsKey, 'json') || { total: 0, successful: 0 };
       return stats.successful;
     } catch {
       return 0;

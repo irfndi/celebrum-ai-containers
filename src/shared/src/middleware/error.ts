@@ -1,3 +1,4 @@
+import type { Context } from 'hono';
 import type { Env } from '../types';
 
 /**
@@ -7,7 +8,7 @@ export class ErrorHandler {
   /**
    * Handle errors with appropriate responses and logging
    */
-  async handle(error: Error, c: any): Promise<Response> {
+  async handle(error: Error, c: Context<{ Bindings: Env }>): Promise<Response> {
     const errorId = this.generateErrorId();
     const timestamp = new Date().toISOString();
     
@@ -50,7 +51,7 @@ export class ErrorHandler {
    */
   private createErrorResponse(error: Error, errorId: string, timestamp: string): {
     status: number;
-    body: any;
+    body: unknown;
   } {
     // Handle specific error types
     if (error.name === 'ValidationError') {
@@ -135,8 +136,8 @@ export class ErrorHandler {
   /**
    * Log error to KV store for monitoring
    */
-  private async logError(errorId: string, error: Error, c: any): Promise<void> {
-    const env = c.env as Env;
+  private async logError(errorId: string, error: Error, c: Context<{ Bindings: Env }>): Promise<void> {
+    const env = c.env;
     if (!env.CELEBRUM_KV) return;
 
     const errorLog = {
@@ -162,7 +163,7 @@ export class ErrorHandler {
    * Middleware function for Hono
    */
   middleware() {
-    return async (c: any, next: () => Promise<void>) => {
+    return async (c: Context<{ Bindings: Env }>, next: () => Promise<void>) => {
       try {
         await next();
       } catch (error) {
@@ -174,7 +175,7 @@ export class ErrorHandler {
   /**
    * Create error response for specific HTTP status codes
    */
-  static createHttpError(status: number, message: string, details?: any): Response {
+  static createHttpError(status: number, message: string, details?: unknown): Response {
     const errorId = `err_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     const timestamp = new Date().toISOString();
 
@@ -183,7 +184,7 @@ export class ErrorHandler {
       message,
       errorId,
       timestamp,
-      ...(details && { details })
+      ...(details && typeof details === 'object' && details !== null ? { details } : {})
     };
 
     return new Response(JSON.stringify(body), {

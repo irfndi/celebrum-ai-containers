@@ -5,8 +5,8 @@
  * Validates configuration, imports, and dry-run functionality
  */
 
-import { existsSync } from 'fs';
-import { join } from 'path';
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
 
 interface TestResult {
   name: string;

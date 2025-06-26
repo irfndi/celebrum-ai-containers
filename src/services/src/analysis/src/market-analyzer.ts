@@ -5,7 +5,7 @@ import type { Env } from '@celebrum-ai/shared';
 export class MarketAnalyzer {
   constructor(private env: Env) {}
 
-  async analyzeMarketTrends(symbol: string): Promise<any> {
+  async analyzeMarketTrends(symbol: string): Promise<unknown> {
     // TODO: Implement market trend analysis
     return {
       symbol,
@@ -15,7 +15,7 @@ export class MarketAnalyzer {
     };
   }
 
-  async getMarketSentiment(symbol: string): Promise<any> {
+  async getMarketSentiment(symbol: string): Promise<unknown> {
     // TODO: Implement market sentiment analysis
     return {
       symbol,

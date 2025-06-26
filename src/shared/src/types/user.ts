@@ -111,7 +111,7 @@ export interface UserActivity {
   userId: string;
   type: 'login' | 'logout' | 'order' | 'trade' | 'portfolio_update' | 'settings_change' | 'api_call';
   description: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   ipAddress: string;
   userAgent: string;
   timestamp: string;
