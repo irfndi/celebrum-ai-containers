@@ -1,8 +1,19 @@
-// Re-export types and utilities
-export * from './types/index';
-export * from './handlers/index';
-export * from './utils/index';
+import { initializeHandlers, processTelegramUpdate } from './handlers';
+import type { TelegramUpdate, TelegramWebhookContext } from './types';
 
-// Import specific items from shared to avoid conflicts
-import * as shared from '@celebrum-ai/shared';
-export { shared };
+// Initialize all the handlers
+initializeHandlers();
+
+export async function handleTelegramUpdate(update: TelegramUpdate, context: TelegramWebhookContext): Promise<Response> {
+    const response = await processTelegramUpdate(update, context);
+    if (response) {
+        return new Response(JSON.stringify(response), {
+            headers: { 'Content-Type': 'application/json' },
+        });
+    }
+    return new Response(JSON.stringify({ ok: true }), {
+        headers: { 'Content-Type': 'application/json' },
+    });
+}
+
+export * from './types';

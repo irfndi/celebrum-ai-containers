@@ -1,3 +1,4 @@
+// @celebrum-ai/shared - Validation schemas and functions
 import { z } from 'zod';
 import { CRYPTOCURRENCIES, FIAT_CURRENCIES, EXCHANGE_INFO } from '../constants';
 

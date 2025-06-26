@@ -162,32 +162,47 @@ export async function processCallbackQuery(
   }
 }
 
+import { SessionService, UserService } from '@celebrum-ai/shared';
+
 // Initialize default handlers
 export function initializeHandlers(): void {
   // Start command
   registerHandler({
     command: 'start',
-    description: 'Welcome message and quick start',
+    description: 'Start the bot and create/authenticate your account',
     handler: async (update, context) => {
+      const sessionService = new SessionService(context.env.SESSIONS);
       const chatId = getChatId(update);
-      const userId = getUserId(update);
-      
-      if (!chatId) return null;
+      const from = update.message?.from;
 
-      console.log(`🚀 Processing /start command for user ${userId} in chat ${chatId}`);
+      if (!chatId || !from) return null;
+
+      const userService = new UserService(context.env.DB);
+      const telegramId = from.id.toString();
+      let user = await userService.findUserByTelegramId(telegramId);
+
+      let welcomeMessage;
+      if (user) {
+        await sessionService.deleteSessionByTelegramId(telegramId); // Clean up old sessions
+        const session = await sessionService.createSession(user);
+        welcomeMessage = `👋 <b>Welcome back, ${from.first_name}!</b>\n\nYour trading journey continues. What would you like to do today?\n\n(Session ID: ${session.sessionId})`;
+      } else {
+        user = await userService.createUser({
+          telegramId: telegramId,
+          firstName: from.first_name,
+          lastName: from.last_name,
+          username: from.username,
+          // Use type assertion to bypass the type check
+          ...(from.language_code ? { languageCode: from.language_code } : {})
+        });
+        const session = await sessionService.createSession(user);
+        welcomeMessage = `🚀 <b>Welcome to Celebrum Trading Platform, ${from.first_name}!</b>\n\nYour account has been created. I'm your AI-powered trading assistant. Here's what I can help you with:\n\n📊 <b>Market Analysis</b>\n• Real-time arbitrage opportunities\n• Price tracking across exchanges\n• Market insights and trends\n\n🛠️ <b>Trading Tools</b>\n• Portfolio management\n• Risk assessment\n• Trade execution assistance\n\nType /help to see all available commands or /opportunities to get started!\n\n<i>Ready to maximize your trading potential? Let's go! 🎯</i>\n\n(Session ID: ${session.sessionId})`;
+      }
 
       return {
         method: 'sendMessage',
         chat_id: chatId,
-        text: `🎯 <b>Welcome to ArbEdge!</b>\n\n` +
-              `🔍 Your gateway to cryptocurrency arbitrage opportunities\n\n` +
-              `<b>Quick Start:</b>\n` +
-              `• Use /opportunities to view current arbitrage opportunities\n` +
-              `• Use /balance to check your portfolio\n` +
-              `• Use /settings to configure your preferences\n` +
-              `• Use /help to see all available commands\n\n` +
-              `💡 <b>Tip:</b> Start by checking out /opportunities to see what's available!\n\n` +
-              `🔐 Your user ID: <code>${userId}</code>`,
+        text: welcomeMessage,
         parse_mode: 'HTML'
       };
     }

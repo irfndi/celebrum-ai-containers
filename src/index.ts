@@ -1,11 +1,11 @@
 import { Hono } from 'hono';
 import { Container, getContainer, loadBalance } from "@cloudflare/containers";
-import { ServiceRouter } from './services/router';
+// import { ServiceRouter } from '@celebrum-ai/services';
 import type { Env } from '@celebrum-ai/shared';
 
-const serviceRouter = new ServiceRouter();
-const apiRouter = serviceRouter.apiHandler();
-const telegramRouter = serviceRouter.telegramBotHandler();
+// const serviceRouter = new ServiceRouter();
+// const apiRouter = serviceRouter.apiHandler();
+// const telegramRouter = serviceRouter.telegramBotHandler();
 
 export class Celebrum_Container extends Container {
   // Port the container listens on (default: 8080)
@@ -37,10 +37,10 @@ const app = new Hono<{
 }>();
 
 // Add API routes
-app.route('/api/v1', apiRouter);
+// app.route('/api/v1', apiRouter);
 
 // Add Telegram webhook route
-app.route('/telegram', telegramRouter);
+// app.route('/telegram', telegramRouter);
 
 // Home route with available endpoints
 app.get("/", (c) => {

@@ -14,7 +14,7 @@
   "packageManager": "pnpm@10.12.1",
   "scripts": {
     "build": "pnpm run build:packages && wrangler deploy --dry-run",
-    "build:packages": "pnpm --recursive --stream --filter \"./packages/**\" run build",
+    "build:packages": "pnpm --recursive --stream --filter \"./packages/**\" --filter \"!@celebrum-ai/services\" run build",
     "dev": "./scripts/dev/start-dev.sh",
     "dev:worker": "wrangler dev",
     "dev:web": "./scripts/dev/start-dev.sh web",

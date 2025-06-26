@@ -1,3 +1,37 @@
+/**
+ * Type definitions for the Celebrum AI platform
+ */
+
+// API types
+export * from './api';
+
+// Market data types
+export * from './market';
+
+// Trading types - explicit re-export to avoid Trade conflict
+export type {
+  Order,
+  TradingSignal,
+  BacktestResult,
+  BacktestTrade,
+  EquityPoint,
+  Portfolio,
+  PortfolioPerformance,
+  PortfolioSettings,
+  RiskMetrics,
+  TradingStrategy,
+  TradingRule,
+  StrategyPerformance,
+  MarketMaker,
+  Arbitrage,
+} from './trading';
+
+// User types
+export * from './user';
+
+// Notification types
+export * from './notifications';
+
 // @celebrum-ai/shared - Shared Types
 import { z } from 'zod';
 import type { D1Database, KVNamespace, DurableObjectNamespace } from '@cloudflare/workers-types';
@@ -188,7 +222,7 @@ export const PositionStatus = {
   CANCELLED: 'cancelled'
 } as const;
 
-export const TradingStrategy = {
+export const TradingStrategyType = {
   ARBITRAGE: 'arbitrage',
   TECHNICAL: 'technical',
   MANUAL: 'manual'
@@ -201,7 +235,7 @@ export const OpportunityType = {
 
 export type PositionTypeType = typeof PositionType[keyof typeof PositionType];
 export type PositionStatusType = typeof PositionStatus[keyof typeof PositionStatus];
-export type TradingStrategyType = typeof TradingStrategy[keyof typeof TradingStrategy];
+export type TradingStrategyTypeType = typeof TradingStrategyType[keyof typeof TradingStrategyType];
 export type OpportunityTypeType = typeof OpportunityType[keyof typeof OpportunityType];
 
 // Position Schema

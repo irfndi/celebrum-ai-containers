@@ -1,0 +1,17 @@
+{
+  "name": "@celebrum-ai/trading",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc -w"
+  },
+  "dependencies": {
+    "@celebrum-ai/shared": "workspace:*",
+    "@celebrum-ai/db": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.4"
+  }
+}

@@ -3,6 +3,15 @@ import { AppError, ValidationError, AuthenticationError, RateLimitError } from '
 import { formatValidationErrors } from '../validation';
 import { API } from '../config';
 
+// Export middleware classes
+export { ErrorHandler, errorHandler } from './error';
+export { HealthCheck } from './health';
+export { RateLimiter } from './rate-limit';
+
+// Export types with prefixes to avoid conflicts
+export type { HealthStatus, ServiceHealth, SystemHealth, HealthCheckConfig } from './health';
+export type { RateLimitConfig as MiddlewareRateLimitConfig, RateLimitInfo as MiddlewareRateLimitInfo } from './rate-limit';
+
 // Types for middleware
 export interface Request {
   headers: Record<string, string | string[] | undefined>;

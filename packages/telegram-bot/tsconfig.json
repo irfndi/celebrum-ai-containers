@@ -2,7 +2,7 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "outDir": "./dist",
-    "rootDir": "./src",
+    "rootDir": "src",
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
@@ -16,20 +16,17 @@
       "@/*": [
         "./src/*"
       ],
-      "@shared/*": [
-        "../shared/dist/*"
-      ],
       "@celebrum-ai/shared": [
-        "../shared/dist/index"
+        "../shared/src"
       ],
       "@celebrum-ai/shared/*": [
-        "../shared/dist/*"
+        "../shared/src/*"
       ],
       "@celebrum-ai/db": [
-        "../db/dist/index"
+        "../db/src"
       ],
       "@celebrum-ai/db/*": [
-        "../db/dist/*"
+        "../db/src/*"
       ]
     }
   },

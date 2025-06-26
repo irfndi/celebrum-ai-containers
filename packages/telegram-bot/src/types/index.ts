@@ -81,8 +81,10 @@ export interface TelegramHandler {
 }
 
 // Context types
+import type { Env } from '@celebrum-ai/shared';
+
 export interface TelegramWebhookContext {
-  env: any; // Cloudflare Workers environment
+  env: Env;
   request: Request;
   waitUntil: (promise: Promise<any>) => void;
 }

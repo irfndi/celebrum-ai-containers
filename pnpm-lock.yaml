@@ -122,6 +122,19 @@ importers:
         specifier: ^5.8.3
         version: 5.8.3
 
+  packages/services:
+    dependencies:
+      '@celebrum-ai/db':
+        specifier: workspace:*
+        version: link:../db
+      '@celebrum-ai/shared':
+        specifier: workspace:*
+        version: link:../shared
+    devDependencies:
+      typescript:
+        specifier: ^5.0.4
+        version: 5.8.3
+
   packages/shared:
     dependencies:
       '@celebrum-ai/db':

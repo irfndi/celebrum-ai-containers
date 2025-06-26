@@ -6,6 +6,10 @@
   "compatibility_flags": [
     "nodejs_compat"
   ],
+  "build": {
+    "command": "pnpm run build:packages",
+    "watch_dir": "../packages/shared/src"
+  },
   "vars": {
     "API_SERVICE_URL": "http://127.0.0.1:8787"
   },

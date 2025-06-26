@@ -1,0 +1,22 @@
+{
+  "name": "@celebrum-ai/analysis",
+  "version": "1.0.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc --build",
+    "clean": "rm -rf dist",
+    "lint": "oxlint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@celebrum-ai/shared": "workspace:*",
+    "@celebrum-ai/db": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.2",
+    "oxlint": "^0.2.13",
+    "typescript": "^5.4.3"
+  }
+}
