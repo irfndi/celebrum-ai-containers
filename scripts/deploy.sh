@@ -1,10 +1,10 @@
 #!/bin/bash
-# Production Deployment Script for ArbEdge
+# Production Deployment Script for Celebrum AI
 # Deploys to Cloudflare Workers with all required services
 
 set -e
 
-echo "🚀 Starting ArbEdge Production Deployment..."
+echo "🚀 Starting Celebrum AI Production Deployment..."
 
 # Check if wrangler is installed
 if ! command -v wrangler &> /dev/null; then

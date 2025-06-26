@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Comprehensive Security Check for ArbEdge Monorepo
+# Comprehensive Security Check for Celebrum AI
 # Orchestrates all security tools and generates unified reports
 
 set -euo pipefail
@@ -67,7 +67,7 @@ while [[ $# -gt 0 ]]; do
             ;;
         -h|--help)
             echo "Usage: $0 [OPTIONS]"
-            echo "Comprehensive security check for ArbEdge monorepo"
+            echo "Comprehensive security check for Celebrum AI"
             echo ""
             echo "Options:"
             echo "  --skip-audit      Skip dependency vulnerability audit"

@@ -1,16 +1,16 @@
 # Cerebrum AI Unified Monorepo Makefile
-# Celebrum AI Monorepo - TypeScript & Go with Cloudflare Containers
+# Celebrum AI - TypeScript & Go with Cloudflare Workers + Cloudflare Containers
 
 # Use standard shell with pnpm
 SHELL := /bin/bash
 export PATH := $(PATH)
 
-.PHONY: help setup test build build-wasm coverage clean lint fix fmt check-all deploy deploy-wasm pre-commit local-ci full-check unit-tests integration-tests e2e-tests lib-tests ci-pipeline ci dev-quick quick validate fix-and-validate quality test-api test-api-local test-api-staging test-api-production test-api-prod-admin test-api-v1 test-api-v1-local test-api-v1-staging test-api-v1-production build-packages build-db build-shared build-telegram-bot build-web build-worker test-packages test-db test-shared test-telegram-bot test-web test-worker lint-packages lint-db lint-shared lint-telegram-bot lint-web lint-worker dev dev-worker dev-web dev-telegram-bot deploy-worker deploy-web fmt-check fmt-fix lint-strict typecheck typecheck-db typecheck-shared typecheck-telegram-bot typecheck-web typecheck-worker check check-wasm clean-go clean-packages clean-db clean-shared clean-telegram-bot clean-web clean-worker doc build-release build-containers test-verbose test-performance test-performance-local test-performance-staging test-performance-production test-performance-stress test-webhook-local test-performance-ramp test-performance-extreme test-complete-super-admin test-complete-super-admin-production test-complete-super-admin-local
+.PHONY: help setup test build build-wasm coverage clean lint fix fmt check-all deploy deploy-wasm pre-commit local-ci full-check unit-tests integration-tests e2e-tests ci-pipeline ci dev-quick quick validate fix-and-validate quality test-api test-api-local test-api-staging test-api-production test-api-prod-admin test-api-v1 test-api-v1-local test-api-v1-staging test-api-v1-production dev dev-worker dev-web dev-telegram-bot deploy-worker deploy-web fmt-check fmt-fix lint-strict typecheck check check-wasm doc build-release build-containers test-verbose test-performance test-performance-local test-performance-staging test-performance-production test-performance-stress test-webhook-local test-performance-ramp test-performance-extreme test-complete-super-admin test-complete-super-admin-production test-complete-super-admin-local
 
 help: ## Show this help message
-	@echo "🚀 Celebrum AI Monorepo Commands"
+	@echo "🚀 Celebrum AI Commands"
 	@echo "===================================="
-	@echo "\033[33m💡 Tip: Use 'make ci' for full validation (TypeScript + Go)\033[0m"
+	@echo "\033[33m💡 Tip: Use 'make ci' for full validation\033[0m"
 	@echo "\033[33m💡 Tip: Use 'make fix-and-validate' to auto-fix then validate\033[0m"
 	@echo "===================================="
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -26,84 +26,25 @@ install: ## Install all dependencies (TypeScript + Go packages)
 	@echo "📦 Setting up Go toolchain..."
 	@go version || echo "⚠️  Go not installed. Please install Go from https://golang.org/dl/"
 
-# TypeScript package commands
-build-packages: ## Build all TypeScript packages
-	@echo "🔨 Building TypeScript packages..."
+# Build commands
+build: ## Build all packages
+	@echo "🔨 Building all packages..."
 	@pnpm run build
 
-build-db: ## Build database package
-	@echo "🔨 Building database package..."
-	@pnpm --filter @celebrum-ai/db run build
-
-build-shared: ## Build shared package
-	@echo "🔨 Building shared package..."
-	@pnpm --filter @celebrum-ai/shared run build
-
-build-telegram-bot: ## Build telegram bot package
-	@echo "🔨 Building telegram bot package..."
-	@pnpm --filter @celebrum-ai/telegram-bot run build
-
-build-web: ## Build web package
-	@echo "🔨 Building web package..."
-	@pnpm --filter @celebrum-ai/web run build
-
-build-worker: ## Build worker (root src)
-	@echo "🔨 Building worker (root src)..."
-	@wrangler deploy --dry-run
-
-test-packages: ## Test all TypeScript packages
-	@echo "🧪 Testing TypeScript packages..."
+# Test commands
+test: ## Run all tests
+	@echo "🧪 Running all tests..."
 	@pnpm run test
 
-test-db: ## Test database package
-	@echo "🧪 Testing database package..."
-	@pnpm --filter @celebrum-ai/db run test
-
-test-shared: ## Test shared package
-	@echo "🧪 Testing shared package..."
-	@pnpm --filter @celebrum-ai/shared run test
-
-test-telegram-bot: ## Test telegram bot package
-	@echo "🧪 Testing telegram bot package..."
-	@pnpm --filter @celebrum-ai/telegram-bot run test
-
-test-web: ## Test web package
-	@echo "🧪 Testing web package..."
-	@pnpm --filter @celebrum-ai/web run test
-
-test-worker: ## Test worker (root src)
-	@echo "🧪 Testing worker (root src)..."
-	@vitest run
-
-lint-packages: ## Lint all TypeScript packages
-	@echo "🔍 Linting TypeScript packages..."
+# Lint commands
+lint: ## Run linting
+	@echo "🔍 Running linting..."
 	@pnpm run lint
 
-lint-db: ## Lint database package
-	@echo "🔍 Linting database package..."
-	@pnpm --filter @celebrum-ai/db run lint
-
-lint-shared: ## Lint shared package
-	@echo "🔍 Linting shared package..."
-	@pnpm --filter @celebrum-ai/shared run lint
-
-lint-telegram-bot: ## Lint telegram bot package
-	@echo "🔍 Linting telegram bot package..."
-	@pnpm --filter @celebrum-ai/telegram-bot run lint
-
-lint-web: ## Lint web package
-	@echo "🔍 Linting web package..."
-	@pnpm --filter @celebrum-ai/web run lint
-
-lint-worker: ## Lint worker (root src)
-	@echo "🔍 Linting worker (root src)..."
-	@oxlint src
-
-# Testing commands
-test: ## Run all tests (TypeScript + Go)
-	@echo "🧪 Running TypeScript tests..."
+# Test commands
+test: ## Run all tests
+	@echo "🧪 Running all tests..."
 	@pnpm run test
-	@echo "🧪 Running Go tests..."
 	@go test ./... || echo "⚠️  No Go modules found yet"
 
 test-verbose: ## Run tests with verbose output
@@ -125,9 +66,7 @@ e2e-tests: ## Run E2E tests
 
 # Build commands
 build: ## Build all packages
-	@echo "🔨 Building dependencies first..."
-	@pnpm --filter @celebrum-ai/db run build && pnpm --filter @celebrum-ai/shared run build
-	@echo "🔨 Building remaining TypeScript packages..."
+	@echo "🔨 Building all packages..."
 	@pnpm run build
 	@echo "🔨 Building Go services..."
 	@go build ./... || echo "⚠️  No Go modules found yet"
@@ -156,11 +95,11 @@ dev-worker: ## Start worker development server
 
 dev-web: ## Start web development server
 	@echo "🚀 Starting web development server..."
-	@pnpm --filter @celebrum-ai/web run dev
+	@cd src/web && pnpm run dev
 
 dev-telegram-bot: ## Start telegram bot development server
 	@echo "🚀 Starting telegram bot development server..."
-	@pnpm --filter @celebrum-ai/telegram-bot run dev
+	@cd src/telegram-bot && pnpm run dev
 
 # Deployment commands
 deploy: ## Deploy all packages
@@ -173,7 +112,7 @@ deploy-worker: ## Deploy worker (root src)
 
 deploy-web: ## Deploy web package
 	@echo "🚀 Deploying web package..."
-	@pnpm --filter @celebrum-ai/web run deploy
+	@cd src/web && pnpm run deploy
 
 # Code quality commands
 fmt: ## Format code (TypeScript + Go)
@@ -195,9 +134,7 @@ fmt-fix: ## Auto-fix code formatting then run CI
 	@echo "🔄 Running CI pipeline..."
 	@$(MAKE) ci-pipeline
 
-lint: ## Run linting
-	@echo "🔍 Running TypeScript linting..."
-	@pnpm run lint
+lint-go: ## Run Go linting
 	@echo "🔍 Running Go linting..."
 	@golangci-lint run || echo "⚠️  golangci-lint not installed or no Go modules found"
 
@@ -206,9 +143,7 @@ lint-strict: ## Run strict linting (matches GitHub CI)
 	@pnpm run lint:strict
 	@golangci-lint run --config .golangci.yml || echo "⚠️  golangci-lint not installed or no Go modules found"
 
-lint-packages: ## Lint all TypeScript packages
-	@echo "🔍 Linting packages..."
-	@pnpm run lint:packages
+# Removed lint-packages target - no longer needed for single repository structure
 
 fix: ## Apply automatic fixes
 	@echo "🔧 Applying automatic fixes..."
@@ -217,7 +152,7 @@ fix: ## Apply automatic fixes
 
 # CI Pipeline
 ci-pipeline: ## Run comprehensive CI pipeline (TypeScript + Go)
-	@echo "🚀 Starting Full Monorepo CI Pipeline..."
+	@echo "🚀 Starting Full CI Pipeline..."
 	@echo "========================================"
 	@echo "📦 Step 0: Installing Dependencies"
 	@pnpm install --frozen-lockfile
@@ -252,13 +187,13 @@ ci-pipeline: ## Run comprehensive CI pipeline (TypeScript + Go)
 	@echo "🐳 Step 10: Docker Build Check"
 	@docker build -t celebrum-ai:test . || echo "⚠️  Dockerfile not found"
 	@echo "✅ Step 10: Docker Build Passed"
-	@echo "🎉 Monorepo CI Pipeline Completed Successfully!"
+	@echo "🎉 CI Pipeline Completed Successfully!"
 	@echo "📊 Test Summary:"
 	@echo "   - TypeScript Packages: All built and tested ✅"
 	@echo "   - Go Services: All built and tested ✅"
 	@echo "   - Cloudflare Workers: ✅ Verified"
 	@echo "   - Docker Containers: ✅ Verified"
-	@echo "   - Monorepo Integration: ✅ Complete"
+	@echo "   - Integration: ✅ Complete"
 
 # Coverage and documentation
 coverage: ## Generate test coverage report
@@ -286,37 +221,12 @@ full-check: ## Run comprehensive code quality checks
 	@./scripts/ci/full-check.sh
 
 # Clean commands
-clean: ## Clean all build artifacts (TypeScript + Go)
-	@echo "🧹 Cleaning TypeScript build artifacts..."
+clean: ## Clean all build artifacts and dependencies
+	@echo "🧹 Cleaning all build artifacts..."
+	@rm -rf dist node_modules .next .turbo
 	@pnpm run clean
-	@echo "🧹 Cleaning Go build artifacts..."
-	@go clean ./... || echo "⚠️  No Go modules found yet"
-	@rm -f coverage.out coverage.html
-
-clean-go: ## Clean Go build artifacts only
-	@echo "🧹 Cleaning Go build artifacts..."
-	@go clean ./... || echo "⚠️  No Go modules found yet"
-	@rm -f coverage.out coverage.html
-
-clean-packages: ## Clean TypeScript package build artifacts
-	@echo "🧹 Cleaning TypeScript build artifacts..."
-	@pnpm run clean
-
-clean-db: ## Clean database package build artifacts
-	@echo "🧹 Cleaning database package..."
-	@pnpm --filter @celebrum-ai/db run clean
-
-clean-shared: ## Clean shared package build artifacts
-	@echo "🧹 Cleaning shared package..."
-	@pnpm --filter @celebrum-ai/shared run clean
-
-clean-telegram-bot: ## Clean telegram bot package build artifacts
-	@echo "🧹 Cleaning telegram bot package..."
-	@pnpm --filter @celebrum-ai/telegram-bot run clean
-
-clean-web: ## Clean web package build artifacts
-	@echo "🧹 Cleaning web package..."
-	@pnpm --filter @celebrum-ai/web run clean
+	@cargo clean
+	@echo "✅ All artifacts cleaned!"
 
 clean-worker: ## Clean worker build artifacts
 	@echo "🧹 Cleaning worker build artifacts..."
@@ -325,29 +235,7 @@ clean-worker: ## Clean worker build artifacts
 # Type checking commands
 typecheck: ## Run TypeScript type checking for all packages
 	@echo "🔍 Running TypeScript type checking..."
-	@echo "🔨 Building dependencies first..."
-	@pnpm --filter @celebrum-ai/db run build && pnpm --filter @celebrum-ai/shared run build
 	@pnpm run typecheck
-
-typecheck-db: ## Run TypeScript type checking for database package
-	@echo "🔍 Type checking database package..."
-	@pnpm --filter @celebrum-ai/db run typecheck
-
-typecheck-shared: ## Run TypeScript type checking for shared package
-	@echo "🔍 Type checking shared package..."
-	@pnpm --filter @celebrum-ai/shared run typecheck
-
-typecheck-telegram-bot: ## Run TypeScript type checking for telegram bot package
-	@echo "🔍 Type checking telegram bot package..."
-	@pnpm --filter @celebrum-ai/telegram-bot run typecheck
-
-typecheck-web: ## Run TypeScript type checking for web package
-	@echo "🔍 Type checking web package..."
-	@pnpm --filter @celebrum-ai/web run typecheck
-
-typecheck-worker: ## Run TypeScript type checking for worker (root src)
-	@echo "🔍 Type checking worker (root src)..."
-	@tsc --noEmit
 
 # Utility commands
 

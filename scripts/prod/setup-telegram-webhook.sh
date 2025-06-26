@@ -7,7 +7,7 @@ set -euo pipefail
 if [[ "${1:-}" == "--help" || "${1:-}" == "-h" ]]; then
     echo "Usage: $0 [WORKER_URL]"
     echo ""
-    echo "Setup Telegram Bot Webhook for ArbEdge"
+    echo "Setup Telegram Bot Webhook for Celebrum AI"
     echo ""
     echo "Arguments:"
     echo "  WORKER_URL    Worker URL (default: https://celebrum-ai.irfandimarsya.workers.dev)"
@@ -20,7 +20,7 @@ if [[ "${1:-}" == "--help" || "${1:-}" == "-h" ]]; then
     exit 0
 fi
 
-echo "🤖 Setting up Telegram Bot Webhook for ArbEdge..."
+echo "🤖 Setting up Telegram Bot Webhook for Celebrum AI..."
 
 # Check if required tools are available
 if ! command -v curl &> /dev/null; then
@@ -80,4 +80,4 @@ else
 fi
 
 echo "✅ Telegram webhook setup completed!"
-echo "💡 Test the bot by sending /start to @your_bot_username" 
+echo "💡 Test the bot by sending /start to @your_bot_username"

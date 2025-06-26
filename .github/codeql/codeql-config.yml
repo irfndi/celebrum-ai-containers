@@ -17,7 +17,6 @@ queries:
 # Paths to include in analysis
 paths:
   - src/
-  - packages/
   - scripts/
   - .github/
 

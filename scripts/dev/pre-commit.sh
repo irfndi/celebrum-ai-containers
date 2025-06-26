@@ -26,7 +26,7 @@ print_error() {
 
 print_header() {
     echo -e "\n${BLUE}=====================================${NC}"
-    echo -e "${BLUE}🚀 ArbEdge Pre-commit Checks${NC}"
+    echo -e "${BLUE}🚀 Celebrum AI Pre-commit Checks${NC}"
     echo -e "${BLUE}=====================================${NC}"
 }
 

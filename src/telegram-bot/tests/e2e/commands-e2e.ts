@@ -15,12 +15,19 @@ import { extractCommand, getChatId, getUserId } from '../../src/utils/index';
 // Mock environment for testing
 const mockEnv = {
   TELEGRAM_BOT_TOKEN: 'test-token',
-  // Add other environment variables as needed
+  DB: {} as any, // Mock D1Database
+  ArbEdgeD1: {} as any, // Mock D1Database
+  SESSIONS: {} as any, // Mock KVNamespace
+  CELEBRUM_KV: {} as any, // Mock KVNamespace
+  PROD_BOT_MARKET_CACHE: {} as any, // Mock KVNamespace
+  PROD_BOT_SESSION_STORE: {} as any, // Mock KVNamespace
+  CELEBRUM_CONTAINERS: {} as any, // Mock DurableObjectNamespace
 };
 
 // Mock context for testing
 const mockContext: TelegramWebhookContext = {
   env: mockEnv,
+  request: new Request('https://example.com'), // Mock Request object
   waitUntil: (promise: Promise<any>) => {
     // In real Cloudflare Workers, this extends the execution context
     // For testing, we can just log or ignore
@@ -189,6 +196,8 @@ export {
 };
 
 // Run tests if this file is executed directly
-if (import.meta.main) {
-  runTests().catch(console.error);
-}
+// Note: import.meta.main is not available in all environments
+// This would typically be used in Deno, but we're using Node.js/TypeScript
+// if (import.meta.main) {
+//   runTests().catch(console.error);
+// }

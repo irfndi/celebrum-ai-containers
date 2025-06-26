@@ -3,7 +3,7 @@
 # Setup script for Cloudflare D1 Database
 set -euo pipefail
 
-echo "🗄️ Setting up Cloudflare D1 Database for ArbEdge..."
+echo "🗄️ Setting up Cloudflare D1 Database for Celebrum AI..."
 
 # Check if pnpm is available
 if ! command -v pnpm &> /dev/null; then

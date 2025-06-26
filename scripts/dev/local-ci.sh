@@ -30,7 +30,7 @@ print_error() {
 
 print_header() {
     echo -e "\n${BLUE}=====================================${NC}"
-    echo -e "${BLUE}🦀 ArbEdge Local CI Pipeline${NC}"
+    echo -e "${BLUE}🦀 Celebrum AI Local CI Pipeline${NC}"
     echo -e "${BLUE}=====================================${NC}"
 }
 

@@ -109,18 +109,19 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
-            packages/*/dist
-            packages/*/build
-            packages/*/.astro
-          key: ${{ runner.os }}-ts-build-${{ hashFiles('packages/*/src/**/*', 'packages/*/package.json') }}
+            src/*/dist
+            src/*/build
+            src/*/.astro
+            dist
+          key: ${{ runner.os }}-ts-build-${{ hashFiles('src/*/src/**/*', 'package.json') }}
           restore-keys: |
             ${{ runner.os }}-ts-build-
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build dependencies first
-        run: pnpm --filter @celebrum-ai/db run build && pnpm --filter @celebrum-ai/shared run build
+      - name: Build TypeScript packages
+        run: pnpm run build
 
       - name: Lint TypeScript packages
         run: pnpm run lint
@@ -168,9 +169,6 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-
-      - name: Build dependencies first
-        run: pnpm --filter @celebrum-ai/db run build && pnpm --filter @celebrum-ai/shared run build
 
       - name: Build TypeScript packages
         run: pnpm run build
@@ -293,29 +291,14 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build dependencies first
-        run: pnpm --filter @celebrum-ai/db run build && pnpm --filter @celebrum-ai/shared run build
-
       - name: Build TypeScript packages
         run: pnpm run build
 
       - name: Install wrangler
         run: pnpm add -g wrangler@latest
 
-      - name: Deploy Core Worker
-        run: wrangler deploy
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-
-      - name: Deploy Telegram Bot
-        run: pnpm run deploy:telegram-bot
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-
-      - name: Deploy Web App
-        run: pnpm run deploy:web
+      - name: Deploy to Cloudflare
+        run: pnpm run deploy
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

@@ -34,9 +34,9 @@ print_info() {
 }
 
 print_header() {
-    echo -e "\n${BLUE}=============================================${NC}"
-    echo -e "${BLUE}🔍 ArbEdge Comprehensive Code Quality Check${NC}"
-    echo -e "${BLUE}=============================================${NC}"
+    echo -e "\n${BLUE}==============================================${NC}"
+    echo -e "${BLUE}🔍 Celebrum AI Comprehensive Code Quality Check${NC}"
+    echo -e "${BLUE}==============================================${NC}"
 }
 
 # Ensure we're using correct Rust toolchain

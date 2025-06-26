@@ -37,7 +37,23 @@
     "strict": true,
 
     /* Skip type checking all .d.ts files. */
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    
+    /* Base URL for module resolution */
+    "baseUrl": ".",
+    /* Path mapping for internal packages */
+    "paths": {
+      "@celebrum-ai/db": ["./src/db/src/index.ts"],
+      "@celebrum-ai/db/*": ["./src/db/src/*"],
+      "@celebrum-ai/shared": ["./src/shared/src/index.ts"],
+      "@celebrum-ai/shared/*": ["./src/shared/src/*"],
+      "@celebrum-ai/telegram-bot": ["./src/telegram-bot/src/index.ts"],
+      "@celebrum-ai/telegram-bot/*": ["./src/telegram-bot/src/*"],
+      "@celebrum-ai/services": ["./src/services/src/index.ts"],
+      "@celebrum-ai/services/*": ["./src/services/src/*"],
+      "@celebrum-ai/web": ["./src/web/src/index.ts"],
+      "@celebrum-ai/web/*": ["./src/web/src/*"]
+    }
   },
   "exclude": ["test"],
   "include": ["worker-configuration.d.ts", "src/**/*.ts"]

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Security Code Scanning Script for ArbEdge Monorepo
+# Security Code Scanning Script for Celebrum AI
 # Performs static code analysis for security vulnerabilities
 
 set -euo pipefail
@@ -292,7 +292,7 @@ check_file_permissions() {
 
 # Main execution
 main() {
-    log_info "Starting security code scanning for ArbEdge monorepo..."
+    log_info "Starting security code scanning for Celebrum AI..."
     log_info "Report directory: $REPORT_DIR"
     
     if [[ "$FIX_MODE" == "true" ]]; then
@@ -312,10 +312,7 @@ main() {
     fi
     
     local packages=(
-        "$ROOT_DIR/packages/shared:shared"
-        "$ROOT_DIR/packages/worker:worker"
-        "$ROOT_DIR/packages/web:web"
-        "$ROOT_DIR/packages/db:db"
+        "$ROOT_DIR:root"
     )
     
     local overall_status=0

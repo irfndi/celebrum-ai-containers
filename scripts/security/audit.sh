@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Security Audit Script for ArbEdge Monorepo
+# Security Audit Script for Celebrum AI
 # Performs comprehensive dependency vulnerability scanning
 
 set -euo pipefail
@@ -219,7 +219,7 @@ validate_lockfile() {
 
 # Main execution
 main() {
-    log_info "Starting security audit for ArbEdge monorepo..."
+    log_info "Starting security audit for Celebrum AI..."
     log_info "Report directory: $REPORT_DIR"
     
     if [[ "$FIX_MODE" == "true" ]]; then
@@ -237,11 +237,6 @@ main() {
     
     local packages=(
         "$ROOT_DIR:root"
-        "$ROOT_DIR/packages/shared:shared"
-        "$ROOT_DIR/packages/worker:worker"
-        "$ROOT_DIR/packages/web:web"
-        "$ROOT_DIR/packages/db:db"
-        "$ROOT_DIR/packages/telegram-bot:telegram-bot"
     )
     
     local overall_status=0

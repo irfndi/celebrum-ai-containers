@@ -29,10 +29,10 @@
         "src/*"
       ],
       "@celebrum-ai/db": [
-        "../db/dist"
+        "../db/src"
       ],
       "@celebrum-ai/db/*": [
-        "../db/dist/*"
+        "../db/src/*"
       ]
     }
   },
@@ -47,9 +47,4 @@
     "**/*.test.ts",
     "**/*.spec.ts"
   ],
-  "references": [
-    {
-      "path": "../db"
-    }
-  ]
 }

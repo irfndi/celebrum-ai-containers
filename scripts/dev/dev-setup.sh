@@ -1,10 +1,10 @@
 #!/bin/bash
-# Development setup script for ArbEdge Rust project
+# Development setup script for Celebrum AI Rust project
 # Ensures correct Rust toolchain configuration for WASM builds
 
 set -e
 
-echo "🦀 ArbEdge Development Setup"
+echo "🦀 Celebrum AI Development Setup"
 echo "=============================="
 
 # Ensure we're using rustup's Rust, not Homebrew's
@@ -53,4 +53,4 @@ echo "You can now run:"
 echo "  cargo build                          # Native build"
 echo "  cargo build --target wasm32-unknown-unknown  # WASM build"
 echo "  cargo test                           # Run tests"
-echo "  cargo tarpaulin --out html           # Generate coverage report" 
+echo "  cargo tarpaulin --out html           # Generate coverage report"
