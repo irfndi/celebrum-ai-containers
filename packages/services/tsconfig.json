@@ -11,9 +11,9 @@
     "tsBuildInfoFile": "./dist/.tsbuildinfo",
     "types": ["node"],
     "paths": {
-      "@celebrum-ai/shared": ["../shared/src"],
-      "@celebrum-ai/db": ["../db/src"]
-    }
+        "@celebrum-ai/shared": ["../shared/dist"],
+        "@celebrum-ai/db": ["../db/dist"]
+      }
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "**/*.test.ts"],

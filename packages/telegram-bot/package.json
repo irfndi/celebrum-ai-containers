@@ -18,8 +18,9 @@
   ],
   "scripts": {
     "build": "tsc --build",
+    "build:force": "tsup",
     "dev": "tsc --build --watch",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --build --dry",
     "test": "vitest",
     "test:coverage": "vitest --coverage",
     "lint": "oxlint src",

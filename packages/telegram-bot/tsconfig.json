@@ -19,16 +19,16 @@
         "./src/*"
       ],
       "@celebrum-ai/shared": [
-        "../shared/src"
+        "../shared/dist"
       ],
       "@celebrum-ai/shared/*": [
-        "../shared/src/*"
+        "../shared/dist/*"
       ],
       "@celebrum-ai/db": [
-        "../db/src"
+        "../db/dist"
       ],
       "@celebrum-ai/db/*": [
-        "../db/src/*"
+        "../db/dist/*"
       ]
     }
   },

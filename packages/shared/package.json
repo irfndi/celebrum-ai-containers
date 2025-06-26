@@ -7,10 +7,10 @@
   "main": "dist/index.js",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     }
-
   },
   "files": [
     "dist",
@@ -21,7 +21,7 @@
     "zod": "^3.25.67"
   },
   "scripts": {
-    "build": "tsc --build",
+    "build": "tsc --build tsconfig.build.json",
     "build:force": "tsup",
     "build:watch": "tsc --build --watch",
     "dev": "tsc --build --watch",

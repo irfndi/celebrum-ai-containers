@@ -28,8 +28,8 @@
       "@/*": [
         "src/*"
       ],
-      "@celebrum-ai/db": ["../db/src"],
-      "@celebrum-ai/db/*": ["../db/src/*"]
+      "@celebrum-ai/db": ["../db/dist"],
+      "@celebrum-ai/db/*": ["../db/dist/*"]
     }
   },
   "include": [
