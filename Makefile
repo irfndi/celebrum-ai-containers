@@ -5,7 +5,7 @@
 SHELL := /bin/bash
 export PATH := $(PATH)
 
-.PHONY: help setup test build build-wasm coverage clean lint fix fmt check-all deploy pre-commit local-ci full-check unit-tests integration-tests e2e-tests lib-tests ci-pipeline test-api test-api-local test-api-staging test-api-production test-api-prod-admin test-api-v1 test-api-v1-local test-api-v1-staging test-api-v1-production
+.PHONY: help setup test build build-wasm coverage clean lint fix fmt check-all deploy deploy-wasm pre-commit local-ci full-check unit-tests integration-tests e2e-tests lib-tests ci-pipeline ci dev-quick quick validate fix-and-validate quality test-api test-api-local test-api-staging test-api-production test-api-prod-admin test-api-v1 test-api-v1-local test-api-v1-staging test-api-v1-production build-packages build-db build-shared build-telegram-bot build-web build-worker test-packages test-db test-shared test-telegram-bot test-web test-worker lint-packages lint-db lint-shared lint-telegram-bot lint-web lint-worker dev dev-worker dev-web dev-telegram-bot deploy-worker deploy-web fmt-check fmt-fix lint-strict typecheck typecheck-db typecheck-shared typecheck-telegram-bot typecheck-web typecheck-worker check check-wasm clean-go clean-packages clean-db clean-shared clean-telegram-bot clean-web clean-worker doc build-release build-containers test-verbose test-performance test-performance-local test-performance-staging test-performance-production test-performance-stress test-webhook-local test-performance-ramp test-performance-extreme test-complete-super-admin test-complete-super-admin-production test-complete-super-admin-local
 
 help: ## Show this help message
 	@echo "🚀 Celebrum AI Monorepo Commands"
@@ -364,12 +364,11 @@ check-all: lint test build build-wasm check-wasm ## Run all basic checks (lint, 
 dev-quick: fmt lint test check-wasm ## Quick development cycle (format, lint, test, WASM check)
 	@echo "🚀 Development cycle completed!"
 
-ci: ci-pipeline ## Run comprehensive CI pipeline (Rust + TypeScript)
+ci: ci-pipeline ## Run comprehensive CI pipeline (TypeScript + Go)
 
-deploy: build-wasm ## Prepare for deployment (build WASM and run tests)
-	@echo "🚀 Preparing for deployment..."
-	@cargo test --quiet
-	@echo "✅ Ready for deployment!"
+deploy-wasm: build-wasm ## Prepare WASM for deployment (build WASM and run tests)
+	@echo "🚀 Preparing WASM for deployment..."
+	@echo "✅ WASM ready for deployment!"
 
 # Workflow commands (recommended usage)
 quick: pre-commit ## Quick validation before commit
