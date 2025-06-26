@@ -10,6 +10,9 @@ on:
     branches: ["**"]  # Run on PRs to all branches
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   # Go-specific checks and tests
   go-checks:
