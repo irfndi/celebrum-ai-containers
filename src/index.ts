@@ -1,46 +1,41 @@
-import { Container, loadBalance, getContainer } from "@cloudflare/containers";
 import { Hono } from "hono";
+import { DurableObject } from "cloudflare:workers";
+import { Container, loadBalance, getContainer } from "@cloudflare/containers";
+
+export class CelebrumAIStorage extends DurableObject {
+  constructor(ctx: DurableObjectState, env: Env) {
+    super(ctx, env);
+  }
+
+  async fetch(request: Request): Promise<Response> {
+    return new Response("CelebrumAIStorage is running", { status: 200 });
+  }
+}
 
 export class CelebrumContainer extends Container {
-  // Port the container listens on (default: 8080)
   defaultPort = 8080;
-  // Time before container sleeps due to inactivity (default: 2m)
-  sleepAfter = "2m";
-  // Environment variables passed to the container
+  sleepAfter = 60000; // 60 seconds
   envVars = {
-    MESSAGE: "Hello from Alchemy-managed Celebrum AI!",
-    NODE_ENV: "production",
-    ALCHEMY_MANAGED: "true",
-    CONTAINER_VERSION: "1.0.0",
+    MESSAGE: "Hello from Celebrum AI Container!",
   };
 
-  // Optional lifecycle hooks
-  override onStart() {
-    console.log("[Alchemy] Celebrum AI Container successfully started");
-    console.log("[Alchemy] Container managed by Alchemy.run");
+  async onStart() {
+    console.log("CelebrumContainer started");
   }
 
-  override onStop() {
-    console.log("[Alchemy] Celebrum AI Container successfully shut down");
+  async onStop() {
+    console.log("CelebrumContainer stopped");
   }
 
-  override onError(error: unknown) {
-    console.log("[Alchemy] Celebrum AI Container error:", error);
-    // Enhanced error reporting for Alchemy monitoring
-    if (error instanceof Error) {
-      console.log("[Alchemy] Error details:", {
-        name: error.name,
-        message: error.message,
-        stack: error.stack,
-        timestamp: new Date().toISOString(),
-      });
-    }
+  async onError(error: Error) {
+    console.error("CelebrumContainer error:", error);
   }
 }
 
 // Create Hono app with proper typing for Cloudflare Workers
 const app = new Hono<{
   Bindings: { 
+    CELEBRUM_STORAGE: DurableObjectNamespace<CelebrumAIStorage>;
     CELEBRUM_CONTAINER: DurableObjectNamespace<CelebrumContainer>;
     ALCHEMY_MANAGED?: string;
     CONTAINER_VERSION?: string;
@@ -60,10 +55,8 @@ app.get("/", (c) => {
     message: "Celebrum AI - Alchemy-managed Container Platform",
     alchemy: alchemyInfo,
     endpoints: {
-      "/container/<ID>": "Start a container for each ID with a 2m timeout",
-      "/lb": "Load balance requests over multiple containers",
-      "/error": "Start a container that errors (demonstrates error handling)",
-      "/singleton": "Get a single specific container instance",
+      "/storage/<ID>": "Access Durable Object storage for each ID",
+      "/container/<ID>": "Access container instance for each ID",
       "/health": "Health check endpoint for Alchemy monitoring",
       "/alchemy/status": "Alchemy deployment status",
     },
@@ -90,40 +83,30 @@ app.get("/alchemy/status", (c) => {
       managed_by_alchemy: c.env.ALCHEMY_MANAGED === "true",
       container_version: c.env.CONTAINER_VERSION,
       deployment_strategy: c.env.DEPLOYMENT_STRATEGY,
-      container_class: "CelebrumContainer",
+      storage_class: "CelebrumAIStorage",
       last_updated: new Date().toISOString(),
     },
     infrastructure: {
       provider: "Cloudflare",
-      container_runtime: "Cloudflare Containers",
+      storage_runtime: "Cloudflare Durable Objects",
       worker_runtime: "Cloudflare Workers",
     },
   });
 });
 
-// Route requests to a specific container using the container ID
+// Route requests to a specific storage instance using the storage ID
+app.get("/storage/:id", async (c) => {
+  const id = c.req.param("id");
+  const storageId = c.env.CELEBRUM_STORAGE.idFromName(`/storage/${id}`);
+  const storage = c.env.CELEBRUM_STORAGE.get(storageId);
+  return await storage.fetch(c.req.raw);
+});
+
+// Route requests to a specific container instance using the container ID
 app.get("/container/:id", async (c) => {
   const id = c.req.param("id");
   const containerId = c.env.CELEBRUM_CONTAINER.idFromName(`/container/${id}`);
   const container = c.env.CELEBRUM_CONTAINER.get(containerId);
-  return await container.fetch(c.req.raw);
-});
-
-// Demonstrate error handling - this route forces a panic in the container
-app.get("/error", async (c) => {
-  const container = getContainer(c.env.CELEBRUM_CONTAINER, "error-test");
-  return await container.fetch(c.req.raw);
-});
-
-// Load balance requests across multiple containers
-app.get("/lb", async (c) => {
-  const container = await loadBalance(c.env.CELEBRUM_CONTAINER, 3);
-  return await container.fetch(c.req.raw);
-});
-
-// Get a single container instance (singleton pattern)
-app.get("/singleton", async (c) => {
-  const container = getContainer(c.env.CELEBRUM_CONTAINER);
   return await container.fetch(c.req.raw);
 });
 
