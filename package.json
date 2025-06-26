@@ -16,6 +16,7 @@
     "test": "pnpm -r run test",
     "test:ci": "pnpm -r run test",
     "test:coverage": "pnpm -r run test:coverage",
+    "typecheck": "pnpm -r run typecheck",
     "clean": "pnpm -r run clean",
      "docs": "pnpm -r run docs"
    },
