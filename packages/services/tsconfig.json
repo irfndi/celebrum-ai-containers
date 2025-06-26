@@ -9,16 +9,32 @@
     "composite": true,
     "incremental": true,
     "tsBuildInfoFile": "./dist/.tsbuildinfo",
-    "types": ["node"],
+    "types": [
+      "node"
+    ],
     "paths": {
-        "@celebrum-ai/shared": ["../shared/dist"],
-        "@celebrum-ai/db": ["../db/dist"]
-      }
+      "@celebrum-ai/shared": [
+        "../shared/dist"
+      ],
+      "@celebrum-ai/db": [
+        "../db/dist"
+      ]
+    }
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "**/*.test.ts"],
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "**/*.test.ts"
+  ],
   "references": [
-    { "path": "../shared" },
-    { "path": "../db" }
+    {
+      "path": "../shared"
+    },
+    {
+      "path": "../db"
+    }
   ]
 }

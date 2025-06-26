@@ -125,7 +125,9 @@ e2e-tests: ## Run E2E tests
 
 # Build commands
 build: ## Build all packages
-	@echo "🔨 Building TypeScript packages..."
+	@echo "🔨 Building dependencies first..."
+	@pnpm --filter @celebrum-ai/db run build && pnpm --filter @celebrum-ai/shared run build
+	@echo "🔨 Building remaining TypeScript packages..."
 	@pnpm run build
 	@echo "🔨 Building Go services..."
 	@go build ./... || echo "⚠️  No Go modules found yet"
@@ -323,8 +325,8 @@ clean-worker: ## Clean worker build artifacts
 # Type checking commands
 typecheck: ## Run TypeScript type checking for all packages
 	@echo "🔍 Running TypeScript type checking..."
-	@echo "🔨 Building database package first..."
-	@pnpm --filter @celebrum-ai/db run build
+	@echo "🔨 Building dependencies first..."
+	@pnpm --filter @celebrum-ai/db run build && pnpm --filter @celebrum-ai/shared run build
 	@pnpm run typecheck
 
 typecheck-db: ## Run TypeScript type checking for database package
