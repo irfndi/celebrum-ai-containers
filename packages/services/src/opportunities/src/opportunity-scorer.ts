@@ -18,6 +18,7 @@ export interface ScoringWeights {
 }
 
 export class OpportunityScorer {
+  private weights: ScoringWeights;
   private defaultWeights: ScoringWeights = {
     spreadWeight: 0.3,
     volumeWeight: 0.25,
@@ -26,7 +27,7 @@ export class OpportunityScorer {
     riskWeight: 0.1
   };
 
-  constructor(private weights: ScoringWeights = {}) {
+  constructor(weights: Partial<ScoringWeights> = {}) {
     this.weights = { ...this.defaultWeights, ...weights };
   }
 

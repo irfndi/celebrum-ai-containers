@@ -15,7 +15,7 @@ export class CronHandler {
    * @param event The scheduled event.
    * @param ctx The execution context.
    */
-  async handle(event: ScheduledEvent, ctx: ExecutionContext): Promise<void> {
+  async handle(event: { cron: string; scheduledTime: number }, ctx: { waitUntil: (promise: Promise<any>) => void }): Promise<void> {
     console.log(`Cron event triggered: ${event.cron}`);
 
     // Example of routing based on cron schedule

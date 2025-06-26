@@ -8,7 +8,6 @@ languages:
   - javascript-typescript
   - actions
   - python
-  - rust
 
 # Query suites to run
 queries:
@@ -39,8 +38,7 @@ paths-ignore:
 build:
   # Commands to run before analysis
   commands:
-    - "pnpm install --frozen-lockfile"
-    - "cargo build --release"
+    - "pnpm install --frozen-lockfile --ignore-scripts"
 
 # External libraries configuration
 external-repository-filters:

@@ -36,11 +36,18 @@ export type {
   // User types
   UserRoleType,
   SubscriptionTierType,
+  ExchangeIdType,
   // Trading configuration types
   TradingConfig,
   RiskManagementConfig,
   RBACOperationResult,
   TechnicalStrategy,
+  StrategyLimits,
+  OpportunityLimits,
+  ApiAccess,
+  UserAccessSummary,
+  Opportunity,
+  ArbitrageOpportunity,
 } from './types';
 
 // Export enums and constants
@@ -48,6 +55,8 @@ export {
   UserRole,
   RiskLevel,
   PositionSizingMethod,
+  Permission,
+  SubscriptionTier,
 } from './types';
 
 export type {

@@ -26,14 +26,14 @@ jobs:
       fail-fast: false
       matrix:
         include:
-        - language: javascript-typescript
-          build-mode: none
-        - language: actions
-          build-mode: none
-        # Default setup configuration for comprehensive analysis
-        - language: python
-          build-mode: none
-          setup-python: true
+          - language: javascript-typescript
+            build-mode: none
+          - language: actions
+            build-mode: none
+          # Default setup configuration for comprehensive analysis
+          - language: python
+            build-mode: none
+            setup-python: true
 
     steps:
     - name: Checkout repository

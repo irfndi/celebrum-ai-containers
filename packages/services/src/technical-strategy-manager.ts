@@ -1,9 +1,9 @@
 import type {
   UserRoleType,
   SubscriptionTierType,
-  StrategyLimits,
   RBACOperationResult,
-  TechnicalStrategy
+  TechnicalStrategy,
+  StrategyLimits
 } from '@celebrum-ai/shared';
 
 /**

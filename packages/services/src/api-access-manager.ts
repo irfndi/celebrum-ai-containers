@@ -4,12 +4,30 @@ import {
   SubscriptionTierType,
   ApiAccess,
   RBACOperationResult,
-  ExchangeIdType
-} from '@celebrum-ai/shared/types';
-import type {
+  ExchangeIdType,
   UserRole,
   SubscriptionTier
-} from '@celebrum-ai/shared/types';
+} from '@celebrum-ai/shared';
+
+type ExchangeApi = {
+  exchangeId: string;
+  apiKey: string;
+  secretKey: string;
+  passphrase?: string;
+  sandbox: boolean;
+  permissions: string[];
+  isActive: boolean;
+  lastUsed?: number;
+};
+
+type AiApi = {
+  provider: string;
+  apiKey: string;
+  model?: string;
+  maxTokens?: number;
+  isActive: boolean;
+  lastUsed?: number;
+};
 
 /**
  * API Access Manager for managing exchange and AI API configurations
@@ -59,7 +77,7 @@ export class ApiAccessManager {
       }
 
       // Check if exchange already exists
-      const existingIndex = apiAccess.exchangeApis.findIndex(api => api.exchangeId === exchangeId);
+      const existingIndex = apiAccess.exchangeApis.findIndex((api: ExchangeApi) => api.exchangeId === exchangeId);
       
       const exchangeApi = {
         exchangeId,
@@ -141,7 +159,7 @@ export class ApiAccessManager {
       }
 
       // Check if provider already exists
-      const existingIndex = apiAccess.aiApis.findIndex(api => api.provider === provider);
+      const existingIndex = apiAccess.aiApis.findIndex((api: AiApi) => api.provider === provider);
       
       const aiApi = {
         provider,
@@ -208,7 +226,7 @@ export class ApiAccessManager {
       }
 
       const initialLength = apiAccess.exchangeApis.length;
-      apiAccess.exchangeApis = apiAccess.exchangeApis.filter(api => api.exchangeId !== exchangeId);
+      apiAccess.exchangeApis = apiAccess.exchangeApis.filter((api: ExchangeApi) => api.exchangeId !== exchangeId);
       
       if (apiAccess.exchangeApis.length === initialLength) {
         return {
@@ -263,7 +281,7 @@ export class ApiAccessManager {
       }
 
       const initialLength = apiAccess.aiApis.length;
-      apiAccess.aiApis = apiAccess.aiApis.filter(api => api.provider !== provider);
+      apiAccess.aiApis = apiAccess.aiApis.filter((api: AiApi) => api.provider !== provider);
       
       if (apiAccess.aiApis.length === initialLength) {
         return {
@@ -317,7 +335,7 @@ export class ApiAccessManager {
         return null;
       }
 
-      const exchangeApi = apiAccess.exchangeApis.find(api => api.exchangeId === exchangeId && api.isActive);
+      const exchangeApi = apiAccess.exchangeApis.find((api: ExchangeApi) => api.exchangeId === exchangeId && api.isActive);
       if (!exchangeApi) {
         return null;
       }
@@ -358,7 +376,7 @@ export class ApiAccessManager {
         return null;
       }
 
-      const aiApi = apiAccess.aiApis.find(api => api.provider === provider && api.isActive);
+      const aiApi = apiAccess.aiApis.find((api: AiApi) => api.provider === provider && api.isActive);
       if (!aiApi) {
         return null;
       }
@@ -438,13 +456,13 @@ export class ApiAccessManager {
       const summary = {
         userId: apiAccess.userId,
         role: apiAccess.role,
-        exchangeApis: apiAccess.exchangeApis.map(api => ({
+        exchangeApis: apiAccess.exchangeApis.map((api: ExchangeApi) => ({
           exchangeId: api.exchangeId,
           sandbox: api.sandbox,
           isActive: api.isActive,
           lastUsed: api.lastUsed
         })),
-        aiApis: apiAccess.aiApis.map(api => ({
+        aiApis: apiAccess.aiApis.map((api: AiApi) => ({
           provider: api.provider,
           model: api.model,
           isActive: api.isActive,
@@ -507,13 +525,13 @@ export class ApiAccessManager {
       let found = false;
       
       if (type === 'exchange') {
-        const api = apiAccess.exchangeApis.find(api => api.exchangeId === identifier);
+        const api = apiAccess.exchangeApis.find((api: ExchangeApi) => api.exchangeId === identifier);
         if (api) {
           api.isActive = isActive;
           found = true;
         }
       } else {
-        const api = apiAccess.aiApis.find(api => api.provider === identifier);
+        const api = apiAccess.aiApis.find((api: AiApi) => api.provider === identifier);
         if (api) {
           api.isActive = isActive;
           found = true;

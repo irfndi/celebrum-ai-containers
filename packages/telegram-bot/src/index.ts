@@ -1,5 +1,5 @@
-import { initializeHandlers, processTelegramUpdate } from './handlers';
 import type { TelegramUpdate, TelegramWebhookContext } from './types';
+import { processTelegramUpdate, initializeHandlers } from './handlers';
 
 // Initialize all the handlers
 initializeHandlers();

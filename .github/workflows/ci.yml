@@ -37,7 +37,7 @@ jobs:
 
       - name: Install golangci-lint
         run: |
-          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.54.2
+          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b "$(go env GOPATH)/bin" v1.54.2
           echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
 
       - name: Check Go formatting
@@ -95,7 +95,7 @@ jobs:
       - name: Get pnpm store directory
         shell: bash
         run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+          echo "STORE_PATH=\"$(pnpm store path --silent)\"" >> $GITHUB_ENV
 
       - name: Setup pnpm cache
         uses: actions/cache@v4
@@ -280,7 +280,7 @@ jobs:
       - name: Get pnpm store directory
         shell: bash
         run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+          echo "STORE_PATH=\"$(pnpm store path --silent)\"" >> $GITHUB_ENV
 
       - name: Setup pnpm cache
         uses: actions/cache@v4

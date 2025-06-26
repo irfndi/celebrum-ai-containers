@@ -57,7 +57,7 @@ jobs:
       - name: Get pnpm store directory
         shell: bash
         run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+          echo "STORE_PATH=\"$(pnpm store path --silent)\"" >> $GITHUB_ENV
       
       - name: Setup pnpm cache
         uses: actions/cache@v4
@@ -118,23 +118,23 @@ jobs:
             CODE_ISSUES=$(jq -r '.summary.total_code_issues // 0' "$LATEST_REPORT")
             CODE_ERRORS=$(jq -r '.summary.code_errors // 0' "$LATEST_REPORT")
             
-            echo "total_vulnerabilities=$TOTAL_VULNS" >> $GITHUB_OUTPUT
-            echo "critical_vulnerabilities=$CRITICAL_VULNS" >> $GITHUB_OUTPUT
-            echo "high_vulnerabilities=$HIGH_VULNS" >> $GITHUB_OUTPUT
-            echo "total_code_issues=$CODE_ISSUES" >> $GITHUB_OUTPUT
-            echo "code_errors=$CODE_ERRORS" >> $GITHUB_OUTPUT
+            echo "total_vulnerabilities=$TOTAL_VULNS" >> "$GITHUB_OUTPUT"
+            echo "critical_vulnerabilities=$CRITICAL_VULNS" >> "$GITHUB_OUTPUT"
+            echo "high_vulnerabilities=$HIGH_VULNS" >> "$GITHUB_OUTPUT"
+            echo "total_code_issues=$CODE_ISSUES" >> "$GITHUB_OUTPUT"
+            echo "code_errors=$CODE_ERRORS" >> "$GITHUB_OUTPUT"
             
             # Determine overall status
             if [[ "$CRITICAL_VULNS" -gt 0 ]] || [[ "$CODE_ERRORS" -gt 0 ]]; then
-              echo "status=critical" >> $GITHUB_OUTPUT
+              echo "status=critical" >> "$GITHUB_OUTPUT"
             elif [[ "$TOTAL_VULNS" -gt 0 ]] || [[ "$CODE_ISSUES" -gt 0 ]]; then
-              echo "status=warning" >> $GITHUB_OUTPUT
+              echo "status=warning" >> "$GITHUB_OUTPUT"
             else
-              echo "status=success" >> $GITHUB_OUTPUT
+              echo "status=success" >> "$GITHUB_OUTPUT"
             fi
           else
             echo "No security report found"
-            echo "status=unknown" >> $GITHUB_OUTPUT
+            echo "status=unknown" >> "$GITHUB_OUTPUT"
           fi
       
       - name: Comment on PR

@@ -1,22 +1,22 @@
 import type {
   UserRoleType,
   SubscriptionTierType,
-  PermissionType,
+  RiskLevelType,
   TradingConfig,
-  ApiAccess,
-  UserAccessSummary,
-  OpportunityLimits,
-  StrategyLimits,
+  RiskManagementConfig,
   RBACOperationResult,
   TechnicalStrategy,
-  RiskManagementConfig,
-  RiskLevelType
+  StrategyLimits,
+  OpportunityLimits,
+  ApiAccess,
+  UserAccessSummary,
+  RBACPermission
 } from '@celebrum-ai/shared';
 import {
-  Permission,
   UserRole,
-  SubscriptionTier,
-  RiskLevel
+  RiskLevel,
+  Permission,
+  SubscriptionTier
 } from '@celebrum-ai/shared';
 
 /**
@@ -25,7 +25,7 @@ import {
  */
 export class RBACService {
   private env: any;
-  private rolePermissions: Map<UserRoleType, PermissionType[]>;
+  private rolePermissions: Map<UserRoleType, string[]>;
   private tierLimits: Map<SubscriptionTierType, any>;
   private featureFlags: Map<string, boolean>;
 
@@ -162,7 +162,7 @@ export class RBACService {
   /**
    * Check if user has specific permission
    */
-  hasPermission(role: UserRoleType, permission: PermissionType): boolean {
+  hasPermission(role: UserRoleType, permission: string): boolean {
     const permissions = this.rolePermissions.get(role);
     return permissions ? permissions.includes(permission) : false;
   }
@@ -170,7 +170,7 @@ export class RBACService {
   /**
    * Get all permissions for a role
    */
-  getRolePermissions(role: UserRoleType): PermissionType[] {
+  getRolePermissions(role: UserRoleType): string[] {
     return this.rolePermissions.get(role) || [];
   }
 

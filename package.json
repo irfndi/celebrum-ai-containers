@@ -7,9 +7,19 @@
     "deploy": "wrangler deploy",
     "dev": "wrangler dev",
     "start": "wrangler dev",
-    "cf-typegen": "wrangler types"
-  },
-  "devDependencies": {
+    "cf-typegen": "wrangler types",
+    "format": "echo 'Using oxlint for formatting'",
+    "lint": "pnpm -r run lint",
+    "lint:fix": "pnpm -r run lint:fix",
+    "lint:strict": "pnpm -r run lint:strict",
+    "build": "pnpm -r run build",
+    "test": "pnpm -r run test",
+    "test:ci": "pnpm -r run test",
+    "test:coverage": "pnpm -r run test:coverage",
+    "clean": "pnpm -r run clean",
+     "docs": "pnpm -r run docs"
+   },
+   "devDependencies": {
     "typescript": "^5.5.2",
     "wrangler": "^4.21.0"
   },

@@ -204,9 +204,9 @@ lint-strict: ## Run strict linting (matches GitHub CI)
 	@pnpm run lint:strict
 	@golangci-lint run --config .golangci.yml || echo "⚠️  golangci-lint not installed or no Go modules found"
 
-lint-packages: ## Run linting on packages only
-	@echo "🔍 Running package linting..."
-	@pnpm run lint
+lint-packages: ## Lint all TypeScript packages
+	@echo "🔍 Linting packages..."
+	@pnpm run lint:packages
 
 fix: ## Apply automatic fixes
 	@echo "🔧 Applying automatic fixes..."
@@ -359,12 +359,12 @@ check-all: lint test build build-wasm check-wasm ## Run all basic checks (lint, 
 	@echo "✅ All basic checks completed successfully!"
 
 # Legacy commands (maintained for compatibility)
-dev: fmt lint test check-wasm ## Quick development cycle (format, lint, test, WASM check)
+dev-quick: fmt lint test check-wasm ## Quick development cycle (format, lint, test, WASM check)
 	@echo "🚀 Development cycle completed!"
 
 ci: ci-pipeline ## Run comprehensive CI pipeline (Rust + TypeScript)
 
-deploy: build-wasm-release ## Prepare for deployment (build WASM and run tests)
+deploy: build-wasm ## Prepare for deployment (build WASM and run tests)
 	@echo "🚀 Preparing for deployment..."
 	@cargo test --quiet
 	@echo "✅ Ready for deployment!"

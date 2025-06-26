@@ -69,7 +69,11 @@ export class ServiceRouter {
     
     telegramApp.post('/webhook', async (c) => {
       const update = await c.req.json();
-      const context = { env: c.env, ctx: c.executionCtx };
+      const context = { 
+        env: c.env, 
+        request: c.req.raw,
+        waitUntil: c.executionCtx.waitUntil.bind(c.executionCtx)
+      };
       return handleTelegramUpdate(update, context);
     });
     
