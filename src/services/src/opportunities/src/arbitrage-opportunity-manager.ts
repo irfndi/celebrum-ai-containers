@@ -2,7 +2,8 @@ import type {
   UserRoleType,
   SubscriptionTierType,
   OpportunityLimits,
-  RBACOperationResult
+  RBACOperationResult,
+  ArbitrageOpportunity
 } from '@celebrum-ai/shared';
 
 /**

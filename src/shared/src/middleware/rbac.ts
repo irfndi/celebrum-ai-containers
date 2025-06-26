@@ -1,4 +1,4 @@
-import {
+import type {
   UserRoleType,
   SubscriptionTierType,
   TradingConfig,
@@ -6,7 +6,8 @@ import {
   RBACOperationResult,
   OpportunityLimits,
   ApiAccess,
-  UserAccessSummary
+  UserAccessSummary,
+  StrategyLimits
 } from '@celebrum-ai/shared';
 import {
   UserRole,
