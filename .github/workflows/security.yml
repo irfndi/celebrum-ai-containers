@@ -307,6 +307,9 @@ jobs:
     runs-on: ubuntu-latest
     if: vars.SNYK_TOKEN != ''
     timeout-minutes: 15
+    permissions:
+      contents: read
+      security-events: write
     
     steps:
       - name: Checkout code
