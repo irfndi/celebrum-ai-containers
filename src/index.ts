@@ -1,13 +1,13 @@
 import { Hono } from "hono";
 import { DurableObject } from "cloudflare:workers";
-import { Container, loadBalance, getContainer } from "@cloudflare/containers";
+import { Container } from "@cloudflare/containers";
 
 export class CelebrumAIStorage extends DurableObject {
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
   }
 
-  async fetch(request: Request): Promise<Response> {
+  async fetch(_request: Request): Promise<Response> {
     return new Response("CelebrumAIStorage is running", { status: 200 });
   }
 }

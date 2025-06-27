@@ -521,7 +521,7 @@ export function cached(options?: {
       // Generate cache key
       const key = options?.keyGenerator 
         ? options.keyGenerator(...args)
-        : `${(target as any).constructor.name}.${propertyKey}:${JSON.stringify(args)}`;
+        : `${(target as unknown as { constructor: { name: string } }).constructor.name}.${propertyKey}:${JSON.stringify(args)}`;
       
       // Try to get from cache
       const cached = await cacheManager.get(key);

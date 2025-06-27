@@ -1,5 +1,11 @@
 # Build and Development Guide
 
+**⚠️ OUTDATED DOCUMENTATION - This document is from the old monorepo structure and is kept for reference only.**
+
+**For current build and development instructions, see the main README.md and use the Makefile commands.**
+
+---
+
 This guide covers the build system, development workflow, and deployment process for the ArbEdge monorepo.
 
 ## 📁 Monorepo Structure

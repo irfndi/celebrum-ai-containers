@@ -69,7 +69,7 @@ deploy_worker() {
     local env=${1:-development}
     echo -e "${GREEN}⚡ Deploying Worker to ${env}...${NC}"
     
-    cd packages/worker
+    # Worker is deployed from root directory
     
     case "$env" in
         "production")
@@ -87,7 +87,6 @@ deploy_worker() {
             ;;
     esac
     
-    cd ../..
     echo -e "${GREEN}✅ Worker deployed to ${env}${NC}"
 }
 
@@ -97,7 +96,7 @@ deploy_telegram_bot() {
     local env=${1:-development}
     echo -e "${GREEN}📱 Deploying Telegram Bot to ${env}...${NC}"
     
-    cd packages/telegram-bot
+    cd src/telegram-bot
     
     case "$env" in
         "production")
@@ -123,7 +122,7 @@ deploy_web() {
     local env=${1:-development}
     echo -e "${GREEN}🌐 Deploying Web App to ${env}...${NC}"
     
-    cd packages/web
+    cd src/web
     
     case "$env" in
         "production")
@@ -160,8 +159,8 @@ deploy_all() {
 print_header
 
 # Check if we're in the right directory
-if [ ! -f "package.json" ] || [ ! -d "packages" ]; then
-    echo -e "${RED}❌ Please run this script from the ArbEdge root directory${NC}"
+if [ ! -f "package.json" ] || [ ! -d "src" ]; then
+    echo -e "${RED}❌ Please run this script from the Celebrum AI root directory${NC}"
     exit 1
 fi
 

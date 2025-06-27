@@ -11,8 +11,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@celebrum-ai/shared": "workspace:*",
-    "@celebrum-ai/db": "workspace:*"
+    "@celebrum-ai/shared": "file:../../../shared",
+    "@celebrum-ai/db": "file:../../../db"
   },
   "devDependencies": {
     "@types/node": "^20.12.2",

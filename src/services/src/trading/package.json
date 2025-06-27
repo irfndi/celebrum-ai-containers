@@ -8,8 +8,8 @@
     "dev": "tsc -w"
   },
   "dependencies": {
-    "@celebrum-ai/shared": "workspace:*",
-    "@celebrum-ai/db": "workspace:*"
+    "@celebrum-ai/shared": "file:../../../shared",
+    "@celebrum-ai/db": "file:../../../db"
   },
   "devDependencies": {
     "typescript": "^5.0.4"
