@@ -6,6 +6,16 @@ import {
   type StrategyLimits
 } from '@celebrum-ai/shared';
 
+interface KVNamespace {
+  get: (key: string, type?: string) => Promise<unknown>;
+  put: (key: string, value: string, options?: { expirationTtl?: number }) => Promise<void>;
+  delete: (key: string) => Promise<void>;
+}
+
+interface EnvWithKV {
+  CELEBRUM_KV?: KVNamespace;
+}
+
 /**
  * Technical Strategy Manager for YAML-based strategy system
  * Handles strategy creation, validation, backtesting, and execution limits
@@ -42,7 +52,7 @@ export class TechnicalStrategyManager {
 
     // Store in KV
     const key = `rbac:strategy_limits:${userId}`;
-    await (this.env as unknown as { CELEBRUM_KV?: any }).CELEBRUM_KV?.put(key, JSON.stringify(strategyLimits), {
+    await (this.env as EnvWithKV).CELEBRUM_KV?.put(key, JSON.stringify(strategyLimits), {
       expirationTtl: 86400 // 24 hours
     });
 
@@ -55,7 +65,7 @@ export class TechnicalStrategyManager {
   async getStrategyLimits(userId: string): Promise<StrategyLimits | null> {
     try {
       const key = `rbac:strategy_limits:${userId}`;
-      const limits = await (this.env as unknown as { CELEBRUM_KV?: any }).CELEBRUM_KV?.get(key, 'json');
+      const limits = await (this.env as EnvWithKV).CELEBRUM_KV?.get(key, 'json');
       return limits as StrategyLimits | null;
     } catch (error) {
       console.error('Failed to get strategy limits:', error);
@@ -199,16 +209,16 @@ export class TechnicalStrategyManager {
 
       // Store strategy
       const strategyKey = `rbac:strategy:${strategyId}`;
-      await (this.env as unknown as { CELEBRUM_KV?: any }).CELEBRUM_KV?.put(strategyKey, JSON.stringify(strategy), {
+      await (this.env as EnvWithKV).CELEBRUM_KV?.put(strategyKey, JSON.stringify(strategy), {
         expirationTtl: 30 * 24 * 60 * 60 // 30 days
       });
 
       // Add to user's strategy list
       const userStrategiesKey = `rbac:user_strategies:${userId}`;
-      const existingStrategies = await (this.env as unknown as { CELEBRUM_KV?: any }).CELEBRUM_KV?.get(userStrategiesKey, 'json') || [];
+      const existingStrategies = await (this.env as EnvWithKV).CELEBRUM_KV?.get(userStrategiesKey, 'json') as string[] || [];
       existingStrategies.push(strategyId);
       
-      await (this.env as unknown as { CELEBRUM_KV?: any }).CELEBRUM_KV?.put(userStrategiesKey, JSON.stringify(existingStrategies), {
+      await (this.env as EnvWithKV).CELEBRUM_KV?.put(userStrategiesKey, JSON.stringify(existingStrategies), {
         expirationTtl: 30 * 24 * 60 * 60
       });
 
@@ -221,7 +231,7 @@ export class TechnicalStrategyManager {
         }
 
         const limitsKey = `rbac:strategy_limits:${userId}`;
-        await (this.env as unknown as { CELEBRUM_KV?: any }).CELEBRUM_KV?.put(limitsKey, JSON.stringify(limits), {
+        await (this.env as EnvWithKV).CELEBRUM_KV?.put(limitsKey, JSON.stringify(limits), {
           expirationTtl: 86400
         });
       }
@@ -263,12 +273,12 @@ export class TechnicalStrategyManager {
   ): Promise<TechnicalStrategy[]> {
     try {
       const userStrategiesKey = `rbac:user_strategies:${userId}`;
-      const strategyIds = await (this.env as unknown as { CELEBRUM_KV?: any }).CELEBRUM_KV?.get(userStrategiesKey, 'json') || [];
+      const strategyIds = await (this.env as EnvWithKV).CELEBRUM_KV?.get(userStrategiesKey, 'json') as string[] || [];
       
       const strategies: TechnicalStrategy[] = [];
       for (const strategyId of strategyIds) {
         const strategyKey = `rbac:strategy:${strategyId}`;
-        const strategy = await (this.env as unknown as { CELEBRUM_KV?: any }).CELEBRUM_KV?.get(strategyKey, 'json');
+        const strategy = await (this.env as EnvWithKV).CELEBRUM_KV?.get(strategyKey, 'json');
         if (strategy) {
           strategies.push(strategy as TechnicalStrategy);
         }
@@ -304,7 +314,7 @@ export class TechnicalStrategyManager {
   ): Promise<RBACOperationResult> {
     try {
       const strategyKey = `rbac:strategy:${strategyId}`;
-      const strategy = await (this.env as unknown as { CELEBRUM_KV?: any }).CELEBRUM_KV?.get(strategyKey, 'json') as TechnicalStrategy;
+      const strategy = await (this.env as EnvWithKV).CELEBRUM_KV?.get(strategyKey, 'json') as TechnicalStrategy;
       
       if (!strategy || strategy.userId !== userId) {
         return {
@@ -338,7 +348,7 @@ export class TechnicalStrategyManager {
         updatedAt: Date.now()
       };
 
-      await (this.env as unknown as { CELEBRUM_KV?: any }).CELEBRUM_KV?.put(strategyKey, JSON.stringify(updatedStrategy), {
+      await (this.env as EnvWithKV).CELEBRUM_KV?.put(strategyKey, JSON.stringify(updatedStrategy), {
         expirationTtl: 30 * 24 * 60 * 60
       });
 
@@ -353,7 +363,7 @@ export class TechnicalStrategyManager {
           }
 
           const limitsKey = `rbac:strategy_limits:${userId}`;
-          await (this.env as unknown as { CELEBRUM_KV?: any }).CELEBRUM_KV?.put(limitsKey, JSON.stringify(limits), {
+          await (this.env as EnvWithKV).CELEBRUM_KV?.put(limitsKey, JSON.stringify(limits), {
             expirationTtl: 86400
           });
         }
@@ -384,7 +394,7 @@ export class TechnicalStrategyManager {
   async deleteStrategy(userId: string, strategyId: string): Promise<RBACOperationResult> {
     try {
       const strategyKey = `rbac:strategy:${strategyId}`;
-      const strategy = await (this.env as unknown as { CELEBRUM_KV?: any }).CELEBRUM_KV?.get(strategyKey, 'json') as TechnicalStrategy;
+      const strategy = await (this.env as EnvWithKV).CELEBRUM_KV?.get(strategyKey, 'json') as TechnicalStrategy;
       
       if (!strategy || strategy.userId !== userId) {
         return {
@@ -396,14 +406,14 @@ export class TechnicalStrategyManager {
       }
 
       // Delete strategy
-      await (this.env as unknown as { CELEBRUM_KV?: any }).CELEBRUM_KV?.delete(strategyKey);
+      await (this.env as EnvWithKV).CELEBRUM_KV?.delete(strategyKey);
 
       // Remove from user's strategy list
       const userStrategiesKey = `rbac:user_strategies:${userId}`;
-      const existingStrategies = await (this.env as unknown as { CELEBRUM_KV?: any }).CELEBRUM_KV?.get(userStrategiesKey, 'json') || [];
+      const existingStrategies = await (this.env as EnvWithKV).CELEBRUM_KV?.get(userStrategiesKey, 'json') as string[] || [];
       const updatedStrategies = existingStrategies.filter((id: string) => id !== strategyId);
       
-      await (this.env as unknown as { CELEBRUM_KV?: any }).CELEBRUM_KV?.put(userStrategiesKey, JSON.stringify(updatedStrategies), {
+      await (this.env as EnvWithKV).CELEBRUM_KV?.put(userStrategiesKey, JSON.stringify(updatedStrategies), {
         expirationTtl: 30 * 24 * 60 * 60
       });
 
@@ -416,7 +426,7 @@ export class TechnicalStrategyManager {
         }
 
         const limitsKey = `rbac:strategy_limits:${userId}`;
-        await (this.env as unknown as { CELEBRUM_KV?: any }).CELEBRUM_KV?.put(limitsKey, JSON.stringify(limits), {
+        await (this.env as EnvWithKV).CELEBRUM_KV?.put(limitsKey, JSON.stringify(limits), {
           expirationTtl: 86400
         });
       }
@@ -459,7 +469,7 @@ export class TechnicalStrategyManager {
       }
 
       const strategyKey = `rbac:strategy:${strategyId}`;
-      const strategy = await (this.env as unknown as { CELEBRUM_KV?: any }).CELEBRUM_KV?.get(strategyKey, 'json') as TechnicalStrategy;
+      const strategy = await (this.env as EnvWithKV).CELEBRUM_KV?.get(strategyKey, 'json') as TechnicalStrategy;
       
       if (!strategy || strategy.userId !== userId) {
         return {
@@ -485,16 +495,16 @@ export class TechnicalStrategyManager {
 
       // Store backtest
       const backtestKey = `rbac:backtest:${backtestId}`;
-      await (this.env as unknown as { CELEBRUM_KV?: any }).CELEBRUM_KV?.put(backtestKey, JSON.stringify(backtest), {
+      await (this.env as EnvWithKV).CELEBRUM_KV?.put(backtestKey, JSON.stringify(backtest), {
         expirationTtl: 7 * 24 * 60 * 60 // 7 days
       });
 
       // Add to user's backtest list
       const userBacktestsKey = `rbac:user_backtests:${userId}`;
-      const existingBacktests = await (this.env as unknown as { CELEBRUM_KV?: any }).CELEBRUM_KV?.get(userBacktestsKey, 'json') || [];
+      const existingBacktests = await (this.env as EnvWithKV).CELEBRUM_KV?.get(userBacktestsKey, 'json') as string[] || [];
       existingBacktests.push(backtestId);
       
-      await (this.env as unknown as { CELEBRUM_KV?: any }).CELEBRUM_KV?.put(userBacktestsKey, JSON.stringify(existingBacktests), {
+      await (this.env as EnvWithKV).CELEBRUM_KV?.put(userBacktestsKey, JSON.stringify(existingBacktests), {
         expirationTtl: 7 * 24 * 60 * 60
       });
 
@@ -503,7 +513,7 @@ export class TechnicalStrategyManager {
       if (limits) {
         limits.concurrentBacktests++;
         const limitsKey = `rbac:strategy_limits:${userId}`;
-        await (this.env as unknown as { CELEBRUM_KV?: any }).CELEBRUM_KV?.put(limitsKey, JSON.stringify(limits), {
+        await (this.env as EnvWithKV).CELEBRUM_KV?.put(limitsKey, JSON.stringify(limits), {
           expirationTtl: 86400
         });
       }
@@ -538,7 +548,7 @@ export class TechnicalStrategyManager {
   async getBacktestResults(userId: string, backtestId: string): Promise<unknown> {
     try {
       const backtestKey = `rbac:backtest:${backtestId}`;
-      const backtest = await (this.env as unknown as { CELEBRUM_KV?: any }).CELEBRUM_KV?.get(backtestKey, 'json');
+      const backtest = await (this.env as EnvWithKV).CELEBRUM_KV?.get(backtestKey, 'json') as any;
       
       if (!backtest || backtest.userId !== userId) {
         return null;
@@ -557,18 +567,18 @@ export class TechnicalStrategyManager {
   async getUserBacktests(userId: string): Promise<unknown[]> {
     try {
       const userBacktestsKey = `rbac:user_backtests:${userId}`;
-      const backtestIds = await (this.env as unknown as { CELEBRUM_KV?: any }).CELEBRUM_KV?.get(userBacktestsKey, 'json') || [];
+      const backtestIds = await (this.env as EnvWithKV).CELEBRUM_KV?.get(userBacktestsKey, 'json') as string[] || [];
       
-      const backtests = [];
+      const backtests: any[] = [];
       for (const backtestId of backtestIds) {
         const backtestKey = `rbac:backtest:${backtestId}`;
-        const backtest = await (this.env as unknown as { CELEBRUM_KV?: any }).CELEBRUM_KV?.get(backtestKey, 'json');
+        const backtest = await (this.env as EnvWithKV).CELEBRUM_KV?.get(backtestKey, 'json') as any;
         if (backtest) {
           backtests.push(backtest);
         }
       }
       
-      return backtests.sort((a, b) => b.startedAt - a.startedAt);
+      return backtests.sort((a: any, b: any) => b.startedAt - a.startedAt);
     } catch (error) {
       console.error('Failed to get user backtests:', error);
       return [];
@@ -601,7 +611,7 @@ export class TechnicalStrategyManager {
 
       // Store updated limits
       const key = `rbac:strategy_limits:${userId}`;
-      await (this.env as unknown as { CELEBRUM_KV?: any }).CELEBRUM_KV?.put(key, JSON.stringify(updatedLimits), {
+      await (this.env as unknown as { CELEBRUM_KV?: { put: (key: string, value: string, options?: { expirationTtl?: number }) => Promise<void> } }).CELEBRUM_KV?.put(key, JSON.stringify(updatedLimits), {
         expirationTtl: 86400
       });
 
@@ -736,7 +746,7 @@ export class TechnicalStrategyManager {
       // Simulate backtest execution with random results
       setTimeout(async () => {
         const backtestKey = `rbac:backtest:${backtestId}`;
-        const backtest = await (this.env as unknown as { CELEBRUM_KV?: any }).CELEBRUM_KV?.get(backtestKey, 'json');
+        const backtest = await (this.env as unknown as { CELEBRUM_KV?: { get: (key: string, type?: string) => Promise<any> } }).CELEBRUM_KV?.get(backtestKey, 'json');
         
         if (backtest) {
           // Generate mock results
@@ -754,7 +764,7 @@ export class TechnicalStrategyManager {
           backtest.results = results;
           backtest.progress = 100;
 
-          await (this.env as unknown as { CELEBRUM_KV?: any }).CELEBRUM_KV?.put(backtestKey, JSON.stringify(backtest), {
+          await (this.env as unknown as { CELEBRUM_KV?: { put: (key: string, value: string, options?: { expirationTtl?: number }) => Promise<void> } }).CELEBRUM_KV?.put(backtestKey, JSON.stringify(backtest), {
             expirationTtl: 7 * 24 * 60 * 60
           });
 
@@ -763,7 +773,7 @@ export class TechnicalStrategyManager {
           if (limits) {
             limits.concurrentBacktests = Math.max(0, limits.concurrentBacktests - 1);
             const limitsKey = `rbac:strategy_limits:${userId}`;
-            await (this.env as unknown as { CELEBRUM_KV?: any }).CELEBRUM_KV?.put(limitsKey, JSON.stringify(limits), {
+            await (this.env as unknown as { CELEBRUM_KV?: { put: (key: string, value: string, options?: { expirationTtl?: number }) => Promise<void> } }).CELEBRUM_KV?.put(limitsKey, JSON.stringify(limits), {
               expirationTtl: 86400
             });
           }

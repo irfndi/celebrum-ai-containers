@@ -138,7 +138,7 @@ export class TradingConfigManager {
   ): Promise<RBACOperationResult> {
     try {
       const key = `rbac:trading_config:${userId}`;
-      const existingConfig = await (this.env as any).ArbEdgeKV.get(key, 'json') as TradingConfig;
+      const existingConfig = await (this.env as unknown as { ArbEdgeKV: { get: (key: string, type: string) => Promise<unknown> } }).ArbEdgeKV.get(key, 'json') as TradingConfig;
       
       if (!existingConfig) {
         return {
@@ -163,7 +163,7 @@ export class TradingConfigManager {
       };
 
       // Store updated configuration
-      await (this.env as any).ArbEdgeKV.put(key, JSON.stringify(updatedConfig), {
+      await (this.env as unknown as { ArbEdgeKV: { put: (key: string, value: string, options: { expirationTtl: number }) => Promise<void> } }).ArbEdgeKV.put(key, JSON.stringify(updatedConfig), {
         expirationTtl: 86400
       });
 
@@ -192,7 +192,7 @@ export class TradingConfigManager {
   ): Promise<RBACOperationResult> {
     try {
       const key = `rbac:trading_config:${userId}`;
-      const existingConfig = await (this.env as any).ArbEdgeKV.get(key, 'json') as TradingConfig;
+      const existingConfig = await (this.env as unknown as { ArbEdgeKV: { get: (key: string, type: string) => Promise<unknown> } }).ArbEdgeKV.get(key, 'json') as TradingConfig;
       
       if (!existingConfig) {
         return {
@@ -222,7 +222,7 @@ export class TradingConfigManager {
       };
 
       // Store updated configuration
-      await (this.env as any).ArbEdgeKV.put(key, JSON.stringify(updatedConfig), {
+      await (this.env as unknown as { ArbEdgeKV: { put: (key: string, value: string, options: { expirationTtl: number }) => Promise<void> } }).ArbEdgeKV.put(key, JSON.stringify(updatedConfig), {
         expirationTtl: 86400
       });
 
@@ -248,7 +248,7 @@ export class TradingConfigManager {
   async getTradingConfig(userId: string): Promise<TradingConfig | null> {
     try {
       const key = `rbac:trading_config:${userId}`;
-      const config = await (this.env as any).ArbEdgeKV.get(key, 'json');
+      const config = await (this.env as unknown as { ArbEdgeKV: { get: (key: string, type: string) => Promise<unknown> } }).ArbEdgeKV.get(key, 'json');
       return config as TradingConfig | null;
     } catch (error) {
       console.error('Failed to get trading configuration:', error);
@@ -527,19 +527,19 @@ export class TradingConfigManager {
     const warnings: string[] = [];
 
     // Check stop loss requirement
-    if (riskConfig.stopLossRequired && !(tradeRequest as any).stopLoss) {
+    if (riskConfig.stopLossRequired && !(tradeRequest as unknown as { stopLoss?: number }).stopLoss) {
       errors.push('Stop loss is required for this risk profile');
     }
 
     // Check take profit recommendation
-    if (riskConfig.takeProfitRecommended && !(tradeRequest as any).takeProfit) {
+    if (riskConfig.takeProfitRecommended && !(tradeRequest as unknown as { takeProfit?: number }).takeProfit) {
       warnings.push('Take profit is recommended for this risk profile');
     }
 
     // Validate risk-reward ratio if both stop loss and take profit are provided
-    if ((tradeRequest as any).stopLoss && (tradeRequest as any).takeProfit && (tradeRequest as any).price) {
-      const risk = Math.abs((tradeRequest as any).price - (tradeRequest as any).stopLoss);
-      const reward = Math.abs((tradeRequest as any).takeProfit - (tradeRequest as any).price);
+    if ((tradeRequest as unknown as { stopLoss?: number }).stopLoss && (tradeRequest as unknown as { takeProfit?: number }).takeProfit && (tradeRequest as unknown as { price?: number }).price) {
+      const risk = Math.abs((tradeRequest as unknown as { price: number; stopLoss: number }).price - (tradeRequest as unknown as { price: number; stopLoss: number }).stopLoss);
+      const reward = Math.abs((tradeRequest as unknown as { takeProfit: number; price: number }).takeProfit - (tradeRequest as unknown as { takeProfit: number; price: number }).price);
       const riskRewardRatio = reward / risk;
 
       if (riskRewardRatio < riskConfig.riskRewardRatioMin) {

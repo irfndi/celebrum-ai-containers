@@ -185,18 +185,30 @@ export class BinanceDataSource extends MarketDataSource {
   async getTicker(symbol: string): Promise<MarketDataPoint> {
     const data = await this.makeRequest(this.config.endpoints.ticker, { symbol }) as unknown;
     
+    const tickerData = data as unknown as {
+      symbol: string;
+      lastPrice: string;
+      volume: string;
+      bidPrice: string;
+      askPrice: string;
+      highPrice: string;
+      lowPrice: string;
+      priceChange: string;
+      priceChangePercent: string;
+    };
+    
     return {
-      symbol: (data as any).symbol,
+      symbol: tickerData.symbol,
       exchange: 'binance',
-      price: parseFloat((data as any).lastPrice),
-      volume: parseFloat((data as any).volume),
+      price: parseFloat(tickerData.lastPrice),
+      volume: parseFloat(tickerData.volume),
       timestamp: new Date().toISOString(),
-      bid: parseFloat((data as any).bidPrice),
-      ask: parseFloat((data as any).askPrice),
-      high24h: parseFloat((data as any).highPrice),
-      low24h: parseFloat((data as any).lowPrice),
-      change24h: parseFloat((data as any).priceChange),
-      changePercent24h: parseFloat((data as any).priceChangePercent),
+      bid: parseFloat(tickerData.bidPrice),
+      ask: parseFloat(tickerData.askPrice),
+      high24h: parseFloat(tickerData.highPrice),
+      low24h: parseFloat(tickerData.lowPrice),
+      change24h: parseFloat(tickerData.priceChange),
+      changePercent24h: parseFloat(tickerData.priceChangePercent),
     };
   }
 
@@ -206,8 +218,8 @@ export class BinanceDataSource extends MarketDataSource {
     return {
       symbol,
       exchange: 'binance',
-      bids: (data as any).bids.map((bid: string[]) => [parseFloat(bid[0]), parseFloat(bid[1])]),
-      asks: (data as any).asks.map((ask: string[]) => [parseFloat(ask[0]), parseFloat(ask[1])]),
+      bids: (data as unknown as { bids: string[][]; asks: string[][] }).bids.map((bid: string[]) => [parseFloat(bid[0]), parseFloat(bid[1])]),
+      asks: (data as unknown as { bids: string[][]; asks: string[][] }).asks.map((ask: string[]) => [parseFloat(ask[0]), parseFloat(ask[1])]),
       timestamp: new Date().toISOString(),
     };
   }
@@ -232,7 +244,7 @@ export class BinanceDataSource extends MarketDataSource {
   async getCandles(symbol: string, interval: string, limit: number = 500): Promise<CandleData[]> {
     const data = await this.makeRequest(this.config.endpoints.candles, { symbol, interval, limit }) as unknown;
     
-    return (data as any).map((candle: unknown[]) => ({
+    return (data as unknown as string[][]).map((candle: unknown[]) => ({
       symbol,
       exchange: 'binance',
       interval,
@@ -242,13 +254,13 @@ export class BinanceDataSource extends MarketDataSource {
       close: parseFloat((candle as string[])[4]),
       volume: parseFloat((candle as string[])[5]),
       timestamp: new Date((candle as string[])[0]).toISOString(),
-      trades: (candle as string[])[8],
+      trades: parseInt((candle as string[])[8], 10),
     }));
   }
 
   async getSymbols(): Promise<string[]> {
     const data = await this.makeRequest(this.config.endpoints.symbols) as unknown;
-    return (data as any).symbols
+    return (data as unknown as { symbols: Array<{ status: string; symbol: string }> }).symbols
       .filter((symbol: unknown) => (symbol as { status: string }).status === 'TRADING')
       .map((symbol: unknown) => (symbol as { symbol: string }).symbol);
   }
@@ -295,14 +307,22 @@ export class CoinbaseDataSource extends MarketDataSource {
     const endpoint = this.config.endpoints.ticker.replace('{symbol}', symbol);
     const data = await this.makeRequest(endpoint) as unknown;
     
+    const tickerData = data as unknown as {
+      price: string;
+      volume: string;
+      time: string;
+      bid: string;
+      ask: string;
+    };
+    
     return {
       symbol,
       exchange: 'coinbase',
-      price: parseFloat((data as any).price),
-      volume: parseFloat((data as any).volume),
-      timestamp: (data as any).time,
-      bid: parseFloat((data as any).bid),
-      ask: parseFloat((data as any).ask),
+      price: parseFloat(tickerData.price),
+      volume: parseFloat(tickerData.volume),
+      timestamp: tickerData.time,
+      bid: parseFloat(tickerData.bid),
+      ask: parseFloat(tickerData.ask),
     };
   }
 
@@ -313,8 +333,8 @@ export class CoinbaseDataSource extends MarketDataSource {
     return {
       symbol,
       exchange: 'coinbase',
-      bids: (data as any).bids.slice(0, depth).map((bid: string[]) => [parseFloat(bid[0]), parseFloat(bid[1])]),
-      asks: (data as any).asks.slice(0, depth).map((ask: string[]) => [parseFloat(ask[0]), parseFloat(ask[1])]),
+      bids: (data as unknown as { bids: string[][]; asks: string[][] }).bids.slice(0, depth).map((bid: string[]) => [parseFloat(bid[0]), parseFloat(bid[1])]),
+      asks: (data as unknown as { bids: string[][]; asks: string[][] }).asks.slice(0, depth).map((ask: string[]) => [parseFloat(ask[0]), parseFloat(ask[1])]),
       timestamp: new Date().toISOString(),
     };
   }
@@ -323,13 +343,13 @@ export class CoinbaseDataSource extends MarketDataSource {
     const endpoint = this.config.endpoints.trades.replace('{symbol}', symbol);
     const data = await this.makeRequest(endpoint) as unknown;
     
-    return (data as any).slice(0, limit).map((trade: unknown) => ({
+    return (data as unknown as Array<{ trade_id: string; price: string; size: string; time: string; side: string }>).slice(0, limit).map((trade: unknown) => ({
       id: (trade as { trade_id: string }).trade_id.toString(),
       symbol,
       exchange: 'coinbase',
       price: parseFloat((trade as { price: string }).price),
       quantity: parseFloat((trade as { size: string }).size),
-      side: (trade as { side: string }).side,
+      side: (trade as { side: string }).side as 'buy' | 'sell',
       timestamp: (trade as { time: string }).time,
     }));
   }
@@ -338,7 +358,7 @@ export class CoinbaseDataSource extends MarketDataSource {
     const endpoint = this.config.endpoints.candles.replace('{symbol}', symbol);
     const data = await this.makeRequest(endpoint, { granularity: this.mapInterval(interval) }) as unknown;
     
-    return (data as any).slice(0, limit).map((candle: number[]) => ({
+    return (data as unknown as number[][]).slice(0, limit).map((candle: number[]) => ({
       symbol,
       exchange: 'coinbase',
       interval,
@@ -353,7 +373,7 @@ export class CoinbaseDataSource extends MarketDataSource {
 
   async getSymbols(): Promise<string[]> {
     const data = await this.makeRequest(this.config.endpoints.symbols) as unknown;
-    return (data as any)
+    return (data as unknown as Array<{ status: string; id: string }>)
       .filter((product: unknown) => (product as { status: string }).status === 'online')
       .map((product: unknown) => (product as { id: string }).id);
   }
@@ -402,46 +422,46 @@ export class KrakenDataSource extends MarketDataSource {
 
   async getTicker(symbol: string): Promise<MarketDataPoint> {
     const data = await this.makeRequest(this.config.endpoints.ticker, { pair: symbol }) as unknown;
-    const tickerData = (data as any).result[symbol];
+    const tickerData = (data as unknown as { result: Record<string, unknown> }).result[symbol];
     
     return {
       symbol,
       exchange: 'kraken',
-      price: parseFloat(tickerData.c[0]),
-      volume: parseFloat(tickerData.v[1]),
+      price: parseFloat((tickerData as any).c[0]),
+      volume: parseFloat((tickerData as any).v[1]),
       timestamp: new Date().toISOString(),
-      bid: parseFloat(tickerData.b[0]),
-      ask: parseFloat(tickerData.a[0]),
-      high24h: parseFloat(tickerData.h[1]),
-      low24h: parseFloat(tickerData.l[1]),
+      bid: parseFloat((tickerData as any).b[0]),
+      ask: parseFloat((tickerData as any).a[0]),
+      high24h: parseFloat((tickerData as any).h[1]),
+      low24h: parseFloat((tickerData as any).l[1]),
     };
   }
 
   async getOrderBook(symbol: string, depth: number = 100): Promise<OrderBookData> {
     const data = await this.makeRequest(this.config.endpoints.orderbook, { pair: symbol, count: depth }) as unknown;
-    const bookData = (data as any).result[symbol];
+    const bookData = (data as unknown as { result: Record<string, unknown> }).result[symbol];
     
     return {
       symbol,
       exchange: 'kraken',
-      bids: bookData.bids.map((bid: string[]) => [parseFloat(bid[0]), parseFloat(bid[1])]),
-      asks: bookData.asks.map((ask: string[]) => [parseFloat(ask[0]), parseFloat(ask[1])]),
+      bids: (bookData as any).bids.map((bid: string[]) => [parseFloat(bid[0]), parseFloat(bid[1])]),
+      asks: (bookData as any).asks.map((ask: string[]) => [parseFloat(ask[0]), parseFloat(ask[1])]),
       timestamp: new Date().toISOString(),
     };
   }
 
   async getTrades(symbol: string, limit: number = 1000): Promise<TradeData[]> {
     const data = await this.makeRequest(this.config.endpoints.trades, { pair: symbol }) as unknown;
-    const trades = (data as any).result[symbol];
+    const trades = (data as unknown as { result: Record<string, unknown[]> }).result[symbol];
     
-    return trades.slice(0, limit).map((trade: unknown[], index: number) => ({
+    return (trades as unknown[]).slice(0, limit).map((trade, index: number) => ({
       id: `${symbol}-${index}`,
       symbol,
       exchange: 'kraken',
-      price: parseFloat((trade as unknown as string[])[0]),
-      quantity: parseFloat((trade as unknown as string[])[1]),
-      side: (trade as unknown as string[])[3] === 'b' ? 'buy' : 'sell',
-      timestamp: new Date(parseFloat((trade as unknown as string[])[2]) * 1000).toISOString(),
+      price: parseFloat((trade as string[])[0]),
+      quantity: parseFloat((trade as string[])[1]),
+      side: (trade as string[])[3] === 'b' ? 'buy' : 'sell',
+      timestamp: new Date(parseFloat((trade as string[])[2]) * 1000).toISOString(),
     }));
   }
 
@@ -450,7 +470,7 @@ export class KrakenDataSource extends MarketDataSource {
       pair: symbol, 
       interval: this.mapInterval(interval) 
     }) as unknown;
-    const candles = (data as any).result[symbol];
+    const candles = (data as unknown as { result: Record<string, number[][]> }).result[symbol];
     
     return candles.slice(0, limit).map((candle: number[]) => ({
       symbol,
@@ -468,7 +488,7 @@ export class KrakenDataSource extends MarketDataSource {
 
   async getSymbols(): Promise<string[]> {
     const data = await this.makeRequest(this.config.endpoints.symbols) as unknown;
-    return Object.keys((data as any).result);
+    return Object.keys((data as unknown as { result: Record<string, unknown> }).result);
   }
 
   getName(): string {

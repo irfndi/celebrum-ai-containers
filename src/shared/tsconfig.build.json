@@ -1,5 +1,9 @@
 {
   "extends": "./tsconfig.json",
+  "references": [
+    { "path": "../db" },
+    { "path": "../telegram-bot" }
+  ],
   "include": [
     "src/**/*.ts",
     "src/**/*.tsx",

@@ -1,58 +1,66 @@
-import alchemy from 'alchemy';
-import { Worker, D1Database } from 'alchemy/cloudflare';
+import { defineConfig } from 'alchemy';
 
-// Configuration function that initializes Alchemy resources
-export async function createAlchemyConfig() {
-  // Validate environment variables
-  validateEnvironment();
-  
-  // Initialize the Alchemy app for Cloudflare Workers
-  const app = await alchemy('cloudflare-worker');
-
-  // Define a D1 Database for data storage
-  const celebrumDatabase = await D1Database('celebrum-db', {
-    name: 'celebrum-ai-database',
-  });
-
-  // Define the Cloudflare Worker
-  const celebrumWorker = await Worker('celebrum-worker', {
+export default defineConfig({
+  worker: {
     name: 'celebrum-ai-worker',
-    entrypoint: './src/index.ts',
     bindings: {
-      DB: celebrumDatabase,
-      MESSAGE: alchemy.secret(process.env.CONTAINER_MESSAGE || 'Hello from Alchemy!'),
-      NODE_ENV: alchemy.secret(process.env.NODE_ENV || 'production'),
-      CLOUDFLARE_ACCOUNT_ID: alchemy.secret(process.env.CLOUDFLARE_ACCOUNT_ID),
-      CLOUDFLARE_API_TOKEN: alchemy.secret(process.env.CLOUDFLARE_API_TOKEN),
+      // D1 Database binding
+      D1: {
+        name: 'celebrum-db',
+        type: 'D1Database',
+      },
+      // KV Namespace binding
+      CELEBRUM_KV: {
+        name: 'celebrum-kv',
+        type: 'KVNamespace',
+      },
+      // R2 Bucket binding
+      CELEBRUM_R2: {
+        name: 'celebrum-storage',
+        type: 'R2Bucket',
+      },
+      // Environment variables
+      ENVIRONMENT: {
+        value: process.env.NODE_ENV || 'development',
+      },
+      API_VERSION: {
+        value: '1.0.0',
+      },
+      DEBUG: {
+        value: process.env.DEBUG || 'false',
+      },
     },
     routes: [
-       {
-         pattern: 'celebrum-ai.com/*',
-         zoneId: 'celebrum-ai.com',
-       },
-     ],
-  });
-
-  return {
-    app,
-    resources: {
-      database: celebrumDatabase,
-      worker: celebrumWorker,
+      {
+        pattern: '*',
+        zone: 'celebrum.ai',
+      },
+    ],
+  },
+  // D1 Database configuration
+  d1: {
+    name: 'celebrum-db',
+    migrations: './src/db/sql',
+  },
+  // KV Namespace configuration
+  kv: {
+    name: 'celebrum-kv',
+    // Optional: Set initial values
+    initialValues: {
+      'app:version': '1.0.0',
+      'app:initialized': new Date().toISOString(),
     },
-    finalize: () => app.finalize(),
-  };
-}
-
-// Default export for compatibility
-export default createAlchemyConfig;
-
-// Environment variables validation function
-export function validateEnvironment() {
-  if (!process.env.CLOUDFLARE_ACCOUNT_ID) {
-    throw new Error('CLOUDFLARE_ACCOUNT_ID environment variable is required');
-  }
-
-  if (!process.env.CLOUDFLARE_API_TOKEN) {
-    throw new Error('CLOUDFLARE_API_TOKEN environment variable is required');
-  }
-}
+  },
+  // R2 Bucket configuration
+  r2: {
+    name: 'celebrum-storage',
+    // Optional: Enable public access
+    publicAccess: false,
+    // Optional: Configure CORS
+    cors: {
+      allowedOrigins: ['https://celebrum.ai'],
+      allowedMethods: ['GET', 'PUT', 'POST', 'DELETE'],
+      allowedHeaders: ['Content-Type', 'Authorization'],
+    },
+  },
+});

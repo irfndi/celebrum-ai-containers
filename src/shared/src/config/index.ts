@@ -1,7 +1,7 @@
 // @celebrum-ai/shared - Configuration
 import featureFlags from './feature_flags.json';
 
-export const FEATURE_FLAGS = featureFlags;
+export const FEATURE_FLAGS_CONFIG = featureFlags;
 
 // Environment Configuration
 export const ENV = {
