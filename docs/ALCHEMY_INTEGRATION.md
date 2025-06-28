@@ -42,6 +42,7 @@ ALCHEMY_VERBOSE="true"            # Enable verbose logging
 # Container Configuration
 CONTAINER_MESSAGE="Hello from Alchemy-managed container!"
 CONTAINER_NODE_ENV="development"
+ENABLE_CONTAINERS="true"          # Set to false to disable container deployment
 ```
 
 ### Alchemy Configuration File
@@ -257,6 +258,52 @@ Container logs include Alchemy-specific prefixes:
 [Alchemy] Container managed by Alchemy.run
 [Alchemy] Error details: { name: "Error", message: "...", ... }
 ```
+
+## Container Configuration
+
+### Enabling/Disabling Containers
+
+Containers can be conditionally enabled or disabled using the `ENABLE_CONTAINERS` environment variable:
+
+- **Local Development**: Set `ENABLE_CONTAINERS="true"` (default)
+- **CI/CD Environments**: Set `ENABLE_CONTAINERS="false"` to skip container deployment
+- **Production**: Set `ENABLE_CONTAINERS="true"` if container support is available
+
+### Container Support
+
+Cloudflare Containers may not be available in all environments or account types. The Alchemy configuration automatically handles this by:
+
+1. Checking the `ENABLE_CONTAINERS` environment variable
+2. Gracefully skipping container configuration if disabled
+3. Logging warnings when container support is unavailable
+4. Continuing with other infrastructure components (Workers, D1, KV, R2)
+
+## Troubleshooting
+
+### Common Issues
+
+#### "Scope name is required when creating a child scope"
+
+This error occurs when the Alchemy app is not properly initialized with a scope configuration. The fix involves:
+
+1. Ensuring the app is created with proper name and stage configuration
+2. Setting appropriate environment variables for scope identification
+
+#### Container Deployment Failures
+
+If containers fail to deploy:
+
+1. Check if `ENABLE_CONTAINERS` is set to `"false"`
+2. Verify Cloudflare account has container support
+3. Review container configuration in `alchemy.run.ts`
+4. Check Docker build process and image availability
+
+#### Missing Environment Variables
+
+Ensure all required environment variables are set:
+- `CLOUDFLARE_ACCOUNT_ID`
+- `CLOUDFLARE_API_TOKEN`
+- `NODE_ENV` (for stage determination)
 
 ## Security Considerations
 

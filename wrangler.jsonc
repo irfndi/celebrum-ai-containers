@@ -13,7 +13,8 @@
   "vars": {
     "ALCHEMY_MANAGED": "true",
     "CONTAINER_VERSION": "1.0.0",
-    "DEPLOYMENT_STRATEGY": "alchemy"
+    "DEPLOYMENT_STRATEGY": "alchemy",
+    "STAGE": "prod"
   },
   "durable_objects": {
     "bindings": [

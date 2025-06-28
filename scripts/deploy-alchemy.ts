@@ -39,6 +39,13 @@ class AlchemyDeployment {
   async buildContainer(): Promise<void> {
     console.log('🔨 Building container image...');
     
+    // Skip container build if containers are disabled
+    if (process.env.ENABLE_CONTAINERS === 'false') {
+      console.log('⚠️  Containers disabled: Skipping container build');
+      console.log('✅ Container build skipped');
+      return;
+    }
+    
     if (this.options.dryRun) {
       console.log('⚠️  Dry run mode: Skipping actual container build');
       console.log('   Would execute: docker build -t celebrum-ai:latest .');
@@ -63,9 +70,23 @@ class AlchemyDeployment {
     try {
       if (this.options.dryRun) {
         console.log('🔍 Dry run mode - showing planned changes:');
-        console.log('- Container: celebrum-ai-container');
+        
+        // Show container only if enabled
+        if (process.env.ENABLE_CONTAINERS !== 'false') {
+          console.log('- Container: celebrum-ai-container');
+        }
+        
         console.log('- Worker: celebrum-ai-containers');
-        console.log('- Bindings: CONTAINER -> celebrum-ai-container');
+        console.log('- D1 Database: celebrum-db');
+        console.log('- KV Namespace: celebrum-kv');
+        console.log('- R2 Bucket: celebrum-r2-storage');
+        console.log('- Durable Objects: celebrum-storage');
+        
+        // Show container bindings only if enabled
+        if (process.env.ENABLE_CONTAINERS !== 'false') {
+          console.log('- Bindings: CELEBRUM_CONTAINER -> celebrum-ai-container');
+        }
+        
         console.log('✅ Infrastructure deployment simulation completed');
         return;
       }
