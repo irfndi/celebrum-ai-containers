@@ -2,8 +2,7 @@ import alchemy from "alchemy";
 import { Worker, D1Database, KVNamespace, R2Bucket, DurableObjectNamespace } from "alchemy/cloudflare";
 
 // Create app with proper scope configuration
-const app = await alchemy({
-  name: "celebrum-ai",
+const app = await alchemy("celebrum-ai", {
   stage: process.env.NODE_ENV === "production" ? "prod" : "dev"
 });
 
@@ -68,9 +67,7 @@ const worker = await Worker("celebrum-ai-containers", {
 export { worker, database, kvNamespace, r2Bucket, durableStorage };
 
 // Conditionally export container if it exists
-if (durableContainer) {
-  export { durableContainer };
-}
+export const container = durableContainer || undefined;
 
 console.log({
   url: worker.url,
