@@ -15,7 +15,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@celebrum-ai/shared': path.resolve(__dirname, './src/shared/src'),
-      '@celebrum-ai/db': path.resolve(__dirname, './src/db/dist'),
+      '@celebrum-ai/db': path.resolve(__dirname, './src/db/src'),
       '@celebrum-ai/telegram-bot': path.resolve(__dirname, './src/telegram-bot/src'),
     },
   },
