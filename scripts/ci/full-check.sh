@@ -149,17 +149,13 @@ else
     print_warning "Documentation has issues"
 fi
 
-# Step 10: Wrangler validation
-print_step "Validating Cloudflare deployment"
-if command -v wrangler >/dev/null 2>&1; then
-    if wrangler deploy --dry-run; then
-        print_success "Wrangler deployment validation passed"
-    else
-        print_error "Wrangler deployment validation failed"
-        exit 1
-    fi
+# Step 10: Alchemy deployment validation
+print_step "Validating Alchemy deployment"
+if pnpm run deploy:alchemy:dry-run; then
+    print_success "Alchemy deployment validation passed"
 else
-    print_warning "Wrangler not installed. Install with: pnpm add -g wrangler@latest"
+    print_error "Alchemy deployment validation failed"
+    exit 1
 fi
 
 # Step 11: Code quality metrics

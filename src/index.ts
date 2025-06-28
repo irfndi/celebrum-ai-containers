@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { DurableObject } from "cloudflare:workers";
 import { Container } from "@cloudflare/containers";
+import type { Env } from "@celebrum-ai/shared";
 
 export class CelebrumAIStorage extends DurableObject {
   constructor(ctx: DurableObjectState, env: Env) {

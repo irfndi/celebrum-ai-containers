@@ -1,8 +1,8 @@
-export declare const positions: import("drizzle-orm/sqlite-core").SQLiteTableWithColumns<{
+export declare const positions: import("drizzle-orm/sqlite-core/table.js").SQLiteTableWithColumns<{
     name: "positions";
     schema: undefined;
     columns: {
-        id: import("drizzle-orm/sqlite-core").SQLiteColumn<{
+        id: import("drizzle-orm/sqlite-core/index.js").SQLiteColumn<{
             name: "id";
             tableName: "positions";
             dataType: "number";
@@ -19,7 +19,7 @@ export declare const positions: import("drizzle-orm/sqlite-core").SQLiteTableWit
             identity: undefined;
             generated: undefined;
         }, {}, {}>;
-        userId: import("drizzle-orm/sqlite-core").SQLiteColumn<{
+        userId: import("drizzle-orm/sqlite-core/index.js").SQLiteColumn<{
             name: "user_id";
             tableName: "positions";
             dataType: "number";
@@ -36,7 +36,7 @@ export declare const positions: import("drizzle-orm/sqlite-core").SQLiteTableWit
             identity: undefined;
             generated: undefined;
         }, {}, {}>;
-        exchangeId: import("drizzle-orm/sqlite-core").SQLiteColumn<{
+        exchangeId: import("drizzle-orm/sqlite-core/index.js").SQLiteColumn<{
             name: "exchange_id";
             tableName: "positions";
             dataType: "string";
@@ -55,7 +55,7 @@ export declare const positions: import("drizzle-orm/sqlite-core").SQLiteTableWit
         }, {}, {
             length: number | undefined;
         }>;
-        symbol: import("drizzle-orm/sqlite-core").SQLiteColumn<{
+        symbol: import("drizzle-orm/sqlite-core/index.js").SQLiteColumn<{
             name: "symbol";
             tableName: "positions";
             dataType: "string";
@@ -74,7 +74,7 @@ export declare const positions: import("drizzle-orm/sqlite-core").SQLiteTableWit
         }, {}, {
             length: number | undefined;
         }>;
-        type: import("drizzle-orm/sqlite-core").SQLiteColumn<{
+        type: import("drizzle-orm/sqlite-core/index.js").SQLiteColumn<{
             name: "type";
             tableName: "positions";
             dataType: "string";
@@ -93,12 +93,12 @@ export declare const positions: import("drizzle-orm/sqlite-core").SQLiteTableWit
         }, {}, {
             length: number | undefined;
         }>;
-        strategy: import("drizzle-orm/sqlite-core").SQLiteColumn<{
+        strategy: import("drizzle-orm/sqlite-core/index.js").SQLiteColumn<{
             name: "strategy";
             tableName: "positions";
             dataType: "string";
             columnType: "SQLiteText";
-            data: "technical" | "arbitrage" | "manual";
+            data: "arbitrage" | "technical" | "manual";
             driverParam: string;
             notNull: true;
             hasDefault: false;
@@ -112,7 +112,7 @@ export declare const positions: import("drizzle-orm/sqlite-core").SQLiteTableWit
         }, {}, {
             length: number | undefined;
         }>;
-        entryPrice: import("drizzle-orm/sqlite-core").SQLiteColumn<{
+        entryPrice: import("drizzle-orm/sqlite-core/index.js").SQLiteColumn<{
             name: "entry_price";
             tableName: "positions";
             dataType: "number";
@@ -129,7 +129,7 @@ export declare const positions: import("drizzle-orm/sqlite-core").SQLiteTableWit
             identity: undefined;
             generated: undefined;
         }, {}, {}>;
-        exitPrice: import("drizzle-orm/sqlite-core").SQLiteColumn<{
+        exitPrice: import("drizzle-orm/sqlite-core/index.js").SQLiteColumn<{
             name: "exit_price";
             tableName: "positions";
             dataType: "number";
@@ -146,7 +146,7 @@ export declare const positions: import("drizzle-orm/sqlite-core").SQLiteTableWit
             identity: undefined;
             generated: undefined;
         }, {}, {}>;
-        quantity: import("drizzle-orm/sqlite-core").SQLiteColumn<{
+        quantity: import("drizzle-orm/sqlite-core/index.js").SQLiteColumn<{
             name: "quantity";
             tableName: "positions";
             dataType: "number";
@@ -163,7 +163,7 @@ export declare const positions: import("drizzle-orm/sqlite-core").SQLiteTableWit
             identity: undefined;
             generated: undefined;
         }, {}, {}>;
-        leverage: import("drizzle-orm/sqlite-core").SQLiteColumn<{
+        leverage: import("drizzle-orm/sqlite-core/index.js").SQLiteColumn<{
             name: "leverage";
             tableName: "positions";
             dataType: "number";
@@ -180,7 +180,7 @@ export declare const positions: import("drizzle-orm/sqlite-core").SQLiteTableWit
             identity: undefined;
             generated: undefined;
         }, {}, {}>;
-        stopLoss: import("drizzle-orm/sqlite-core").SQLiteColumn<{
+        stopLoss: import("drizzle-orm/sqlite-core/index.js").SQLiteColumn<{
             name: "stop_loss";
             tableName: "positions";
             dataType: "number";
@@ -197,7 +197,7 @@ export declare const positions: import("drizzle-orm/sqlite-core").SQLiteTableWit
             identity: undefined;
             generated: undefined;
         }, {}, {}>;
-        takeProfit: import("drizzle-orm/sqlite-core").SQLiteColumn<{
+        takeProfit: import("drizzle-orm/sqlite-core/index.js").SQLiteColumn<{
             name: "take_profit";
             tableName: "positions";
             dataType: "number";
@@ -214,12 +214,12 @@ export declare const positions: import("drizzle-orm/sqlite-core").SQLiteTableWit
             identity: undefined;
             generated: undefined;
         }, {}, {}>;
-        status: import("drizzle-orm/sqlite-core").SQLiteColumn<{
+        status: import("drizzle-orm/sqlite-core/index.js").SQLiteColumn<{
             name: "status";
             tableName: "positions";
             dataType: "string";
             columnType: "SQLiteText";
-            data: "partially_filled" | "cancelled" | "open" | "closed";
+            data: "open" | "closed" | "partially_filled" | "cancelled";
             driverParam: string;
             notNull: true;
             hasDefault: true;
@@ -233,7 +233,7 @@ export declare const positions: import("drizzle-orm/sqlite-core").SQLiteTableWit
         }, {}, {
             length: number | undefined;
         }>;
-        pnl: import("drizzle-orm/sqlite-core").SQLiteColumn<{
+        pnl: import("drizzle-orm/sqlite-core/index.js").SQLiteColumn<{
             name: "pnl";
             tableName: "positions";
             dataType: "number";
@@ -250,7 +250,7 @@ export declare const positions: import("drizzle-orm/sqlite-core").SQLiteTableWit
             identity: undefined;
             generated: undefined;
         }, {}, {}>;
-        fees: import("drizzle-orm/sqlite-core").SQLiteColumn<{
+        fees: import("drizzle-orm/sqlite-core/index.js").SQLiteColumn<{
             name: "fees";
             tableName: "positions";
             dataType: "number";
@@ -267,7 +267,7 @@ export declare const positions: import("drizzle-orm/sqlite-core").SQLiteTableWit
             identity: undefined;
             generated: undefined;
         }, {}, {}>;
-        metadata: import("drizzle-orm/sqlite-core").SQLiteColumn<{
+        metadata: import("drizzle-orm/sqlite-core/index.js").SQLiteColumn<{
             name: "metadata";
             tableName: "positions";
             dataType: "json";
@@ -296,7 +296,7 @@ export declare const positions: import("drizzle-orm/sqlite-core").SQLiteTableWit
                 autoClose?: boolean;
             };
         }>;
-        createdAt: import("drizzle-orm/sqlite-core").SQLiteColumn<{
+        createdAt: import("drizzle-orm/sqlite-core/index.js").SQLiteColumn<{
             name: "created_at";
             tableName: "positions";
             dataType: "date";
@@ -313,7 +313,7 @@ export declare const positions: import("drizzle-orm/sqlite-core").SQLiteTableWit
             identity: undefined;
             generated: undefined;
         }, {}, {}>;
-        updatedAt: import("drizzle-orm/sqlite-core").SQLiteColumn<{
+        updatedAt: import("drizzle-orm/sqlite-core/index.js").SQLiteColumn<{
             name: "updated_at";
             tableName: "positions";
             dataType: "date";
@@ -330,7 +330,7 @@ export declare const positions: import("drizzle-orm/sqlite-core").SQLiteTableWit
             identity: undefined;
             generated: undefined;
         }, {}, {}>;
-        closedAt: import("drizzle-orm/sqlite-core").SQLiteColumn<{
+        closedAt: import("drizzle-orm/sqlite-core/index.js").SQLiteColumn<{
             name: "closed_at";
             tableName: "positions";
             dataType: "date";
@@ -350,11 +350,11 @@ export declare const positions: import("drizzle-orm/sqlite-core").SQLiteTableWit
     };
     dialect: "sqlite";
 }>;
-export declare const opportunities: import("drizzle-orm/sqlite-core").SQLiteTableWithColumns<{
+export declare const opportunities: import("drizzle-orm/sqlite-core/table.js").SQLiteTableWithColumns<{
     name: "opportunities";
     schema: undefined;
     columns: {
-        id: import("drizzle-orm/sqlite-core").SQLiteColumn<{
+        id: import("drizzle-orm/sqlite-core/index.js").SQLiteColumn<{
             name: "id";
             tableName: "opportunities";
             dataType: "number";
@@ -371,12 +371,12 @@ export declare const opportunities: import("drizzle-orm/sqlite-core").SQLiteTabl
             identity: undefined;
             generated: undefined;
         }, {}, {}>;
-        type: import("drizzle-orm/sqlite-core").SQLiteColumn<{
+        type: import("drizzle-orm/sqlite-core/index.js").SQLiteColumn<{
             name: "type";
             tableName: "opportunities";
             dataType: "string";
             columnType: "SQLiteText";
-            data: "technical" | "arbitrage";
+            data: "arbitrage" | "technical";
             driverParam: string;
             notNull: true;
             hasDefault: false;
@@ -390,7 +390,7 @@ export declare const opportunities: import("drizzle-orm/sqlite-core").SQLiteTabl
         }, {}, {
             length: number | undefined;
         }>;
-        symbol: import("drizzle-orm/sqlite-core").SQLiteColumn<{
+        symbol: import("drizzle-orm/sqlite-core/index.js").SQLiteColumn<{
             name: "symbol";
             tableName: "opportunities";
             dataType: "string";
@@ -409,7 +409,7 @@ export declare const opportunities: import("drizzle-orm/sqlite-core").SQLiteTabl
         }, {}, {
             length: number | undefined;
         }>;
-        exchange1: import("drizzle-orm/sqlite-core").SQLiteColumn<{
+        exchange1: import("drizzle-orm/sqlite-core/index.js").SQLiteColumn<{
             name: "exchange_1";
             tableName: "opportunities";
             dataType: "string";
@@ -428,7 +428,7 @@ export declare const opportunities: import("drizzle-orm/sqlite-core").SQLiteTabl
         }, {}, {
             length: number | undefined;
         }>;
-        exchange2: import("drizzle-orm/sqlite-core").SQLiteColumn<{
+        exchange2: import("drizzle-orm/sqlite-core/index.js").SQLiteColumn<{
             name: "exchange_2";
             tableName: "opportunities";
             dataType: "string";
@@ -447,7 +447,7 @@ export declare const opportunities: import("drizzle-orm/sqlite-core").SQLiteTabl
         }, {}, {
             length: number | undefined;
         }>;
-        price1: import("drizzle-orm/sqlite-core").SQLiteColumn<{
+        price1: import("drizzle-orm/sqlite-core/index.js").SQLiteColumn<{
             name: "price_1";
             tableName: "opportunities";
             dataType: "number";
@@ -464,7 +464,7 @@ export declare const opportunities: import("drizzle-orm/sqlite-core").SQLiteTabl
             identity: undefined;
             generated: undefined;
         }, {}, {}>;
-        price2: import("drizzle-orm/sqlite-core").SQLiteColumn<{
+        price2: import("drizzle-orm/sqlite-core/index.js").SQLiteColumn<{
             name: "price_2";
             tableName: "opportunities";
             dataType: "number";
@@ -481,7 +481,7 @@ export declare const opportunities: import("drizzle-orm/sqlite-core").SQLiteTabl
             identity: undefined;
             generated: undefined;
         }, {}, {}>;
-        profitPercentage: import("drizzle-orm/sqlite-core").SQLiteColumn<{
+        profitPercentage: import("drizzle-orm/sqlite-core/index.js").SQLiteColumn<{
             name: "profit_percentage";
             tableName: "opportunities";
             dataType: "number";
@@ -498,7 +498,7 @@ export declare const opportunities: import("drizzle-orm/sqlite-core").SQLiteTabl
             identity: undefined;
             generated: undefined;
         }, {}, {}>;
-        confidence: import("drizzle-orm/sqlite-core").SQLiteColumn<{
+        confidence: import("drizzle-orm/sqlite-core/index.js").SQLiteColumn<{
             name: "confidence";
             tableName: "opportunities";
             dataType: "number";
@@ -515,7 +515,7 @@ export declare const opportunities: import("drizzle-orm/sqlite-core").SQLiteTabl
             identity: undefined;
             generated: undefined;
         }, {}, {}>;
-        expiresAt: import("drizzle-orm/sqlite-core").SQLiteColumn<{
+        expiresAt: import("drizzle-orm/sqlite-core/index.js").SQLiteColumn<{
             name: "expires_at";
             tableName: "opportunities";
             dataType: "date";
@@ -532,7 +532,7 @@ export declare const opportunities: import("drizzle-orm/sqlite-core").SQLiteTabl
             identity: undefined;
             generated: undefined;
         }, {}, {}>;
-        isActive: import("drizzle-orm/sqlite-core").SQLiteColumn<{
+        isActive: import("drizzle-orm/sqlite-core/index.js").SQLiteColumn<{
             name: "is_active";
             tableName: "opportunities";
             dataType: "boolean";
@@ -549,7 +549,7 @@ export declare const opportunities: import("drizzle-orm/sqlite-core").SQLiteTabl
             identity: undefined;
             generated: undefined;
         }, {}, {}>;
-        createdAt: import("drizzle-orm/sqlite-core").SQLiteColumn<{
+        createdAt: import("drizzle-orm/sqlite-core/index.js").SQLiteColumn<{
             name: "created_at";
             tableName: "opportunities";
             dataType: "date";
@@ -569,11 +569,11 @@ export declare const opportunities: import("drizzle-orm/sqlite-core").SQLiteTabl
     };
     dialect: "sqlite";
 }>;
-export declare const tradingStrategies: import("drizzle-orm/sqlite-core").SQLiteTableWithColumns<{
+export declare const tradingStrategies: import("drizzle-orm/sqlite-core/table.js").SQLiteTableWithColumns<{
     name: "trading_strategies";
     schema: undefined;
     columns: {
-        id: import("drizzle-orm/sqlite-core").SQLiteColumn<{
+        id: import("drizzle-orm/sqlite-core/index.js").SQLiteColumn<{
             name: "id";
             tableName: "trading_strategies";
             dataType: "number";
@@ -590,7 +590,7 @@ export declare const tradingStrategies: import("drizzle-orm/sqlite-core").SQLite
             identity: undefined;
             generated: undefined;
         }, {}, {}>;
-        userId: import("drizzle-orm/sqlite-core").SQLiteColumn<{
+        userId: import("drizzle-orm/sqlite-core/index.js").SQLiteColumn<{
             name: "user_id";
             tableName: "trading_strategies";
             dataType: "number";
@@ -607,7 +607,7 @@ export declare const tradingStrategies: import("drizzle-orm/sqlite-core").SQLite
             identity: undefined;
             generated: undefined;
         }, {}, {}>;
-        name: import("drizzle-orm/sqlite-core").SQLiteColumn<{
+        name: import("drizzle-orm/sqlite-core/index.js").SQLiteColumn<{
             name: "name";
             tableName: "trading_strategies";
             dataType: "string";
@@ -626,12 +626,12 @@ export declare const tradingStrategies: import("drizzle-orm/sqlite-core").SQLite
         }, {}, {
             length: number | undefined;
         }>;
-        type: import("drizzle-orm/sqlite-core").SQLiteColumn<{
+        type: import("drizzle-orm/sqlite-core/index.js").SQLiteColumn<{
             name: "type";
             tableName: "trading_strategies";
             dataType: "string";
             columnType: "SQLiteText";
-            data: "technical" | "arbitrage" | "manual";
+            data: "arbitrage" | "technical" | "manual";
             driverParam: string;
             notNull: true;
             hasDefault: false;
@@ -645,7 +645,7 @@ export declare const tradingStrategies: import("drizzle-orm/sqlite-core").SQLite
         }, {}, {
             length: number | undefined;
         }>;
-        isActive: import("drizzle-orm/sqlite-core").SQLiteColumn<{
+        isActive: import("drizzle-orm/sqlite-core/index.js").SQLiteColumn<{
             name: "is_active";
             tableName: "trading_strategies";
             dataType: "boolean";
@@ -662,7 +662,7 @@ export declare const tradingStrategies: import("drizzle-orm/sqlite-core").SQLite
             identity: undefined;
             generated: undefined;
         }, {}, {}>;
-        settings: import("drizzle-orm/sqlite-core").SQLiteColumn<{
+        settings: import("drizzle-orm/sqlite-core/index.js").SQLiteColumn<{
             name: "settings";
             tableName: "trading_strategies";
             dataType: "json";
@@ -679,7 +679,7 @@ export declare const tradingStrategies: import("drizzle-orm/sqlite-core").SQLite
             identity: undefined;
             generated: undefined;
         }, {}, {}>;
-        performance: import("drizzle-orm/sqlite-core").SQLiteColumn<{
+        performance: import("drizzle-orm/sqlite-core/index.js").SQLiteColumn<{
             name: "performance";
             tableName: "trading_strategies";
             dataType: "json";
@@ -712,7 +712,7 @@ export declare const tradingStrategies: import("drizzle-orm/sqlite-core").SQLite
                 lastUpdated?: number;
             };
         }>;
-        createdAt: import("drizzle-orm/sqlite-core").SQLiteColumn<{
+        createdAt: import("drizzle-orm/sqlite-core/index.js").SQLiteColumn<{
             name: "created_at";
             tableName: "trading_strategies";
             dataType: "date";
@@ -729,7 +729,7 @@ export declare const tradingStrategies: import("drizzle-orm/sqlite-core").SQLite
             identity: undefined;
             generated: undefined;
         }, {}, {}>;
-        updatedAt: import("drizzle-orm/sqlite-core").SQLiteColumn<{
+        updatedAt: import("drizzle-orm/sqlite-core/index.js").SQLiteColumn<{
             name: "updated_at";
             tableName: "trading_strategies";
             dataType: "date";

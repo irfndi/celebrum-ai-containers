@@ -1,0 +1,29 @@
+{
+  "kind": "cloudflare::R2Bucket",
+  "id": "celebrum-r2-storage",
+  "fqn": "celebrum-ai/irfandi/celebrum-r2-storage",
+  "seq": 2,
+  "data": {},
+  "status": "created",
+  "output": {
+    "Symbol(alchemy::ResourceKind)": "cloudflare::R2Bucket",
+    "Symbol(alchemy::ResourceID)": "celebrum-r2-storage",
+    "Symbol(alchemy::ResourceFQN)": "celebrum-ai/irfandi/celebrum-r2-storage",
+    "Symbol(alchemy::ResourceScope)": {
+      "@scope": null
+    },
+    "Symbol(alchemy::ResourceSeq)": 2,
+    "name": "celebrum-r2-storage",
+    "location": "default",
+    "creationDate": {
+      "@date": "2025-06-28T04:48:10.699Z"
+    },
+    "jurisdiction": "default",
+    "type": "r2_bucket",
+    "accountId": "4d12ccdb69bc57519b6aac269a04c9af"
+  },
+  "props": {
+    "name": "celebrum-r2-storage",
+    "adopt": true
+  }
+}

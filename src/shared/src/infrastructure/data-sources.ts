@@ -424,16 +424,18 @@ export class KrakenDataSource extends MarketDataSource {
     const data = await this.makeRequest(this.config.endpoints.ticker, { pair: symbol }) as unknown;
     const tickerData = (data as unknown as { result: Record<string, unknown> }).result[symbol];
     
+    const ticker = tickerData as { c: [string]; v: [string, string]; b: [string]; a: [string]; h: [string, string]; l: [string, string]; };
+
     return {
       symbol,
       exchange: 'kraken',
-      price: parseFloat((tickerData as any).c[0]),
-      volume: parseFloat((tickerData as any).v[1]),
+      price: parseFloat(ticker.c[0]),
+      volume: parseFloat(ticker.v[1]),
       timestamp: new Date().toISOString(),
-      bid: parseFloat((tickerData as any).b[0]),
-      ask: parseFloat((tickerData as any).a[0]),
-      high24h: parseFloat((tickerData as any).h[1]),
-      low24h: parseFloat((tickerData as any).l[1]),
+      bid: parseFloat(ticker.b[0]),
+      ask: parseFloat(ticker.a[0]),
+      high24h: parseFloat(ticker.h[1]),
+      low24h: parseFloat(ticker.l[1]),
     };
   }
 
@@ -441,11 +443,13 @@ export class KrakenDataSource extends MarketDataSource {
     const data = await this.makeRequest(this.config.endpoints.orderbook, { pair: symbol, count: depth }) as unknown;
     const bookData = (data as unknown as { result: Record<string, unknown> }).result[symbol];
     
+    const book = bookData as { bids: string[][]; asks: string[][] };
+
     return {
       symbol,
       exchange: 'kraken',
-      bids: (bookData as any).bids.map((bid: string[]) => [parseFloat(bid[0]), parseFloat(bid[1])]),
-      asks: (bookData as any).asks.map((ask: string[]) => [parseFloat(ask[0]), parseFloat(ask[1])]),
+      bids: book.bids.map((bid) => [parseFloat(bid[0]), parseFloat(bid[1])]),
+      asks: book.asks.map((ask) => [parseFloat(ask[0]), parseFloat(ask[1])]),
       timestamp: new Date().toISOString(),
     };
   }

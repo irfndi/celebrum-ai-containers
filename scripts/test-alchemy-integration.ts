@@ -32,7 +32,7 @@ class AlchemyIntegrationTester {
     console.log('\n🔍 Testing file existence...');
     
     const requiredFiles = [
-      'alchemy.config.ts',
+      'alchemy.run.ts',
       'scripts/deploy-alchemy.ts',
       'wrangler.jsonc',
       'src/index.ts',
@@ -55,20 +55,20 @@ class AlchemyIntegrationTester {
     console.log('\n🔧 Testing Alchemy config import...');
     
     try {
-      const { createAlchemyConfig } = await import('../alchemy.config.ts');
+      const alchemyModule = await import('../alchemy.run.ts');
       
-      // Test that the function exists
+      // Test that the worker export exists
       this.addResult(
-        'Alchemy config function import',
-        typeof createAlchemyConfig === 'function',
-        'createAlchemyConfig function imported successfully'
+        'Alchemy worker export',
+        alchemyModule.worker !== undefined,
+        'Alchemy worker exported successfully'
       );
       
-      // Test that the function can be called (but don't actually call it to avoid side effects)
+      // Test that the worker has expected properties
       this.addResult(
-        'Alchemy config function type',
-        createAlchemyConfig.constructor.name === 'AsyncFunction',
-        'function is async as expected'
+        'Alchemy worker structure',
+        alchemyModule.worker && typeof alchemyModule.worker === 'object' && alchemyModule.worker.url,
+        'Alchemy worker has expected structure with URL'
       );
     } catch (error) {
       this.addResult(
@@ -110,8 +110,7 @@ class AlchemyIntegrationTester {
         'deploy:alchemy',
         'deploy:alchemy:staging',
         'deploy:alchemy:dev',
-        'deploy:alchemy:dry-run',
-        'build:alchemy'
+        'deploy:alchemy:dry-run'
       ];
 
       for (const script of requiredScripts) {

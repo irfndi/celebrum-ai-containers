@@ -73,13 +73,13 @@ deploy_worker() {
     
     case "$env" in
         "production")
-            wrangler deploy --env production
+            pnpm run deploy:alchemy
             ;;
         "staging")
-            wrangler deploy --env staging
+            pnpm run deploy:alchemy:staging
             ;;
         "development")
-            wrangler deploy --env development
+            pnpm run deploy:alchemy:dev
             ;;
         *)
             echo -e "${RED}❌ Unknown environment: $env${NC}"
@@ -100,13 +100,13 @@ deploy_telegram_bot() {
     
     case "$env" in
         "production")
-            wrangler deploy --env production
+            pnpm run deploy:alchemy
             ;;
         "staging")
-            wrangler deploy --env staging
+            pnpm run deploy:alchemy:staging
             ;;
         "development")
-            wrangler deploy --env development
+            pnpm run deploy:alchemy:dev
             ;;
         *)
             echo -e "${RED}❌ Unknown environment: $env${NC}"

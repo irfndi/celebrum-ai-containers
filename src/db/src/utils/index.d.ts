@@ -1,3 +1,3 @@
-export * from './connection';
-export * from './queries';
+export * from './connection.js';
+export * from './queries.js';
 //# sourceMappingURL=index.d.ts.map

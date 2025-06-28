@@ -25,8 +25,8 @@ if [ ! -d "../db/dist" ]; then
     (cd ../db && pnpm run build)
 fi
 
-# Run TypeScript compilation with tsup
-echo "🔨 Building with tsup..."
+# Run TypeScript compilation
+echo "🔨 Building with TypeScript..."
 pnpm run build
 
 # Verify build output

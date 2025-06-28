@@ -1,7 +1,10 @@
-import { eq, and, desc, sql } from 'drizzle-orm';
-import { users, positions, opportunities, tradingStrategies } from '../schema/index';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.DatabaseQueries = exports.TradingStrategyQueries = exports.OpportunityQueries = exports.PositionQueries = exports.UserQueries = void 0;
+const drizzle_orm_1 = require("drizzle-orm");
+const index_js_1 = require("../schema/index.js");
 // User operations
-export class UserQueries {
+class UserQueries {
     db;
     constructor(db) {
         this.db = db;
@@ -9,101 +12,103 @@ export class UserQueries {
     async findByTelegramId(telegramId) {
         const result = await this.db
             .select()
-            .from(users)
-            .where(eq(users.telegramId, telegramId))
+            .from(index_js_1.users)
+            .where((0, drizzle_orm_1.eq)(index_js_1.users.telegramId, telegramId))
             .limit(1);
         return result[0];
     }
     async findById(id) {
         const result = await this.db
             .select()
-            .from(users)
-            .where(eq(users.id, id))
+            .from(index_js_1.users)
+            .where((0, drizzle_orm_1.eq)(index_js_1.users.id, id))
             .limit(1);
         return result[0];
     }
     async create(user) {
         const result = await this.db
-            .insert(users)
+            .insert(index_js_1.users)
             .values(user)
             .returning();
         return result[0];
     }
     async update(id, updates) {
         const result = await this.db
-            .update(users)
+            .update(index_js_1.users)
             .set({
             ...updates,
-            updatedAt: sql `(unixepoch())`,
+            updatedAt: (0, drizzle_orm_1.sql) `(unixepoch())`,
         })
-            .where(eq(users.id, id))
+            .where((0, drizzle_orm_1.eq)(index_js_1.users.id, id))
             .returning();
         return result[0];
     }
     async delete(id) {
         const result = await this.db
-            .delete(users)
-            .where(eq(users.id, id));
+            .delete(index_js_1.users)
+            .where((0, drizzle_orm_1.eq)(index_js_1.users.id, id));
         // D1Result doesn't have changes property, use success flag instead
         return result.success;
     }
 }
+exports.UserQueries = UserQueries;
 // Position operations
-export class PositionQueries {
+class PositionQueries {
     db;
     constructor(db) {
         this.db = db;
     }
     async findByUserId(userId, status) {
-        let query = this.db.select().from(positions);
+        let query = this.db.select().from(index_js_1.positions);
         if (status) {
-            return await query.where(and(eq(positions.userId, userId), eq(positions.status, status)));
+            return await query.where((0, drizzle_orm_1.and)((0, drizzle_orm_1.eq)(index_js_1.positions.userId, userId), (0, drizzle_orm_1.eq)(index_js_1.positions.status, status)));
         }
-        return await query.where(eq(positions.userId, userId));
+        return await query.where((0, drizzle_orm_1.eq)(index_js_1.positions.userId, userId));
     }
     async findById(id) {
         const result = await this.db
             .select()
-            .from(positions)
-            .where(eq(positions.id, id))
+            .from(index_js_1.positions)
+            .where((0, drizzle_orm_1.eq)(index_js_1.positions.id, id))
             .limit(1);
         return result[0];
     }
     async create(position) {
         const result = await this.db
-            .insert(positions)
+            .insert(index_js_1.positions)
             .values(position)
             .returning();
         return result[0];
     }
     async update(id, updates) {
         const result = await this.db
-            .update(positions)
+            .update(index_js_1.positions)
             .set({
             ...updates,
-            updatedAt: sql `(unixepoch())`,
+            updatedAt: (0, drizzle_orm_1.sql) `(unixepoch())`,
         })
-            .where(eq(positions.id, id))
+            .where((0, drizzle_orm_1.eq)(index_js_1.positions.id, id))
             .returning();
         return result[0];
     }
     async closePosition(id, exitPrice, pnl) {
         const result = await this.db
-            .update(positions)
+            .update(index_js_1.positions)
             .set({
             status: 'closed',
             exitPrice,
             pnl,
-            closedAt: sql `(unixepoch())`,
-            updatedAt: sql `(unixepoch())`,
+            closedAt: (0, drizzle_orm_1.sql) `(unixepoch())`,
+            updatedAt: (0, drizzle_orm_1.sql) `(unixepoch())`,
         })
-            .where(eq(positions.id, id))
+            .where((0, drizzle_orm_1.eq)(index_js_1.positions.id, id))
             .returning();
         return result[0];
     }
 }
+exports.PositionQueries = PositionQueries;
 // Opportunity operations
-export class OpportunityQueries {
+class OpportunityQueries {
     db;
     constructor(db) {
         this.db = db;
@@ -111,80 +116,81 @@ export class OpportunityQueries {
     async findActive(type) {
         let baseQuery = this.db
             .select()
-            .from(opportunities)
-            .orderBy(desc(opportunities.profitPercentage));
+            .from(index_js_1.opportunities)
+            .orderBy((0, drizzle_orm_1.desc)(index_js_1.opportunities.profitPercentage));
         if (type) {
-            return await baseQuery.where(and(eq(opportunities.isActive, true), eq(opportunities.type, type)));
+            return await baseQuery.where((0, drizzle_orm_1.and)((0, drizzle_orm_1.eq)(index_js_1.opportunities.isActive, true), (0, drizzle_orm_1.eq)(index_js_1.opportunities.type, type)));
         }
-        return await baseQuery.where(eq(opportunities.isActive, true));
+        return await baseQuery.where((0, drizzle_orm_1.eq)(index_js_1.opportunities.isActive, true));
     }
     async findById(id) {
         const result = await this.db
             .select()
-            .from(opportunities)
-            .where(eq(opportunities.id, id))
+            .from(index_js_1.opportunities)
+            .where((0, drizzle_orm_1.eq)(index_js_1.opportunities.id, id))
             .limit(1);
         return result[0];
     }
     async create(opportunity) {
         const result = await this.db
-            .insert(opportunities)
+            .insert(index_js_1.opportunities)
             .values(opportunity)
             .returning();
         return result[0];
     }
     async deactivate(id) {
         const result = await this.db
-            .update(opportunities)
+            .update(index_js_1.opportunities)
             .set({ isActive: false })
-            .where(eq(opportunities.id, id))
+            .where((0, drizzle_orm_1.eq)(index_js_1.opportunities.id, id))
             .returning();
         return result[0];
     }
     async cleanup() {
         const result = await this.db
-            .delete(opportunities)
-            .where(sql `expires_at < unixepoch()`);
+            .delete(index_js_1.opportunities)
+            .where((0, drizzle_orm_1.sql) `expires_at < unixepoch()`);
         // D1Result uses meta.changes for affected rows count
         return result.meta.changes ?? 0;
     }
 }
+exports.OpportunityQueries = OpportunityQueries;
 // Trading Strategy operations
-export class TradingStrategyQueries {
+class TradingStrategyQueries {
     db;
     constructor(db) {
         this.db = db;
     }
     async findByUserId(userId, isActive) {
-        let query = this.db.select().from(tradingStrategies);
+        let query = this.db.select().from(index_js_1.tradingStrategies);
         if (isActive !== undefined) {
-            return await query.where(and(eq(tradingStrategies.userId, userId), eq(tradingStrategies.isActive, isActive)));
+            return await query.where((0, drizzle_orm_1.and)((0, drizzle_orm_1.eq)(index_js_1.tradingStrategies.userId, userId), (0, drizzle_orm_1.eq)(index_js_1.tradingStrategies.isActive, isActive)));
         }
-        return await query.where(eq(tradingStrategies.userId, userId));
+        return await query.where((0, drizzle_orm_1.eq)(index_js_1.tradingStrategies.userId, userId));
     }
     async findById(id) {
         const result = await this.db
             .select()
-            .from(tradingStrategies)
-            .where(eq(tradingStrategies.id, id))
+            .from(index_js_1.tradingStrategies)
+            .where((0, drizzle_orm_1.eq)(index_js_1.tradingStrategies.id, id))
             .limit(1);
         return result[0];
     }
     async create(strategy) {
         const result = await this.db
-            .insert(tradingStrategies)
+            .insert(index_js_1.tradingStrategies)
             .values(strategy)
             .returning();
         return result[0];
     }
     async updatePerformance(id, performance) {
         const result = await this.db
-            .update(tradingStrategies)
+            .update(index_js_1.tradingStrategies)
             .set({
             performance: performance,
-            updatedAt: sql `(unixepoch())`,
+            updatedAt: (0, drizzle_orm_1.sql) `(unixepoch())`,
         })
-            .where(eq(tradingStrategies.id, id))
+            .where((0, drizzle_orm_1.eq)(index_js_1.tradingStrategies.id, id))
             .returning();
         return result[0];
     }
@@ -194,18 +200,19 @@ export class TradingStrategyQueries {
         if (!current)
             return undefined;
         const result = await this.db
-            .update(tradingStrategies)
+            .update(index_js_1.tradingStrategies)
             .set({
             isActive: !current.isActive,
-            updatedAt: sql `(unixepoch())`,
+            updatedAt: (0, drizzle_orm_1.sql) `(unixepoch())`,
         })
-            .where(eq(tradingStrategies.id, id))
+            .where((0, drizzle_orm_1.eq)(index_js_1.tradingStrategies.id, id))
             .returning();
         return result[0];
     }
 }
+exports.TradingStrategyQueries = TradingStrategyQueries;
 // Main query class that combines all operations
-export class DatabaseQueries {
+class DatabaseQueries {
     users;
     positions;
     opportunities;
@@ -217,4 +224,5 @@ export class DatabaseQueries {
         this.strategies = new TradingStrategyQueries(db);
     }
 }
+exports.DatabaseQueries = DatabaseQueries;
 //# sourceMappingURL=queries.js.map

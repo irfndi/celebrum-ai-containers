@@ -1,6 +1,6 @@
 import { sql } from 'drizzle-orm';
 import { integer, real, sqliteTable, text, index } from 'drizzle-orm/sqlite-core';
-import { users } from './users';
+import { users } from './users.js';
 
 export const positions = sqliteTable(
   'positions',

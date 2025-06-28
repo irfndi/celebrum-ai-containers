@@ -102,13 +102,13 @@ dev-telegram-bot: ## Start telegram bot development server
 	@cd src/telegram-bot && pnpm run dev
 
 # Deployment commands
-deploy: ## Deploy all packages
-	@echo "🚀 Deploying all packages..."
-	@pnpm run deploy
+deploy: ## Deploy all packages using Alchemy
+	@echo "🚀 Deploying all packages with Alchemy..."
+	@pnpm run deploy:alchemy
 
-deploy-worker: ## Deploy worker (root src)
-	@echo "🚀 Deploying worker (root src)..."
-	@wrangler deploy
+deploy-worker: ## Deploy worker using Alchemy
+	@echo "🚀 Deploying worker with Alchemy..."
+	@pnpm run deploy:alchemy
 
 deploy-web: ## Deploy web package
 	@echo "🚀 Deploying web package..."
@@ -181,9 +181,9 @@ ci-pipeline: ## Run comprehensive CI pipeline (TypeScript + Go)
 	@echo "🧪 Step 8: Go Testing"
 	@go test ./... || echo "⚠️  No Go modules found yet"
 	@echo "✅ Step 8: Go Tests Passed"
-	@echo "🎯 Step 9: Cloudflare Workers Build Check"
-	@wrangler deploy --dry-run || echo "⚠️  Docker not available, skipping Cloudflare Workers check"
-	@echo "✅ Step 9: Cloudflare Workers Build Passed"
+	@echo "🎯 Step 9: Alchemy Deployment Check"
+	@pnpm run deploy:alchemy:dry-run || echo "⚠️  Alchemy dry-run failed, check configuration"
+	@echo "✅ Step 9: Alchemy Deployment Check Passed"
 	@echo "🐳 Step 10: Docker Build Check"
 	@docker build -t celebrum-ai:test . || echo "⚠️  Docker not available, skipping Docker build check"
 	@echo "✅ Step 10: Docker Build Passed"

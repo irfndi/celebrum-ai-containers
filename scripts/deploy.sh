@@ -48,113 +48,15 @@ wrangler secret put CLOUDFLARE_API_TOKEN --env production <<< "$CLOUDFLARE_API_T
 # Re-enable command echoing if it was previously enabled
 set -x
 
-# Create KV Namespaces
-echo "📦 Creating KV namespaces..."
-USER_PROFILES_ID=$(wrangler kv:namespace create "USER_PROFILES" --env production | grep -o 'id = "[^"]*"' | cut -d'"' -f2)
-MARKET_CACHE_ID=$(wrangler kv:namespace create "PROD_BOT_MARKET_CACHE" --env production | grep -o 'id = "[^"]*"' | cut -d'"' -f2)
-SESSION_STORE_ID=$(wrangler kv:namespace create "PROD_BOT_SESSION_STORE" --env production | grep -o 'id = "[^"]*"' | cut -d'"' -f2)
-
-# Validate KV namespace IDs
-if [ -z "$USER_PROFILES_ID" ] || [ "$USER_PROFILES_ID" = "null" ]; then
-    echo "❌ Error: Failed to extract USER_PROFILES KV namespace ID"
-    exit 1
-fi
-
-if [ -z "$MARKET_CACHE_ID" ] || [ "$MARKET_CACHE_ID" = "null" ]; then
-    echo "❌ Error: Failed to extract MARKET_CACHE KV namespace ID"
-    exit 1
-fi
-
-if [ -z "$SESSION_STORE_ID" ] || [ "$SESSION_STORE_ID" = "null" ]; then
-    echo "❌ Error: Failed to extract SESSION_STORE KV namespace ID"
-    exit 1
-fi
-
-echo "✅ KV Namespaces created:"
-echo "  USER_PROFILES: $USER_PROFILES_ID"
-echo "  PROD_BOT_MARKET_CACHE: $MARKET_CACHE_ID"
-echo "  PROD_BOT_SESSION_STORE: $SESSION_STORE_ID"
-
-# Create D1 Database
-echo "🗄️ Creating D1 database..."
-D1_DB_ID=$(wrangler d1 create arbitrage-production --env production | grep -o 'database_id = "[^"]*"' | cut -d'"' -f2)
-
-# Validate D1 database ID
-if [ -z "$D1_DB_ID" ] || [ "$D1_DB_ID" = "null" ]; then
-    echo "❌ Error: Failed to extract D1 database ID"
-    exit 1
-fi
-
-echo "✅ D1 Database created: $D1_DB_ID"
-
-# Create R2 Buckets
-echo "🪣 Creating R2 buckets..."
-wrangler r2 bucket create celebrum-ai-market-data --env production
-wrangler r2 bucket create celebrum-ai-analytics --env production
-echo "✅ R2 Buckets created"
-
-# Create Queues
-echo "🚥 Creating Cloudflare Queues..."
-wrangler queues create opportunity-distribution --env production
-wrangler queues create user-notifications --env production
-wrangler queues create analytics-events --env production
-wrangler queues create dead-letter-queue --env production
-echo "✅ Queues created"
-
-# Create Pipelines
-echo "🔄 Creating Cloudflare Pipelines..."
-wrangler pipelines create market-data-pipeline --r2-bucket celebrum-ai-market-data --env production
-wrangler pipelines create analytics-pipeline --r2-bucket celebrum-ai-analytics --env production
-wrangler pipelines create audit-pipeline --r2-bucket celebrum-ai-analytics --env production
-echo "✅ Pipelines created"
-
-# Update wrangler.toml with actual IDs
-echo "📝 Updating wrangler.toml with resource IDs..."
-
-# Update USER_PROFILES ID
-if ! sed -i.bak "s/your-kv-namespace-id-here/$USER_PROFILES_ID/g" wrangler.toml; then
-    echo "❌ Error: Failed to update USER_PROFILES ID in wrangler.toml"
-    exit 1
-fi
-
-# Update MARKET_CACHE ID
-if ! sed -i.bak "s/your-market-cache-kv-id-here/$MARKET_CACHE_ID/g" wrangler.toml; then
-    echo "❌ Error: Failed to update MARKET_CACHE ID in wrangler.toml"
-    exit 1
-fi
-
-# Update SESSION_STORE ID
-if ! sed -i.bak "s/your-session-kv-id-here/$SESSION_STORE_ID/g" wrangler.toml; then
-    echo "❌ Error: Failed to update SESSION_STORE ID in wrangler.toml"
-    exit 1
-fi
-
-# Update D1 database ID
-if ! sed -i.bak "s/your-d1-database-id-here/$D1_DB_ID/g" wrangler.toml; then
-    echo "❌ Error: Failed to update D1 database ID in wrangler.toml"
-    exit 1
-fi
-
-# Clean up backup files after successful replacements
-rm -f wrangler.toml.bak
-
-echo "✅ wrangler.toml updated successfully"
-
-# Run D1 migrations
-echo "🔄 Running D1 migrations..."
-wrangler d1 migrations apply arbitrage-production --env production
-
 # Run CI pipeline before deployment
 echo "🧪 Running CI pipeline to ensure code quality..."
-make ci
+pnpm run lint
+pnpm run test
+pnpm run build
 
-# Build and deploy
-echo "🔨 Building and deploying Worker..."
-cargo install -q worker-build
-worker-build --release
-
-# Deploy to production
-wrangler deploy --env production
+# Deploy using Alchemy (manages all resources)
+echo "🚀 Deploying with Alchemy..."
+pnpm run deploy:alchemy
 
 echo "🎉 Deployment completed successfully!"
 echo ""

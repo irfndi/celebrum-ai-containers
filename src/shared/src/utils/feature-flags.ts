@@ -193,7 +193,7 @@ export function RequireFeature(featureKey: string) {
 
     descriptor.value = async function (...args: unknown[]) {
       // Extract context from arguments or instance
-      const context = (this as any)?.getFeatureFlagContext?.() || {};
+      const context = (this as { getFeatureFlagContext?: () => FeatureFlagContext })?.getFeatureFlagContext?.() || {};
       
       const result = await FeatureFlagUtils.checkFeature(featureKey, context);
       
@@ -212,8 +212,12 @@ export function RequireFeature(featureKey: string) {
  * Decorator for classes that require feature flags
  */
 export function RequireFeatures(featureKeys: string[]) {
-  return function <T extends { new (...args: any[]): {} }>(constructor: T) {
+  return function <T extends { new (...args: any[]): object }>(constructor: T) {
     return class extends constructor {
+      constructor(...args: any[]) {
+        super(...args);
+      }
+
       async checkRequiredFeatures(context?: FeatureFlagContext): Promise<void> {
         const results = await FeatureFlagUtils.checkFeatures(featureKeys, context);
         

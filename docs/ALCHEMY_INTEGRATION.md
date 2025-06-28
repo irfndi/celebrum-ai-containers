@@ -46,7 +46,7 @@ CONTAINER_NODE_ENV="development"
 
 ### Alchemy Configuration File
 
-The main configuration is in `alchemy.config.ts`:
+The main configuration is in `alchemy.run.ts`:
 
 ```typescript
 import alchemy from 'alchemy';
@@ -95,9 +95,6 @@ pnpm run deploy:alchemy:dev
 
 # Dry run (preview changes without applying)
 pnpm run deploy:alchemy:dry-run
-
-# Build Alchemy configuration
-pnpm run build:alchemy
 ```
 
 ### Deployment Process

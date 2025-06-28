@@ -8,13 +8,45 @@ import {
 
 // KV namespace interface for proper typing
 interface KVNamespace {
-  get(key: string, type?: 'text' | 'json' | 'arrayBuffer' | 'stream'): Promise<any>;
-  put(key: string, value: string | ArrayBuffer | ArrayBufferView | ReadableStream, options?: any): Promise<void>;
+  get(key: string, type?: 'text' | 'json' | 'arrayBuffer' | 'stream'): Promise<unknown>;
+  put(key: string, value: string | ArrayBuffer | ArrayBufferView | ReadableStream, options?: { expiration?: number; expirationTtl?: number }): Promise<void>;
   delete(key: string): Promise<void>;
 }
 
 interface EnvWithKV {
   CELEBRUM_KV?: KVNamespace;
+}
+
+// Helper interfaces for type safety
+interface ResetTimestamps {
+  dailyReset: number;
+  hourlyReset: number;
+}
+
+interface OpportunityCache {
+  opportunities: ArbitrageOpportunity[];
+  timestamp: number;
+}
+
+
+
+// Type guard functions
+function isStringArray(value: unknown): value is string[] {
+  return Array.isArray(value) && value.every(item => typeof item === 'string');
+}
+
+function isResetTimestamps(value: unknown): value is ResetTimestamps {
+  return typeof value === 'object' && value !== null &&
+    'dailyReset' in value && 'hourlyReset' in value &&
+    typeof (value as ResetTimestamps).dailyReset === 'number' &&
+    typeof (value as ResetTimestamps).hourlyReset === 'number';
+}
+
+function isOpportunityCache(value: unknown): value is OpportunityCache {
+  return typeof value === 'object' && value !== null &&
+    'opportunities' in value && 'timestamp' in value &&
+    Array.isArray((value as OpportunityCache).opportunities) &&
+    typeof (value as OpportunityCache).timestamp === 'number';
 }
 
 /**
@@ -309,7 +341,8 @@ export class ArbitrageOpportunityManager {
 
       // Add to user's alert list
       const userAlertsKey = `rbac:user_alerts:${userId}`;
-      const existingAlerts = await (this.env as EnvWithKV).CELEBRUM_KV?.get(userAlertsKey, 'json') || [];
+      const alertsData = await (this.env as EnvWithKV).CELEBRUM_KV?.get(userAlertsKey, 'json');
+      const existingAlerts = isStringArray(alertsData) ? alertsData : [];
       existingAlerts.push(alertId);
       
       await (this.env as EnvWithKV).CELEBRUM_KV?.put(userAlertsKey, JSON.stringify(existingAlerts), {
@@ -341,7 +374,8 @@ export class ArbitrageOpportunityManager {
   async getUserOpportunityAlerts(userId: string): Promise<unknown[]> {
     try {
       const userAlertsKey = `rbac:user_alerts:${userId}`;
-      const alertIds = await (this.env as EnvWithKV).CELEBRUM_KV?.get(userAlertsKey, 'json') || [];
+      const alertIdsData = await (this.env as EnvWithKV).CELEBRUM_KV?.get(userAlertsKey, 'json');
+      const alertIds = isStringArray(alertIdsData) ? alertIdsData : [];
       
       const alerts = [];
       for (const alertId of alertIds) {
@@ -436,10 +470,10 @@ export class ArbitrageOpportunityManager {
   ): Promise<void> {
     try {
       const lastResetKey = `rbac:opportunity_reset:${userId}`;
-      const lastReset = await (this.env as EnvWithKV).CELEBRUM_KV?.get(lastResetKey, 'json') || {
-        dailyReset: 0,
-        hourlyReset: 0
-      };
+      const resetData = await (this.env as EnvWithKV).CELEBRUM_KV?.get(lastResetKey, 'json');
+      const lastReset: ResetTimestamps = isResetTimestamps(resetData) 
+        ? resetData 
+        : { dailyReset: 0, hourlyReset: 0 };
 
       const now = new Date(currentTime);
       const lastDailyReset = new Date(lastReset.dailyReset);
@@ -487,7 +521,8 @@ export class ArbitrageOpportunityManager {
   private async getOpportunitiesFromCache(role: UserRoleType): Promise<ArbitrageOpportunity[]> {
     try {
       const cacheKey = `opportunities_cache:${role}`;
-      const cached = await (this.env as EnvWithKV).CELEBRUM_KV?.get(cacheKey, 'json');
+      const cachedData = await (this.env as EnvWithKV).CELEBRUM_KV?.get(cacheKey, 'json');
+      const cached = isOpportunityCache(cachedData) ? cachedData : null;
       return cached ? cached.opportunities : [];
     } catch (error) {
       console.error('Failed to get opportunities from cache:', error);
@@ -617,7 +652,8 @@ export class ArbitrageOpportunityManager {
   private async getTotalExecutions(userId: string): Promise<number> {
     try {
       const statsKey = `rbac:opportunity_stats:${userId}`;
-      const stats = await (this.env as EnvWithKV).CELEBRUM_KV?.get(statsKey, 'json') || { total: 0, successful: 0 };
+      const statsData = await (this.env as EnvWithKV).CELEBRUM_KV?.get(statsKey, 'json') || { total: 0, successful: 0 };
+      const stats = statsData as { total: number; successful: number };
       return stats.total;
     } catch {
       return 0;
@@ -630,7 +666,8 @@ export class ArbitrageOpportunityManager {
   private async getSuccessfulExecutions(userId: string): Promise<number> {
     try {
       const statsKey = `rbac:opportunity_stats:${userId}`;
-      const stats = await (this.env as EnvWithKV).CELEBRUM_KV?.get(statsKey, 'json') || { total: 0, successful: 0 };
+      const statsData = await (this.env as EnvWithKV).CELEBRUM_KV?.get(statsKey, 'json');
+      const stats = (statsData as { total: number; successful: number }) || { total: 0, successful: 0 };
       return stats.successful;
     } catch {
       return 0;

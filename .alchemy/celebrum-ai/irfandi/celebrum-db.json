@@ -1,0 +1,32 @@
+{
+  "kind": "cloudflare::D1Database",
+  "id": "celebrum-db",
+  "fqn": "celebrum-ai/irfandi/celebrum-db",
+  "seq": 0,
+  "data": {},
+  "status": "created",
+  "output": {
+    "Symbol(alchemy::ResourceKind)": "cloudflare::D1Database",
+    "Symbol(alchemy::ResourceID)": "celebrum-db",
+    "Symbol(alchemy::ResourceFQN)": "celebrum-ai/irfandi/celebrum-db",
+    "Symbol(alchemy::ResourceScope)": {
+      "@scope": null
+    },
+    "Symbol(alchemy::ResourceSeq)": 0,
+    "type": "d1",
+    "id": "37da863b-3fb1-491a-94ad-42839afcb981",
+    "name": "celebrum-db",
+    "fileSize": 12288,
+    "numTables": 0,
+    "version": "production",
+    "readReplication": {
+      "mode": "disabled"
+    },
+    "accountId": "4d12ccdb69bc57519b6aac269a04c9af"
+  },
+  "props": {
+    "name": "celebrum-db",
+    "adopt": true,
+    "migrationsFiles": []
+  }
+}

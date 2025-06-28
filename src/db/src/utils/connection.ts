@@ -1,6 +1,6 @@
 import { drizzle } from 'drizzle-orm/d1';
 import type { DrizzleD1Database } from 'drizzle-orm/d1';
-import * as schema from '../schema/index';
+import * as schema from '../schema/index.js';
 
 // Type for our database instance
 export type Database = DrizzleD1Database<typeof schema>;

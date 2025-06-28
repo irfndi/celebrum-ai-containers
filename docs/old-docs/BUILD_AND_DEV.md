@@ -53,7 +53,7 @@ wrangler login
 Each package has its own `build.sh` script:
 
 - **`packages/db/build.sh`** - TypeScript compilation + schema generation
-- **`packages/shared/build.sh`** - Multi-format builds with tsup
+- **`packages/shared/build.sh`** - TypeScript compilation builds
 - **`packages/telegram-bot/build.sh`** - TypeScript + optional Rust components
 - **`packages/web/build.sh`** - Astro build process
 - **`packages/worker/build.sh`** - TypeScript + WASM compilation

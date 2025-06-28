@@ -1,0 +1,1 @@
+{"version":3,"file":"market-analyzer.d.ts","sourceRoot":"","sources":["market-analyzer.ts"],"names":[],"mappings":"AAEA,OAAO,KAAK,EAAE,GAAG,EAAE,MAAM,qBAAqB,CAAC;AAE/C,qBAAa,cAAc;IACb,OAAO,CAAC,GAAG;gBAAH,GAAG,EAAE,GAAG;IAEtB,mBAAmB,CAAC,MAAM,EAAE,MAAM,GAAG,OAAO,CAAC,OAAO,CAAC;IAUrD,kBAAkB,CAAC,MAAM,EAAE,MAAM,GAAG,OAAO,CAAC,OAAO,CAAC;CAS3D"}

@@ -20,19 +20,7 @@
       {
         "class_name": "CelebrumAIStorage",
         "name": "CELEBRUM_STORAGE"
-      },
-      {
-        "class_name": "CelebrumContainer",
-        "name": "CELEBRUM_CONTAINER"
       }
     ]
-  },
-
-  "containers": [
-    {
-      "name": "celebrum-ai-container",
-      "class_name": "CelebrumContainer",
-      "image": "./Dockerfile"
-    }
-  ]
+  }
 }

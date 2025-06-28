@@ -16,6 +16,25 @@ interface EnvWithKV {
   CELEBRUM_KV?: KVNamespace;
 }
 
+interface Backtest {
+  id: string;
+  userId: string;
+  strategyId: string;
+  startedAt: number;
+  completedAt?: number;
+  status: 'pending' | 'running' | 'completed' | 'failed';
+  progress?: number;
+  results?: unknown;
+}
+
+// Type guard functions
+function isStrategyLimits(value: unknown): value is StrategyLimits {
+  return typeof value === 'object' && value !== null &&
+    'maxStrategies' in value && 'createdStrategies' in value &&
+    'maxActiveStrategies' in value && 'activeStrategies' in value &&
+    'maxConcurrentBacktests' in value && 'concurrentBacktests' in value;
+}
+
 /**
  * Technical Strategy Manager for YAML-based strategy system
  * Handles strategy creation, validation, backtesting, and execution limits
@@ -65,8 +84,8 @@ export class TechnicalStrategyManager {
   async getStrategyLimits(userId: string): Promise<StrategyLimits | null> {
     try {
       const key = `rbac:strategy_limits:${userId}`;
-      const limits = await (this.env as EnvWithKV).CELEBRUM_KV?.get(key, 'json');
-      return limits as StrategyLimits | null;
+      const limitsData = await (this.env as EnvWithKV).CELEBRUM_KV?.get(key, 'json');
+      return isStrategyLimits(limitsData) ? limitsData : null;
     } catch (error) {
       console.error('Failed to get strategy limits:', error);
       return null;
@@ -545,12 +564,17 @@ export class TechnicalStrategyManager {
   /**
    * Get backtest results
    */
-  async getBacktestResults(userId: string, backtestId: string): Promise<unknown> {
+  async getBacktestResults(userId: string, backtestId: string): Promise<Backtest | null> {
     try {
       const backtestKey = `rbac:backtest:${backtestId}`;
-      const backtest = await (this.env as EnvWithKV).CELEBRUM_KV?.get(backtestKey, 'json') as any;
+      const backtestData = await (this.env as EnvWithKV).CELEBRUM_KV?.get(backtestKey, 'json');
       
-      if (!backtest || backtest.userId !== userId) {
+      if (!backtestData) {
+        return null;
+      }
+      
+      const backtest = backtestData as Backtest;
+      if (backtest.userId !== userId) {
         return null;
       }
       
@@ -564,21 +588,23 @@ export class TechnicalStrategyManager {
   /**
    * Get user's backtests
    */
-  async getUserBacktests(userId: string): Promise<unknown[]> {
+  async getUserBacktests(userId: string): Promise<Backtest[]> {
     try {
       const userBacktestsKey = `rbac:user_backtests:${userId}`;
-      const backtestIds = await (this.env as EnvWithKV).CELEBRUM_KV?.get(userBacktestsKey, 'json') as string[] || [];
+      const backtestIdsData = await (this.env as EnvWithKV).CELEBRUM_KV?.get(userBacktestsKey, 'json') || [];
+      const backtestIds = backtestIdsData as string[];
       
-      const backtests: any[] = [];
+      const backtests: Backtest[] = [];
       for (const backtestId of backtestIds) {
         const backtestKey = `rbac:backtest:${backtestId}`;
-        const backtest = await (this.env as EnvWithKV).CELEBRUM_KV?.get(backtestKey, 'json') as any;
-        if (backtest) {
+        const backtestData = await (this.env as EnvWithKV).CELEBRUM_KV?.get(backtestKey, 'json');
+        if (backtestData) {
+          const backtest = backtestData as Backtest;
           backtests.push(backtest);
         }
       }
       
-      return backtests.sort((a: any, b: any) => b.startedAt - a.startedAt);
+      return backtests.sort((a, b) => b.startedAt - a.startedAt);
     } catch (error) {
       console.error('Failed to get user backtests:', error);
       return [];
@@ -746,9 +772,10 @@ export class TechnicalStrategyManager {
       // Simulate backtest execution with random results
       setTimeout(async () => {
         const backtestKey = `rbac:backtest:${backtestId}`;
-        const backtest = await (this.env as unknown as { CELEBRUM_KV?: { get: (key: string, type?: string) => Promise<any> } }).CELEBRUM_KV?.get(backtestKey, 'json');
+        const backtestData = await (this.env as unknown as { CELEBRUM_KV?: { get: (key: string, type?: string) => Promise<unknown> } }).CELEBRUM_KV?.get(backtestKey, 'json');
         
-        if (backtest) {
+        if (backtestData) {
+          const backtest = backtestData as Backtest;
           // Generate mock results
           const results = {
             totalTrades: Math.floor(Math.random() * 100) + 50,

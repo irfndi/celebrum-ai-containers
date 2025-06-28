@@ -1,8 +1,8 @@
-// Main database exports
-export * from './schema/index';
-export * from './utils/connection';
-export * from './utils/queries';
-export { UserQueries } from './utils/queries';
+// Export all database schemas and utilities
+export * from './schema/index.js';
+export * from './utils/connection.js';
+export * from './utils/queries.js';
+export { UserQueries } from './utils/queries.js';
 
 // Re-export commonly used Drizzle types and functions
 export { eq, and, or, not, sql, desc, asc, like, ilike } from 'drizzle-orm';

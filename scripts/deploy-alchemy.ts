@@ -64,17 +64,15 @@ class AlchemyDeployment {
       if (this.options.dryRun) {
         console.log('🔍 Dry run mode - showing planned changes:');
         console.log('- Container: celebrum-ai-container');
-        console.log('- Worker: celebrum-ai-worker');
+        console.log('- Worker: celebrum-ai-containers');
         console.log('- Bindings: CONTAINER -> celebrum-ai-container');
         console.log('✅ Infrastructure deployment simulation completed');
         return;
       }
       
       // Import and execute the Alchemy configuration
-      const { default: alchemy } = await import('../alchemy.config.ts');
-      
-      // Execute the actual deployment
-      await alchemy.deploy();
+      // The deployment happens automatically when alchemy.run.ts is imported
+      await import('../alchemy.run.ts');
       
       console.log('✅ Infrastructure deployed successfully');
     } catch (error) {

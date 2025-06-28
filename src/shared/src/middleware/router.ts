@@ -1,6 +1,5 @@
 import { Hono } from 'hono';
 import type { Env } from '../types';
-import { handleTelegramUpdate } from '@celebrum-ai/telegram-bot';
 
 /**
  * ServiceRouter handles routing requests to appropriate services
@@ -61,10 +60,14 @@ export class ServiceRouter {
   /**
    * Handle Telegram bot webhook requests
    */
-  telegramBotHandler() {
+  telegramBotHandler(handleTelegramUpdate?: (update: unknown, context: unknown) => Promise<Response>) {
     const telegramApp = new Hono<{ Bindings: Env }>();
     
     telegramApp.post('/webhook', async (c) => {
+      if (!handleTelegramUpdate) {
+        return c.json({ error: 'Telegram handler not configured' }, 500);
+      }
+      
       const update = await c.req.json();
       const context = { 
         env: c.env, 

@@ -150,19 +150,13 @@ else
     exit 1
 fi
 
-# Step 11: Test wrangler build (mirrors CI dry-run)
-print_step "Testing wrangler build (dry-run)"
-if command -v wrangler >/dev/null 2>&1; then
-    echo "Wrangler version: $(wrangler --version)"
-    if wrangler deploy --dry-run; then
-        print_success "Wrangler dry-run successful"
-    else
-        print_error "Wrangler dry-run failed"
-        exit 1
-    fi
+# Step 11: Test Alchemy deployment (dry-run)
+print_step "Testing Alchemy deployment (dry-run)"
+if pnpm run deploy:alchemy:dry-run; then
+    print_success "Alchemy dry-run successful"
 else
-    print_warning "Wrangler not installed, skipping dry-run test"
-    print_warning "Install with: pnpm add -g wrangler@latest"
+    print_error "Alchemy dry-run failed"
+    exit 1
 fi
 
 # Final summary

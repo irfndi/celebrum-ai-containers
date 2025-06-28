@@ -1,5 +1,5 @@
 import type { DrizzleD1Database } from 'drizzle-orm/d1';
-import * as schema from '../schema/index';
+import * as schema from '../schema/index.js';
 export type Database = DrizzleD1Database<typeof schema>;
 export interface Env {
     ArbEdgeD1: D1Database;

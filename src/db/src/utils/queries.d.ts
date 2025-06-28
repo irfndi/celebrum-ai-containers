@@ -1,5 +1,5 @@
-import type { Database } from './connection';
-import type { User, NewUser, Position, NewPosition, Opportunity, NewOpportunity, TradingStrategy, NewTradingStrategy } from '../schema/index';
+import type { Database } from './connection.js';
+import type { User, NewUser, Position, NewPosition, Opportunity, NewOpportunity, TradingStrategy, NewTradingStrategy } from '../schema/index.js';
 export declare class UserQueries {
     private db;
     constructor(db: Database);

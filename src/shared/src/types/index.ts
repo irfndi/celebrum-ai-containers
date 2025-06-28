@@ -55,6 +55,7 @@ export interface Env {
   DISCORD_BOT_SERVICE_URL?: string;
   TELEGRAM_BOT_SERVICE_URL?: string;
   TELEGRAM_BOT_TOKEN?: string;
+  ADMIN_TELEGRAM_IDS?: string;
   RATE_LIMIT_REQUESTS_PER_MINUTE?: string;
   ENVIRONMENT?: string;
 }
