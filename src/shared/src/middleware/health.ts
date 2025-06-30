@@ -68,7 +68,7 @@ export class HealthCheck {
       ...config,
     };
     this.startTime = Date.now();
-    this.version = process.env.VERSION || '1.0.0';
+    this.version = '1.0.0'; // VERSION env var not available in Cloudflare Workers
   }
 
   /**

@@ -4,11 +4,12 @@ import featureFlags from './feature_flags.json';
 export const FEATURE_FLAGS_CONFIG = featureFlags;
 
 // Environment Configuration
+// Note: process.env not directly available in Cloudflare Workers
 export const ENV = {
-  NODE_ENV: process.env.NODE_ENV || 'development',
-  IS_PRODUCTION: process.env.NODE_ENV === 'production',
-  IS_DEVELOPMENT: process.env.NODE_ENV === 'development',
-  IS_TEST: process.env.NODE_ENV === 'test',
+  NODE_ENV: 'production', // Default to production for Cloudflare Workers
+  IS_PRODUCTION: true,
+  IS_DEVELOPMENT: false,
+  IS_TEST: false,
 } as const;
 
 // API Configuration

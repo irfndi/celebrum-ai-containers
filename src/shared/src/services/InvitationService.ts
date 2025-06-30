@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from 'uuid';
+// Using native crypto.randomUUID() instead of uuid package for Cloudflare Workers compatibility
 import { NotFoundError, ValidationError } from '../errors';
 import type { Database, InvitationCode as DbInvitationCode, InvitationUsage as DbInvitationUsage } from '@celebrum-ai/db';
 import { invitationCodes, invitationUsage } from '@celebrum-ai/db';
@@ -106,7 +106,7 @@ export class InvitationService {
       // 6. Create usage record
       const betaExpiresAt = new Date();
       betaExpiresAt.setDate(betaExpiresAt.getDate() + 90);
-      const usageId = uuidv4();
+      const usageId = globalThis.crypto.randomUUID();
       const now = new Date();
 
       const [newUsage] = await tx.insert(invitationUsage).values({

@@ -356,8 +356,8 @@ export const healthCheckMiddleware = (path: string = '/health'): MiddlewareFunct
       res.status(200).json({
         status: 'healthy',
         timestamp: new Date().toISOString(),
-        uptime: process.uptime(),
-        memory: process.memoryUsage(),
+        uptime: 0, // process.uptime() not available in Cloudflare Workers
+        memory: { rss: 0, heapUsed: 0, heapTotal: 0, external: 0, arrayBuffers: 0 }, // process.memoryUsage() not available in Cloudflare Workers
       });
       return;
     }

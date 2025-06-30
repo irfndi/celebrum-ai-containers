@@ -3,9 +3,10 @@
   "name": "celebrum-ai-containers",
   "main": "src/index.ts",
   "account_id": "4d12ccdb69bc57519b6aac269a04c9af",
-  "compatibility_date": "2025-05-23",
+  "compatibility_date": "2024-09-23",
   "compatibility_flags": [
-    "nodejs_compat"
+    "nodejs_compat",
+    "nodejs_compat_v2"
   ],
   "observability": {
     "enabled": true

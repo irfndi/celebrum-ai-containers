@@ -1,6 +1,10 @@
 #!/usr/bin/env tsx
 
+import { config } from 'dotenv';
 import { execSync } from 'node:child_process';
+
+// Load environment variables from .env file
+config();
 
 interface DeploymentOptions {
   environment: 'development' | 'staging' | 'production';
