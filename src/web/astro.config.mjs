@@ -1,4 +1,4 @@
-import { defineConfig } from "astro/config";
+import { defineConfig } from 'astro/config';
 import cloudflare from "@astrojs/cloudflare";
 import tailwindcss from "@tailwindcss/vite";
 
@@ -11,11 +11,22 @@ export default defineConfig({
     platformProxy: {
       enabled: true,
     },
+    runtime: {
+      mode: 'local',
+      type: 'pages',
+    },
   }),
   srcDir: './src',
   integrations: [],
   vite: {
     // @ts-ignore - Tailwind CSS v4 vite plugin compatibility
     plugins: [tailwindcss()],
+    define: {
+      global: 'globalThis',
+      'crypto.randomUUID': 'globalThis.crypto.randomUUID',
+    },
+    optimizeDeps: {
+      exclude: ['crypto']
+    }
   },
 });
