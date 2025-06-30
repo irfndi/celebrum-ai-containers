@@ -7,7 +7,7 @@ echo "🧪 Testing DEVELOPMENT Telegram Bot"
 echo "===================================="
 
 # Development server URL - can be overridden via environment variable
-DEV_URL="${TELEGRAM_DEV_WEBHOOK_URL:-http://localhost:8787/telegram/webhook}"
+DEV_URL="${TELEGRAM_DEV_WEBHOOK_URL:-http://localhost:8787/api/telegram/webhook}"
 
 echo "🎯 Target URL: $DEV_URL"
 
@@ -134,4 +134,4 @@ echo "Environment Variables:"
 echo "- TELEGRAM_DEV_WEBHOOK_URL: Override the default localhost URL (optional)"
 echo ""
 echo "Note: Ensure development server is running with 'wrangler dev'"
-echo "If commands don't work, the webhook handler may need to use the CommandRouter properly." 
+echo "If commands don't work, the webhook handler may need to use the CommandRouter properly."

@@ -48,7 +48,7 @@ fi
 
 # Worker URL - accept as environment variable or script argument with default
 WORKER_URL="${1:-${WORKER_URL:-https://celebrum-ai.irfandimarsya.workers.dev}}"
-WEBHOOK_URL="$WORKER_URL/telegram/webhook"
+WEBHOOK_URL="$WORKER_URL/api/telegram/webhook"
 
 echo "📡 Setting webhook URL: $WEBHOOK_URL"
 
