@@ -24,6 +24,8 @@ export default defineConfig({
     define: {
       global: 'globalThis',
       'crypto.randomUUID': 'globalThis.crypto.randomUUID',
+      'crypto.subtle': 'globalThis.crypto.subtle',
+      'crypto.getRandomValues': 'globalThis.crypto.getRandomValues',
     },
     optimizeDeps: {
       exclude: ['crypto']
