@@ -25,5 +25,12 @@
     ".temporary-code/**",
     "coverage/**",
     "*.d.ts"
-  ]
+  ],
+  "settings": {
+    "import/resolver": {
+      "typescript": {
+        "alwaysTryTypes": true
+      }
+    }
+  }
 }

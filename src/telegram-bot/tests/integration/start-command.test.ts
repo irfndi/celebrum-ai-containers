@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { UserService, SessionService } from '@celebrum-ai/shared';
 import type { User, NewUser } from '@celebrum-ai/db/schema';
+import type { D1Database, KVNamespace } from '@cloudflare/workers-types';
 
 // Mock KV Namespace
 class MockKVNamespace {
@@ -38,32 +39,32 @@ class MockD1Database {
   private nextId = 1;
 
   // Drizzle-style methods
-  insert(_table: any) {
+  insert(_table: unknown) {
     return {
-      values: (data: any) => {
+      values: (data: Partial<NewUser>) => {
         return {
           returning: async () => {
+            const typedData = data;
             const userData: User = {
               id: this.nextId++,
-              telegramId: data.telegramId,
-              firstName: data.firstName,
-              lastName: data.lastName,
-              username: data.username,
-              email: data.email || null,
-              languageCode: data.languageCode || null,
-              role: data.role || 'free',
-              status: data.status || 'active',
+              telegramId: typedData.telegramId,
+              firstName: typedData.firstName,
+              lastName: typedData.lastName,
+              username: typedData.username,
+              email: typedData.email || null,
+              languageCode: typedData.languageCode || null,
+              role: typedData.role || 'free',
+              status: typedData.status || 'active',
               createdAt: new Date(),
               updatedAt: new Date(),
-              lastActiveAt: data.lastActiveAt || new Date(),
-              settings: typeof data.settings === 'string' ? data.settings : JSON.stringify(data.settings || {}),
-              apiLimits: typeof data.apiLimits === 'string' ? data.apiLimits : JSON.stringify(data.apiLimits || {}),
-              accountBalance: data.accountBalance || 0,
-              betaExpiresAt: data.betaExpiresAt || null,
-              tradingPreferences: typeof data.tradingPreferences === 'string' ? data.tradingPreferences : JSON.stringify(data.tradingPreferences || {})
+              lastActiveAt: typedData.lastActiveAt || new Date(),
+              settings: typeof typedData.settings === 'string' ? typedData.settings : JSON.stringify(typedData.settings || {}),
+              apiLimits: typeof typedData.apiLimits === 'string' ? typedData.apiLimits : JSON.stringify(typedData.apiLimits || {}),
+              accountBalance: typedData.accountBalance || 0,
+              betaExpiresAt: typedData.betaExpiresAt || null,
+              tradingPreferences: typeof typedData.tradingPreferences === 'string' ? typedData.tradingPreferences : JSON.stringify(typedData.tradingPreferences || {})
             };
             this.users.set(userData.id, userData);
-            console.log('D1 insert created user:', userData);
             return [userData];
           }
         };
@@ -73,15 +74,14 @@ class MockD1Database {
 
   select() {
     return {
-      from: (_table: any) => {
+      from: (_table: unknown) => {
         return {
-          where: (_condition: any) => {
+          where: (_condition: unknown) => {
             return {
-              limit: (count: number) => {
+              limit: (count: unknown) => {
                 // For telegram_id lookup - simplified for testing
                 const users = Array.from(this.users.values());
-                console.log('D1 select found users:', users);
-                return users.slice(0, count);
+                return users.slice(0, count as number);
               }
             };
           }
@@ -90,11 +90,11 @@ class MockD1Database {
     };
   }
 
-  update(_table: any) {
+  update(_table: unknown) {
     return {
-      set: (data: any) => {
+      set: (data: Partial<User>) => {
         return {
-          where: (_condition: any) => {
+          where: (_condition: unknown) => {
             return {
               returning: async () => {
                 // Find and update user (simplified)
@@ -105,7 +105,6 @@ class MockD1Database {
                     ...data,
                     updatedAt: new Date()
                   });
-                  console.log('D1 update user:', user);
                   return [user];
                 }
                 return [];
@@ -117,16 +116,15 @@ class MockD1Database {
     };
   }
 
-  delete(_table: any) {
+  delete(_table: unknown) {
     return {
-      where: (_condition: any) => {
+      where: (_condition: unknown) => {
         return {
           returning: async () => {
             const users = Array.from(this.users.values());
             if (users.length > 0) {
               const deletedUser = users[0];
               this.users.delete(deletedUser.id);
-              console.log('D1 delete user:', deletedUser);
               return [deletedUser];
             }
             return [];
@@ -138,7 +136,7 @@ class MockD1Database {
 
   async prepare(query: string) {
     return {
-      bind: (...params: any[]) => ({
+      bind: (...params: unknown[]) => ({
         first: async () => {
           if (query.includes('SELECT') && query.includes('telegram_id')) {
             const telegramId = params[0];
@@ -225,8 +223,8 @@ describe('/start Command Implementation', () => {
   beforeEach(() => {
     mockKV = new MockKVNamespace();
     mockDB = new MockD1Database();
-    userService = new UserService(mockDB as any);
-    sessionService = new SessionService(mockKV as any, 3600); // 1 hour TTL
+    userService = new UserService(mockDB as unknown as D1Database);
+    sessionService = new SessionService(mockKV as unknown as KVNamespace, 3600); // 1 hour TTL
   });
 
   describe('New User Flow', () => {
@@ -395,7 +393,7 @@ describe('/start Command Implementation', () => {
 
     it('should handle session expiration', async () => {
       // Create session service with very short TTL
-      const shortTTLSessionService = new SessionService(mockKV as any, 1); // 1 second
+      const shortTTLSessionService = new SessionService(mockKV as unknown as KVNamespace, 1); // 1 second
       
       const session = await shortTTLSessionService.createSession(user);
       expect(session).toBeDefined();

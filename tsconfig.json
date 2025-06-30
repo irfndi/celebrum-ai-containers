@@ -4,7 +4,7 @@
     "module": "CommonJS",
     "moduleResolution": "node",
     "strict": true,
-    "noEmit": false,
+    "noEmit": true,
     "skipLibCheck": true,
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
@@ -14,9 +14,9 @@
     "resolveJsonModule": true,
     "allowJs": true,
     "esModuleInterop": true,
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
+    "declaration": false,
+    "declarationMap": false,
+    "sourceMap": false,
     "incremental": true,
     "composite": false,
     "outDir": "dist",
@@ -60,6 +60,10 @@
     "dist",
     "**/*.test.ts",
     "**/*.spec.ts",
-    "src/web/**/*"
-  ]
+    "src/web/**/*",
+    "src/web/dist/**/*"
+  ],
+  "ts-node": {
+    "transpileOnly": true
+  }
 }

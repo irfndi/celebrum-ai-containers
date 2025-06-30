@@ -212,8 +212,10 @@ export function RequireFeature(featureKey: string) {
  * Decorator for classes that require feature flags
  */
 export function RequireFeatures(featureKeys: string[]) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return function <T extends { new (...args: any[]): object }>(constructor: T) {
     return class extends constructor {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       constructor(...args: any[]) {
         super(...args);
       }

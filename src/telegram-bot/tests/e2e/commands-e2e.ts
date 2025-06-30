@@ -5,32 +5,33 @@
 
 import { 
   initializeHandlers, 
-  processTelegramUpdate, 
-  getAllHandlers 
+  processTelegramUpdate
 } from '../../src/handlers/index';
-import { TelegramUpdate, TelegramWebhookContext } from '../../src/types/index';
+import type { TelegramUpdate, TelegramWebhookContext } from '../../src/types/index';
+import type { Env } from '@celebrum-ai/shared';
+import type { D1Database, KVNamespace } from '@cloudflare/workers-types';
 import { extractCommand, getChatId, getUserId } from '../../src/utils/index';
 
 // Mock environment for testing
 const mockEnv = {
   TELEGRAM_BOT_TOKEN: 'test-token',
-  DB: {} as any, // Mock D1Database
-  ArbEdgeD1: {} as any, // Mock D1Database
-  SESSIONS: {} as any, // Mock KVNamespace
-  CELEBRUM_KV: {} as any, // Mock KVNamespace
-  PROD_BOT_MARKET_CACHE: {} as any, // Mock KVNamespace
-  PROD_BOT_SESSION_STORE: {} as any, // Mock KVNamespace
-  CELEBRUM_CONTAINERS: {} as any, // Mock DurableObjectNamespace
+  DB: {} as D1Database, // Mock D1Database
+  ArbEdgeD1: {} as D1Database, // Mock D1Database
+  SESSIONS: {} as KVNamespace, // Mock KVNamespace
+  CELEBRUM_KV: {} as KVNamespace, // Mock KVNamespace
+  PROD_BOT_MARKET_CACHE: {} as KVNamespace, // Mock KVNamespace
+  PROD_BOT_SESSION_STORE: {} as KVNamespace, // Mock KVNamespace
+  CELEBRUM_CONTAINERS: {} as unknown, // Mock DurableObjectNamespace
+  CELEBRUM_STORAGE: {} as unknown, // Mock DurableObjectNamespace
 };
 
 // Mock context for testing
 const mockContext: TelegramWebhookContext = {
-  env: mockEnv,
+  env: mockEnv as unknown as Env,
   request: new Request('https://example.com'), // Mock Request object
-  waitUntil: (_promise: Promise<any>) => {
+  waitUntil: (_promise: Promise<unknown>) => {
     // In real Cloudflare Workers, this extends the execution context
-    // For testing, we can just log or ignore
-    console.log('waitUntil called with promise');
+    // For testing, we can just ignore
   }
 };
 
@@ -58,45 +59,29 @@ function createTestUpdate(command: string, userId: number = 12345, chatId: numbe
 
 // Test all handlers
 async function testHandlers() {
-  console.log('🧪 Testing Telegram Bot Handlers\n');
-  
   // Initialize handlers
   initializeHandlers();
-  
-  // Get all registered handlers
-  const handlers = getAllHandlers();
-  console.log(`📋 Registered handlers: ${handlers.map(h => h.command).join(', ')}\n`);
   
   // Test each command
   const testCommands = ['start', 'help', 'opportunities', 'balance', 'profile', 'settings', 'status'];
   
   for (const command of testCommands) {
-    console.log(`🔍 Testing /${command} command:`);
-    
     try {
       const update = createTestUpdate(command);
       const response = await processTelegramUpdate(update, mockContext);
       
-      if (response) {
-        console.log(`✅ Response received:`);
-        console.log(`   Method: ${response.method}`);
-        console.log(`   Chat ID: ${response.chat_id}`);
-        console.log(`   Text preview: ${response.text?.substring(0, 100)}...`);
-      } else {
-        console.log(`❌ No response received`);
+      // Verify response exists for basic validation
+      if (!response) {
+        throw new Error(`No response received for /${command}`);
       }
     } catch (error) {
-      console.log(`❌ Error: ${error}`);
+      throw new Error(`Error testing /${command}: ${error}`);
     }
-    
-    console.log('');
   }
 }
 
 // Test utility functions
 function testUtilities() {
-  console.log('🧪 Testing Utility Functions\n');
-  
   // Test command extraction
   const testMessages = [
     '/start',
@@ -108,26 +93,25 @@ function testUtilities() {
   
   testMessages.forEach(message => {
     const command = extractCommand(message);
-    console.log(`📝 "${message}" → command: ${command || 'null'}`);
+    // Verify command extraction works as expected
+    if (message.startsWith('/') && !command && message !== 'Hello world') {
+      throw new Error(`Failed to extract command from: ${message}`);
+    }
   });
-  
-  console.log('');
   
   // Test update parsing
   const testUpdate = createTestUpdate('test');
   const chatId = getChatId(testUpdate);
   const userId = getUserId(testUpdate);
   
-  console.log(`🔍 Test update parsing:`);
-  console.log(`   Chat ID: ${chatId}`);
-  console.log(`   User ID: ${userId}`);
-  console.log('');
+  // Verify parsing works
+  if (!chatId || !userId) {
+    throw new Error('Failed to parse chat ID or user ID from test update');
+  }
 }
 
 // Test callback query handling
 async function testCallbackQuery() {
-  console.log('🧪 Testing Callback Query Handling\n');
-  
   const callbackUpdate: TelegramUpdate = {
     update_id: Date.now(),
     callback_query: {
@@ -157,31 +141,20 @@ async function testCallbackQuery() {
   
   try {
     const response = await processTelegramUpdate(callbackUpdate, mockContext);
-    if (response) {
-      console.log(`✅ Callback query response:`);
-      console.log(`   Method: ${response.method}`);
-      console.log(`   Text preview: ${response.text?.substring(0, 100)}...`);
-    } else {
-      console.log(`❌ No callback query response`);
+    // Verify callback query handling works
+    if (!response) {
+      throw new Error('No response received for callback query');
     }
   } catch (error) {
-    console.log(`❌ Callback query error: ${error}`);
+    throw new Error(`Callback query error: ${error}`);
   }
-  
-  console.log('');
 }
 
 // Main test function
 async function runTests() {
-  console.log('🚀 Starting Telegram Bot Tests\n');
-  console.log('=' .repeat(50));
-  
   testUtilities();
   await testHandlers();
   await testCallbackQuery();
-  
-  console.log('=' .repeat(50));
-  console.log('✅ All tests completed!\n');
 }
 
 // Export for use in other test files

@@ -44,11 +44,19 @@ if (process.env.ENABLE_CONTAINERS !== "false") {
 }
 
 // Create Worker with all bindings (adopt existing if present)
-const bindings: Record<string, any> = {
+const bindings: Record<string, unknown> = {
   DB: database,
-  KV: kvNamespace,
-  R2: r2Bucket,
+  ArbEdgeD1: database, // Using same database for now
+  SESSIONS: kvNamespace,
+  CELEBRUM_KV: kvNamespace,
+  PROD_BOT_MARKET_CACHE: kvNamespace,
+  PROD_BOT_SESSION_STORE: kvNamespace,
   CELEBRUM_STORAGE: durableStorage,
+  CELEBRUM_CONTAINERS: durableStorage, // Using same durable object for now
+  TELEGRAM_BOT_TOKEN: process.env.TELEGRAM_BOT_TOKEN || "",
+  ADMIN_TELEGRAM_IDS: process.env.ADMIN_TELEGRAM_IDS || "",
+  RATE_LIMIT_REQUESTS_PER_MINUTE: process.env.RATE_LIMIT_REQUESTS_PER_MINUTE || "60",
+  ENVIRONMENT: process.env.NODE_ENV || "development",
 };
 
 // Only add container binding if it was successfully created

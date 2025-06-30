@@ -26,16 +26,6 @@ install: ## Install all dependencies (TypeScript + Go packages)
 	@echo "📦 Setting up Go toolchain..."
 	@go version || echo "⚠️  Go not installed. Please install Go from https://golang.org/dl/"
 
-# Build commands
-build: ## Build all packages
-	@echo "🔨 Building all packages..."
-	@pnpm run build
-
-# Test commands
-test: ## Run all tests
-	@echo "🧪 Running all tests..."
-	@pnpm run test
-
 # Lint commands
 lint: ## Run linting
 	@echo "🔍 Running linting..."
@@ -45,12 +35,12 @@ lint: ## Run linting
 test: ## Run all tests
 	@echo "🧪 Running all tests..."
 	@pnpm run test
-	@go test ./... || echo "⚠️  No Go modules found yet"
+	@cd container_src && go test ./... || echo "⚠️  No Go modules found yet"
 
 test-verbose: ## Run tests with verbose output
 	@echo "🧪 Running tests (verbose)..."
 	@pnpm run test -- --verbose
-	@go test -v ./... || echo "⚠️  No Go modules found yet"
+	@cd container_src && go test -v ./... || echo "⚠️  No Go modules found yet"
 
 unit-tests: ## Run unit tests
 	@echo "🧪 Running TypeScript unit tests..."
@@ -69,12 +59,12 @@ build: ## Build all packages
 	@echo "🔨 Building all packages..."
 	@pnpm run build
 	@echo "🔨 Building Go services..."
-	@go build ./... || echo "⚠️  No Go modules found yet"
+	@cd container_src && go build ./... || echo "⚠️  No Go modules found yet"
 
 build-release: ## Build release for production
 	@echo "🔨 Building production release..."
 	@pnpm run build:prod
-	@go build -ldflags="-s -w" ./... || echo "⚠️  No Go modules found yet"
+	@cd container_src && go build -ldflags="-s -w" ./... || echo "⚠️  No Go modules found yet"
 
 build-wasm: ## Build for WASM target (Cloudflare Workers)
 	@echo "🎯 Building for Cloudflare Workers..."
@@ -119,18 +109,18 @@ fmt: ## Format code (TypeScript + Go)
 	@echo "🎨 Formatting TypeScript code..."
 	@pnpm run format
 	@echo "🎨 Formatting Go code..."
-	@go fmt ./... || echo "⚠️  No Go modules found yet"
+	@cd container_src && go fmt ./... || echo "⚠️  No Go modules found yet"
 
 fmt-check: ## Check code formatting (TypeScript + Go)
 	@echo "🎨 Checking TypeScript code formatting..."
 	@pnpm run format:check
 	@echo "🎨 Checking Go code formatting..."
-	@go fmt -l ./... || echo "⚠️  No Go modules found yet"
+	@cd container_src && gofmt -l . || echo "⚠️  No Go modules found yet"
 
 fmt-fix: ## Auto-fix code formatting then run CI
 	@echo "🎨 Auto-fixing code formatting..."
 	@pnpm run format
-	@go fmt ./... || echo "⚠️  No Go modules found yet"
+	@cd container_src && go fmt ./... || echo "⚠️  No Go modules found yet"
 	@echo "🔄 Running CI pipeline..."
 	@$(MAKE) ci-pipeline
 
@@ -148,7 +138,7 @@ lint-strict: ## Run strict linting (matches GitHub CI)
 fix: ## Apply automatic fixes
 	@echo "🔧 Applying automatic fixes..."
 	@pnpm run lint:fix
-	@go fmt ./... || echo "⚠️  No Go modules found yet"
+	@cd container_src && go fmt ./... || echo "⚠️  No Go modules found yet"
 
 # CI Pipeline
 ci-pipeline: ## Run comprehensive CI pipeline (TypeScript + Go)
@@ -166,20 +156,23 @@ ci-pipeline: ## Run comprehensive CI pipeline (TypeScript + Go)
 	@echo "🔨 Step 3: TypeScript Package Building"
 	@pnpm run build
 	@echo "✅ Step 3: TypeScript Packages Built"
+	@echo "🌐 Step 3.1: Astro SSR Web Build"
+	@pnpm run build:web
+	@echo "✅ Step 3.1: Astro SSR Web Build Completed"
 	@echo "🧪 Step 4: TypeScript Testing"
 	@pnpm run test:ci
 	@echo "✅ Step 4: TypeScript Tests Passed"
 	@echo "🎨 Step 5: Go Code Formatting Check"
-	@go fmt -l ./... || echo "⚠️  No Go modules found yet"
+	@cd container_src && gofmt -l . || echo "⚠️  No Go modules found yet"
 	@echo "✅ Step 5: Go Formatting Passed"
 	@echo "🔍 Step 6: Go Linting Check"
-	@golangci-lint run || echo "⚠️  golangci-lint not installed or no Go modules found"
+	@cd container_src && golangci-lint run || echo "⚠️  golangci-lint not installed or no Go modules found"
 	@echo "✅ Step 6: Go Linting Passed"
 	@echo "🔨 Step 7: Go Build Check"
-	@go build ./... || echo "⚠️  No Go modules found yet"
+	@cd container_src && go build ./... || echo "⚠️  No Go modules found yet"
 	@echo "✅ Step 7: Go Build Passed"
 	@echo "🧪 Step 8: Go Testing"
-	@go test ./... || echo "⚠️  No Go modules found yet"
+	@cd container_src && go test ./... || echo "⚠️  No Go modules found yet"
 	@echo "✅ Step 8: Go Tests Passed"
 	@echo "🎯 Step 9: Alchemy Deployment Check"
 	@pnpm run deploy:alchemy:dry-run || echo "⚠️  Alchemy dry-run failed, check configuration"
@@ -214,16 +207,16 @@ ci-no-docker: ## Run CI pipeline without Docker-dependent steps
 	@pnpm run test:ci
 	@echo "✅ Step 4: TypeScript Tests Passed"
 	@echo "🎨 Step 5: Go Code Formatting Check"
-	@go fmt -l ./... || echo "⚠️  No Go modules found yet"
+	@cd container_src && gofmt -l . || echo "⚠️  No Go modules found yet"
 	@echo "✅ Step 5: Go Formatting Passed"
 	@echo "🔍 Step 6: Go Linting Check"
-	@golangci-lint run || echo "⚠️  golangci-lint not installed or no Go modules found"
+	@cd container_src && golangci-lint run || echo "⚠️  golangci-lint not installed or no Go modules found"
 	@echo "✅ Step 6: Go Linting Passed"
 	@echo "🔨 Step 7: Go Build Check"
-	@go build ./... || echo "⚠️  No Go modules found yet"
+	@cd container_src && go build ./... || echo "⚠️  No Go modules found yet"
 	@echo "✅ Step 7: Go Build Passed"
 	@echo "🧪 Step 8: Go Testing"
-	@go test ./... || echo "⚠️  No Go modules found yet"
+	@cd container_src && go test ./... || echo "⚠️  No Go modules found yet"
 	@echo "✅ Step 8: Go Tests Passed"
 	@echo "⚠️  Skipping Docker-dependent steps (Cloudflare Workers & Docker build)"
 	@echo "🎉 CI Pipeline Completed Successfully!"
@@ -238,15 +231,15 @@ coverage: ## Generate test coverage report
 	@echo "📊 Generating TypeScript coverage report..."
 	@pnpm run test:coverage
 	@echo "📊 Generating Go coverage report..."
-	@go test -coverprofile=coverage.out ./... || echo "⚠️  No Go modules found yet"
-	@go tool cover -html=coverage.out -o coverage.html || echo "⚠️  No Go modules found yet"
+	@cd container_src && go test -coverprofile=coverage.out ./... || echo "⚠️  No Go modules found yet"
+	@cd container_src && go tool cover -html=coverage.out -o coverage.html || echo "⚠️  No Go modules found yet"
 	@echo "Coverage reports generated"
 
 doc: ## Generate documentation
 	@echo "📚 Generating TypeScript documentation..."
 	@pnpm run docs
 	@echo "📚 Generating Go documentation..."
-	@go doc -all ./... || echo "⚠️  No Go modules found yet"
+	@cd container_src && go doc -all ./... || echo "⚠️  No Go modules found yet"
 
 # Script-based commands (recommended for development)
 pre-commit: ## Run quick pre-commit checks

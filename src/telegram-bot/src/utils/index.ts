@@ -155,7 +155,7 @@ export function validateBotToken(token: string): boolean {
   return tokenRegex.test(token);
 }
 
-export function createInlineKeyboard(buttons: Array<Array<{text: string, callback_data?: string, url?: string}>>): any {
+export function createInlineKeyboard(buttons: Array<Array<{text: string, callback_data?: string, url?: string}>>): unknown {
   return {
     inline_keyboard: buttons
   };

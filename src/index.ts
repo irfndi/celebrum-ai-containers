@@ -2,6 +2,12 @@ import { Hono } from "hono";
 import { DurableObject } from "cloudflare:workers";
 import { Container } from "@cloudflare/containers";
 import type { Env } from "@celebrum-ai/shared";
+import { handleTelegramUpdate } from "./telegram-bot/src";
+
+// Types for Cloudflare Workers
+interface ExportedHandler {
+  fetch(request: Request, env: unknown, ctx: unknown): Promise<Response>;
+}
 
 export class CelebrumAIStorage extends DurableObject {
   constructor(ctx: DurableObjectState, env: Env) {
@@ -33,18 +39,49 @@ export class CelebrumContainer extends Container {
   }
 }
 
-// Create Hono app with proper typing for Cloudflare Workers
+// Initialize Hono app with proper bindings
 const app = new Hono<{
-  Bindings: { 
-    CELEBRUM_STORAGE: DurableObjectNamespace<CelebrumAIStorage>;
-    ALCHEMY_MANAGED?: string;
-    CONTAINER_VERSION?: string;
-    DEPLOYMENT_STRATEGY?: string;
-  };
+  Bindings: Env;
 }>();
 
-// Home route with available endpoints
-app.get("/", (c) => {
+// Initialize Astro SSR handler
+let astroHandler: ExportedHandler | null = null;
+
+// Load Astro SSR handler at module level
+(async () => {
+  try {
+    // Dynamic import of the Astro SSR handler
+    const astroModule = await import("./web/dist/_worker.js/index.js");
+    astroHandler = astroModule.default;
+    console.log("Astro SSR handler loaded successfully");
+  } catch (error) {
+    console.error("Failed to load Astro SSR handler:", error);
+  }
+})();
+
+// Telegram webhook endpoint
+app.post("/api/telegram/webhook", async (c) => {
+  try {
+    const update = await c.req.json();
+    const context = {
+      env: c.env,
+      request: c.req.raw,
+      waitUntil: (promise: Promise<unknown>) => {
+        // In Cloudflare Workers, we can use the execution context
+        // For now, we'll just handle the promise directly
+        promise.catch(console.error);
+      },
+    };
+    
+    return await handleTelegramUpdate(update, context);
+  } catch (error) {
+    console.error("Telegram webhook error:", error);
+    return c.json({ error: "Webhook processing failed" }, 500);
+  }
+});
+
+// API status endpoint
+app.get("/api/status", (c) => {
   const alchemyInfo = {
     managed: c.env.ALCHEMY_MANAGED || "false",
     version: c.env.CONTAINER_VERSION || "unknown",
@@ -55,16 +92,17 @@ app.get("/", (c) => {
     message: "Celebrum AI - Alchemy-managed Container Platform",
     alchemy: alchemyInfo,
     endpoints: {
-      "/storage/<ID>": "Access Durable Object storage for each ID",
-      "/container/<ID>": "Access container instance for each ID",
-      "/health": "Health check endpoint for Alchemy monitoring",
+      "/api/storage/<ID>": "Access Durable Object storage for each ID",
+      "/api/container/<ID>": "Access container instance for each ID",
+      "/api/health": "Health check endpoint for Alchemy monitoring",
+      "/api/telegram/webhook": "Telegram bot webhook endpoint",
       "/alchemy/status": "Alchemy deployment status",
     },
   });
 });
 
 // Health check endpoint for Alchemy monitoring
-app.get("/health", (c) => {
+app.get("/api/health", (c) => {
   return c.json({
     status: "healthy",
     timestamp: new Date().toISOString(),
@@ -95,18 +133,44 @@ app.get("/alchemy/status", (c) => {
 });
 
 // Route requests to a specific storage instance using the storage ID
-app.get("/storage/:id", async (c) => {
+app.get("/api/storage/:id", async (c) => {
   const id = c.req.param("id");
   const storageId = c.env.CELEBRUM_STORAGE.idFromName(`/storage/${id}`);
-  const storage = c.env.CELEBRUM_STORAGE.get(storageId);
-  return await storage.fetch(c.req.raw);
+  const storage = (c.env.CELEBRUM_STORAGE as unknown as DurableObjectNamespace).get(storageId);
+  return storage.fetch(c.req.raw);
 });
 
 // Route requests to a specific container instance using the container ID
-app.get("/container/:id", async (c) => {
+app.get("/api/container/:id", async (c) => {
   const id = c.req.param("id");
   // Container functionality will be handled by the CelebrumContainer class
   return new Response(`Container ${id} endpoint - functionality to be implemented`, { status: 200 });
+});
+
+// Catch-all route for Astro SSR - this should be last
+app.all("*", async (c) => {
+  if (astroHandler) {
+    try {
+      return await astroHandler.fetch(c.req.raw, c.env, {
+        waitUntil: () => {},
+        passThroughOnException: () => {},
+      });
+    } catch (error) {
+      console.error("Astro SSR error:", error);
+      return c.json({ error: "Internal server error" }, 500);
+    }
+  }
+  
+  // Fallback if Astro is not available
+  return c.json({
+    message: "Celebrum AI - Landing page not available",
+    error: "Astro SSR handler not loaded",
+    available_endpoints: {
+      "/api/status": "API status",
+      "/api/health": "Health check",
+      "/api/telegram/webhook": "Telegram webhook",
+    },
+  }, 503);
 });
 
 export default app;

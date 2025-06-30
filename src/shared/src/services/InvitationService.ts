@@ -5,8 +5,8 @@ import { invitationCodes, invitationUsage } from '@celebrum-ai/db';
 import { eq, and, count, gt, sql } from 'drizzle-orm';
 
 // Debug: Check what's being imported
-console.log('invitationCodes:', invitationCodes);
-console.log('invitationCodes.code:', invitationCodes?.code);
+// console.log('invitationCodes:', invitationCodes);
+// console.log('invitationCodes.code:', invitationCodes?.code);
 
 // Re-export database types for convenience
 export type InvitationCode = DbInvitationCode;

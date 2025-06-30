@@ -1,5 +1,7 @@
 // Telegram API types and interfaces
 
+import type { Env } from '@celebrum-ai/shared';
+
 export interface TelegramUpdate {
   update_id: number;
   message?: TelegramMessage;
@@ -81,12 +83,10 @@ export interface TelegramHandler {
 }
 
 // Context types
-import type { Env } from '@celebrum-ai/shared';
-
 export interface TelegramWebhookContext {
   env: Env;
   request: Request;
-  waitUntil: (promise: Promise<any>) => void;
+  waitUntil: (promise: Promise<unknown>) => void;
 }
 
 // Configuration types
@@ -105,9 +105,9 @@ export interface TelegramError {
 }
 
 // Success response types
-export interface TelegramSuccess<T = any> {
+export interface TelegramSuccess<T = unknown> {
   ok: true;
   result: T;
 }
 
-export type TelegramApiResponse<T = any> = TelegramSuccess<T> | TelegramError;
+export type TelegramApiResponse<T = unknown> = TelegramSuccess<T> | TelegramError;

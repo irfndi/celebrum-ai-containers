@@ -50,6 +50,7 @@ export interface Env {
   
   // Container
   CELEBRUM_CONTAINERS: DurableObjectNamespace<Container>;
+  CELEBRUM_STORAGE: DurableObjectNamespace;
   API_SERVICE_URL?: string;
   WEB_SERVICE_URL?: string;
   DISCORD_BOT_SERVICE_URL?: string;
@@ -57,6 +58,11 @@ export interface Env {
   TELEGRAM_BOT_TOKEN?: string;
   ADMIN_TELEGRAM_IDS?: string;
   RATE_LIMIT_REQUESTS_PER_MINUTE?: string;
+  
+  // Alchemy deployment properties
+  ALCHEMY_MANAGED?: string;
+  CONTAINER_VERSION?: string;
+  DEPLOYMENT_STRATEGY?: string;
   ENVIRONMENT?: string;
 }
 

@@ -40,7 +40,8 @@ const mockEnv = {
     clear(): void {
       this.data.clear();
     }
-  }
+  },
+  CELEBRUM_STORAGE: {} as unknown // Mock DurableObjectNamespace
 };
 
 describe('FeatureFlagService', () => {

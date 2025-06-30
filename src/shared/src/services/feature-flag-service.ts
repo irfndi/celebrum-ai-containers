@@ -23,7 +23,7 @@ export class FeatureFlagService {
   private initializeFromJson(): void {
     // The FeatureFlagManager already has its own defaults
     // This method can be used to sync with JSON if needed
-    console.log('FeatureFlagService initialized with JSON configuration');
+    // console.log('FeatureFlagService initialized with JSON configuration');
   }
 
   /**
