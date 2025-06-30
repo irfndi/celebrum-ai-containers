@@ -20,7 +20,7 @@
     "format": "echo 'Using oxlint for formatting'",
     "lint": "oxlint .",
     "lint:fix": "oxlint . --fix",
-    "build": "tsc",
+    "build": "pnpm run build:web && tsc",
     "test:alchemy": "tsx scripts/test-alchemy-integration.ts",
     "build:db": "tsc && cp -r dist/src/db/* dist/db/ 2>/dev/null || true",
     "build:shared": "tsc && cp -r dist/src/shared/* dist/shared/ 2>/dev/null || true",
