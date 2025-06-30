@@ -21,7 +21,7 @@ export class SessionService {
   }
 
   async createSession(user: User): Promise<Session> {
-    const sessionId = crypto.randomUUID();
+    const sessionId = globalThis.crypto.randomUUID();
     const now = new Date();
     const expiresAt = new Date(now.getTime() + this.sessionTTL * 1000);
     
