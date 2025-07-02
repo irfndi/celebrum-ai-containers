@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { UserService, SessionService } from '@celebrum-ai/shared';
+import { UserService, SessionService } from '../../../shared/src/services/index';
 import type { User, NewUser } from '@celebrum-ai/db/schema';
 import type { D1Database, KVNamespace } from '@cloudflare/workers-types';
 

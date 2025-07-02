@@ -13,14 +13,21 @@ CREATE TABLE IF NOT EXISTS opportunity_distribution_analytics (
     distribution_strategy TEXT NOT NULL,
     detection_timestamp INTEGER NOT NULL,
     distribution_timestamp INTEGER NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    
-    -- Indexes for performance
-    INDEX idx_opportunity_distribution_analytics_opportunity_id (opportunity_id),
-    INDEX idx_opportunity_distribution_analytics_pair (pair),
-    INDEX idx_opportunity_distribution_analytics_distribution_timestamp (distribution_timestamp),
-    INDEX idx_opportunity_distribution_analytics_detection_timestamp (detection_timestamp)
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Create indexes for performance
+CREATE INDEX IF NOT EXISTS idx_opportunity_distribution_analytics_opportunity_id 
+ON opportunity_distribution_analytics (opportunity_id);
+
+CREATE INDEX IF NOT EXISTS idx_opportunity_distribution_analytics_pair 
+ON opportunity_distribution_analytics (pair);
+
+CREATE INDEX IF NOT EXISTS idx_opportunity_distribution_analytics_distribution_timestamp 
+ON opportunity_distribution_analytics (distribution_timestamp);
+
+CREATE INDEX IF NOT EXISTS idx_opportunity_distribution_analytics_detection_timestamp 
+ON opportunity_distribution_analytics (detection_timestamp);
 
 -- Create index for analytics queries
 CREATE INDEX IF NOT EXISTS idx_opportunity_distribution_analytics_composite 
@@ -30,6 +37,4 @@ ON opportunity_distribution_analytics (distribution_timestamp, pair, distributed
 CREATE INDEX IF NOT EXISTS idx_opportunity_distribution_analytics_performance 
 ON opportunity_distribution_analytics (detection_timestamp, distribution_timestamp);
 
--- Record migration completion
-INSERT INTO migration_tracking (migration_id, migration_name, applied_at) 
-VALUES ('014', 'add_opportunity_distribution_analytics', CURRENT_TIMESTAMP); 
+-- Migration completed - tracking handled by Wrangler

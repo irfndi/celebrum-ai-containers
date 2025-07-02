@@ -7,7 +7,7 @@ export type Database = DrizzleD1Database<typeof schema>;
 
 // Cloudflare Worker environment interface
 export interface Env {
-  ArbEdgeD1: D1Database;
+  DB: D1Database;
 }
 
 /**
@@ -25,7 +25,7 @@ export function createDb(d1Database: D1Database): Database {
  * @returns Database instance
  */
 export function getDatabase(env: Env): Database {
-  return createDb(env.ArbEdgeD1);
+  return createDb(env.DB);
 }
 
 /**

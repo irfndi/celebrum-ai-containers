@@ -1,0 +1,24 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Run type checking
+echo "🔍 Running type checking..."
+pnpm typecheck
+
+# Run linting
+echo "🧹 Running linter..."
+pnpm lint
+
+# Run unit tests
+echo "🧪 Running unit tests..."
+pnpm test:unit
+
+# Check if there are any test files that need to be committed
+echo "📋 Checking for uncommitted test files..."
+if git diff --cached --name-only | grep -E "\.(test|spec)\.(ts|js)$" > /dev/null; then
+  echo "✅ Test files found in commit"
+else
+  echo "⚠️  No test files found in commit - make sure to add tests for new features"
+fi
+
+echo "✅ Pre-commit checks passed!"

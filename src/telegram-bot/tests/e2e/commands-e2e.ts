@@ -16,7 +16,6 @@ import { extractCommand, getChatId, getUserId } from '../../src/utils/index';
 const mockEnv = {
   TELEGRAM_BOT_TOKEN: 'test-token',
   DB: {} as D1Database, // Mock D1Database
-  ArbEdgeD1: {} as D1Database, // Mock D1Database
   SESSIONS: {} as KVNamespace, // Mock KVNamespace
   CELEBRUM_KV: {} as KVNamespace, // Mock KVNamespace
   PROD_BOT_MARKET_CACHE: {} as KVNamespace, // Mock KVNamespace

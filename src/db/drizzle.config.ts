@@ -2,7 +2,7 @@ import type { Config } from 'drizzle-kit';
 
 export default {
   dialect: 'sqlite',
-  schema: './src/schema/index.ts',
+  schema: './src/db/src/schema/index.ts',
   out: './sql/migrations',
   driver: 'd1-http',
   dbCredentials: {
@@ -13,4 +13,4 @@ export default {
   },
   verbose: true,
   strict: true,
-} satisfies Config; 
+} satisfies Config;

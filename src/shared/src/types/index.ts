@@ -40,7 +40,6 @@ export * from './notifications';
 export interface Env {
   // Database
   DB: D1Database;
-  ArbEdgeD1: D1Database;
   
   // KV Stores
   SESSIONS: KVNamespace;
@@ -596,7 +595,7 @@ export interface CloudflareEnv {
   PROD_BOT_SESSION_STORE: KVNamespace;
   
   // D1 Database
-  ArbEdgeD1: D1Database;
+  DB: D1Database;
   
   // Environment Variables
   ENVIRONMENT: string;

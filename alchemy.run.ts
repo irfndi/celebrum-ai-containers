@@ -45,8 +45,7 @@ if (process.env.ENABLE_CONTAINERS !== "false") {
 
 // Create Worker with all bindings (adopt existing if present)
 const bindings: Record<string, unknown> = {
-  DB: database,
-  ArbEdgeD1: database, // Using same database for now
+    DB: database, // Using same database for now
   SESSIONS: kvNamespace,
   CELEBRUM_KV: kvNamespace,
   PROD_BOT_MARKET_CACHE: kvNamespace,

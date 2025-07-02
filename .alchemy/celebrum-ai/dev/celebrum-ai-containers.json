@@ -125,7 +125,7 @@
         "scriptName": "celebrum-ai-containers",
         "sqlite": true
       },
-      "TELEGRAM_BOT_TOKEN": "",
+      "TELEGRAM_BOT_TOKEN": "7570710032:AAHn2WkvAnqltmipf02HZITIehOzR48lvws",
       "ADMIN_TELEGRAM_IDS": "",
       "RATE_LIMIT_REQUESTS_PER_MINUTE": "60",
       "ENVIRONMENT": "development",
@@ -142,8 +142,8 @@
     "compatibilityDate": "2025-06-27",
     "compatibilityFlags": [],
     "format": "esm",
-    "createdAt": 1751288590438,
-    "updatedAt": 1751288590438,
+    "createdAt": 1751291594457,
+    "updatedAt": 1751291594457,
     "url": "https://celebrum-ai-containers.irfandimarsya.workers.dev"
   },
   "props": {
@@ -257,7 +257,7 @@
         "className": "CelebrumAIStorage",
         "sqlite": true
       },
-      "TELEGRAM_BOT_TOKEN": "",
+      "TELEGRAM_BOT_TOKEN": "7570710032:AAHn2WkvAnqltmipf02HZITIehOzR48lvws",
       "ADMIN_TELEGRAM_IDS": "",
       "RATE_LIMIT_REQUESTS_PER_MINUTE": "60",
       "ENVIRONMENT": "development",

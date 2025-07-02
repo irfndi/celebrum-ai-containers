@@ -40,13 +40,18 @@ export async function processTelegramUpdate(
 
     // Handle messages
     const message = update.message;
+    console.log('Processing update with message:', message);
     if (!message?.text) {
+      console.log('No message text found');
       return null;
     }
 
     // Extract command from message
+    console.log('Message text:', message.text);
     const command = extractCommand(message.text);
+    console.log('Extracted command:', command);
     if (!command) {
+      console.log('No command extracted');
       return null;
     }
 
@@ -86,6 +91,8 @@ export async function processTelegramUpdate(
 
   } catch (error) {
     console.error('Error processing telegram update:', error);
+    console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+    console.error('Error message:', error instanceof Error ? error.message : String(error));
     
     const chatId = getChatId(update);
     if (chatId) {
@@ -172,6 +179,7 @@ export function initializeHandlers(): void {
     command: 'start',
     description: 'Start the bot and create/authenticate your account',
     handler: async (update, context) => {
+      console.log('Start command triggered for user:', update.message?.from?.id);
       const sessionService = new SessionService(context.env.SESSIONS);
       const chatId = getChatId(update);
       const from = update.message?.from;
@@ -182,7 +190,9 @@ export function initializeHandlers(): void {
       const userService = new UserService(db);
       const invitationService = new InvitationService(db);
       const telegramId = from.id.toString();
+      console.log('Looking for user with telegramId:', telegramId);
       let user = await userService.findUserByTelegramId(telegramId);
+      console.log('User found:', user);
 
       // Extract invitation code from command arguments (e.g., /start ABC123)
       const messageText = update.message?.text || '';

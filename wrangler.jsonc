@@ -16,6 +16,14 @@
     "DEPLOYMENT_STRATEGY": "alchemy",
     "STAGE": "prod"
   },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "prod-celebrum-ai",
+      "database_id": "879bf844-93b2-433d-9319-6e6065bbfdfd",
+      "migrations_dir": "src/db/sql/migrations"
+    }
+  ],
   "durable_objects": {
     "bindings": [
       {

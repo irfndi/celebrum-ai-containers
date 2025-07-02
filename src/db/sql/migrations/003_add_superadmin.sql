@@ -19,9 +19,9 @@ INSERT OR REPLACE INTO user_profiles (
     last_login_at,
     profile_metadata
 ) VALUES (
-    'superadmin_' || COALESCE(${SUPERADMIN_TELEGRAM_ID}, '0'),
-    COALESCE(${SUPERADMIN_TELEGRAM_ID}, 0),
-    COALESCE('${SUPERADMIN_USERNAME}', 'admin'),
+    'superadmin_1',
+    1,
+    'admin',
     '[]',
     'high',
     '{"max_position_size":10000.0,"preferred_exchanges":["binance","bybit"],"auto_execution_enabled":true,"max_daily_trades":100,"profit_threshold":0.001}',
@@ -56,8 +56,8 @@ INSERT OR REPLACE INTO user_trading_preferences (
     created_at,
     updated_at
 ) VALUES (
-    'pref_superadmin_' || COALESCE(${SUPERADMIN_TELEGRAM_ID}, '0'),
-    'superadmin_' || COALESCE(${SUPERADMIN_TELEGRAM_ID}, '0'),
+    'pref_superadmin_1',
+    'superadmin_1',
     'hybrid',
     'advanced',
     'aggressive',
@@ -83,7 +83,7 @@ INSERT OR REPLACE INTO user_opportunity_preferences (
     created_at,
     updated_at
 ) VALUES (
-    'superadmin_' || COALESCE(${SUPERADMIN_TELEGRAM_ID}, '0'),
+    'superadmin_1',
     '{"risk_tolerance":"high","max_position_size_usd":10000.0,"min_profit_threshold":0.001,"max_profit_threshold":1.0,"preferred_exchanges":["binance","bybit"],"excluded_exchanges":[],"preferred_pairs":["BTCUSDT","ETHUSDT","BNBUSDT","ADAUSDT","XRPUSDT"],"excluded_pairs":[],"max_exposure_per_pair":5000.0,"max_daily_trades":100,"auto_execution":true,"requires_confirmation":false,"profit_taking_strategy":"aggressive","stop_loss_strategy":"tight","position_sizing_method":"fixed","diversification_enabled":true,"correlation_analysis_enabled":true,"sentiment_analysis_enabled":true,"technical_analysis_enabled":true,"ai_enhancement_enabled":true,"notification_preferences":{"instant_alerts":true,"daily_summary":true,"weekly_report":true,"performance_updates":true},"admin_features":{"access_all_users":true,"modify_system_config":true,"view_audit_logs":true,"manage_user_permissions":true,"system_maintenance":true}}',
     datetime('now'),
     datetime('now')
@@ -103,12 +103,12 @@ INSERT INTO audit_log (
     NULL,
     'create_superadmin',
     'user_profile',
-    'superadmin_' || COALESCE(${SUPERADMIN_TELEGRAM_ID}, '0'),
-    '{"telegram_id":"' || COALESCE(${SUPERADMIN_TELEGRAM_ID}, '0') || '","username":"' || COALESCE('${SUPERADMIN_USERNAME}', 'admin') || '","role":"superadmin","created_by":"system","notes":"Initial superadmin user setup from environment variables"}',
+    'superadmin_1',
+    '{"telegram_id":"1","username":"admin","role":"superadmin","created_by":"system","notes":"Initial superadmin user setup from environment variables"}',
     unixepoch('now') * 1000,
     'system',
     'migration_script'
 );
 
 -- Record this migration
-INSERT INTO schema_migrations (version, description) VALUES ('003', 'Add superadmin user from environment variables'); 
+INSERT INTO schema_migrations (version, description) VALUES ('003', 'Add superadmin user from environment variables');
