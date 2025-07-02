@@ -6,6 +6,7 @@ import type {
 } from '../types/index';
 import { extractCommand, isRateLimited, getChatId, getUserId } from '../utils/index';
 import { SessionService, UserService, InvitationService } from '@celebrum-ai/shared';
+import { FeatureFlagManager } from '@celebrum-ai/shared/config/feature-flag-manager';
 import { createDb } from '@celebrum-ai/db';
 import { ValidationError, NotFoundError } from '@celebrum-ai/shared/errors';
 
@@ -199,15 +200,27 @@ export function initializeHandlers(): void {
       const args = messageText.split(' ').slice(1);
       const invitationCode = args[0];
 
+      // Check feature flags
+      const featureFlagManager = new FeatureFlagManager(context.env);
+      const invitationRequired = await featureFlagManager.isFeatureEnabled('registration.invitation_required');
+      const _bypassForExisting = await featureFlagManager.isFeatureEnabled('registration.bypass_for_existing');
+
       let welcomeMessage;
       if (user) {
-        // Existing user - just create a new session
+        // Existing user - update automatic fields from Telegram and create a new session
+        await userService.updateFromTelegramData(telegramId, {
+          firstName: from.first_name,
+          lastName: from.last_name,
+          username: from.username,
+          languageCode: from.language_code
+        });
+        
         await sessionService.deleteSessionByTelegramId(telegramId); // Clean up old sessions
         const session = await sessionService.createSession(user);
         welcomeMessage = `👋 <b>Welcome back, ${from.first_name}!</b>\n\nYour trading journey continues. What would you like to do today?\n\n(Session ID: ${session.sessionId})`;
       } else {
-        // New user - require invitation code
-        if (!invitationCode) {
+        // New user - check if invitation is required
+        if (invitationRequired && !invitationCode) {
           return {
             method: 'sendMessage',
             chat_id: chatId,
@@ -217,11 +230,13 @@ export function initializeHandlers(): void {
         }
 
         try {
-          // Validate the invitation code
-          await invitationService.validateInvitationCode(invitationCode);
+          // Validate the invitation code if required
+          if (invitationRequired && invitationCode) {
+            await invitationService.validateInvitationCode(invitationCode);
+          }
           
-          // Create the user
-          user = await userService.createUser({
+          // Create the user with username tracking
+          user = await userService.createUserWithUsernameTracking({
             telegramId: telegramId,
             firstName: from.first_name,
             lastName: from.last_name,
@@ -230,8 +245,10 @@ export function initializeHandlers(): void {
             ...(from.language_code ? { languageCode: from.language_code } : {})
           });
 
-          // Record the invitation code usage
-          await invitationService.useInvitationCode(invitationCode, user.id.toString(), parseInt(telegramId, 10));
+          // Record the invitation code usage if provided and required
+          if (invitationRequired && invitationCode) {
+            await invitationService.useInvitationCode(invitationCode, user.id.toString(), parseInt(telegramId, 10));
+          }
           
           // Create session
           const session = await sessionService.createSession(user);
@@ -276,6 +293,10 @@ export function initializeHandlers(): void {
       const _userId = getUserId(update);
       if (!chatId) return null;
 
+      // Initialize services
+      const db = createDb(context.env.DB);
+      const userService = new UserService(db);
+
       let helpText = `🤖 <b>Celebrum Trading Bot Commands</b>\n\n`;
       
       // Standard commands available to all users
@@ -291,8 +312,10 @@ export function initializeHandlers(): void {
       // Check if user is admin for admin commands
       const from = update.message?.from;
       if (from) {
-        const adminIds = (context.env.ADMIN_TELEGRAM_IDS || '').split(',').map((id: string) => parseInt(id.trim(), 10)).filter((id: number) => !isNaN(id));
-        if (adminIds.includes(from.id)) {
+        const telegramId = from.id.toString();
+        const user = await userService.findUserByTelegramId(telegramId);
+        const isUserSuperadmin = user && user.role === 'superadmin';
+        if (isUserSuperadmin) {
           helpText += `\n<b>👑 Admin Commands</b>\n`;
           helpText += `🔑 /createinvites <count> [purpose] [max_uses] [expires_days] - Create invitation codes\n`;
           helpText += `📊 /invitestats - View invitation statistics\n`;
@@ -479,10 +502,14 @@ export function initializeHandlers(): void {
       const from = update.message?.from;
       if (!chatId || !from) return null;
 
-      // TODO: Implement proper admin check
-      // For now, we'll use a simple check - you can replace this with proper RBAC
-      const adminIds = (context.env.ADMIN_TELEGRAM_IDS || '').split(',').map((id: string) => parseInt(id.trim(), 10)).filter((id: number) => !isNaN(id));
-      if (!adminIds.includes(from.id)) {
+      // Check if user is superadmin from database
+      const db = createDb(context.env.DB);
+      const userService = new UserService(db);
+      const telegramId = from.id.toString();
+      const user = await userService.findUserByTelegramId(telegramId);
+      const isUserSuperadmin = user && user.role === 'superadmin';
+      
+      if (!isUserSuperadmin) {
         return {
           method: 'sendMessage',
           chat_id: chatId,
@@ -568,9 +595,14 @@ export function initializeHandlers(): void {
       const from = update.message?.from;
       if (!chatId || !from) return null;
 
-      // TODO: Implement proper admin check
-      const adminIds = (context.env.ADMIN_TELEGRAM_IDS || '').split(',').map((id: string) => parseInt(id.trim(), 10)).filter((id: number) => !isNaN(id));
-      if (!adminIds.includes(from.id)) {
+      // Check if user is superadmin from database
+      const db = createDb(context.env.DB);
+      const userService = new UserService(db);
+      const telegramId = from.id.toString();
+      const user = await userService.findUserByTelegramId(telegramId);
+      const isUserSuperadmin = user && user.role === 'superadmin';
+      
+      if (!isUserSuperadmin) {
         return {
           method: 'sendMessage',
           chat_id: chatId,

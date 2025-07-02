@@ -1,5 +1,6 @@
 // Export all schemas
 export * from './users.js';
+export * from './user-username-history.js';
 export * from './trading.js';
 export * from './invitations.js';
  

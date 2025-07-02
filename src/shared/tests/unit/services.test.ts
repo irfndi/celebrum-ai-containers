@@ -7,9 +7,21 @@ import { describe, test, expect, beforeEach, vi } from 'vitest';
 import { UserService } from '../../src/services/UserService';
 import { SessionService } from '../../src/services/SessionService';
 import { InvitationService } from '../../src/services/InvitationService';
-import type { User, NewUser } from '@celebrum-ai/db/schema';
-import type { Database } from '@celebrum-ai/db';
 import type { KVNamespace } from '@cloudflare/workers-types';
+
+// Mock types
+type User = {
+  id: string;
+  telegramId: string;
+  username?: string;
+  firstName: string;
+  lastName?: string;
+  languageCode?: string;
+  createdAt: Date;
+};
+
+type NewUser = Partial<User>;
+type Database = any;
 
 
 
@@ -22,11 +34,19 @@ const mockUserQueries = {
   clear: vi.fn()
 };
 
+const mockUsernameHistoryQueries = {
+  findByTelegramId: vi.fn(),
+  findByUserId: vi.fn(),
+  create: vi.fn(),
+  getLatestUsername: vi.fn()
+};
+
 // Mock the database modules
 vi.mock('@celebrum-ai/db', () => {
   return {
     Database: vi.fn(),
     UserQueries: vi.fn().mockImplementation(() => mockUserQueries),
+    UserUsernameHistoryQueries: vi.fn().mockImplementation(() => mockUsernameHistoryQueries),
     invitationCodes: {
       id: 'mock-id',
       code: 'mock-code',
@@ -56,23 +76,13 @@ const mockKV = {
 
 // Test data
 const mockUser: User = {
-  id: 1,
+  id: '1',
   telegramId: '12345',
   firstName: 'John',
   lastName: 'Doe',
   username: 'johndoe',
   languageCode: 'en',
-  email: null,
-  role: 'free',
-  status: 'active',
-  createdAt: new Date(),
-  updatedAt: new Date(),
-  lastActiveAt: null,
-  settings: {},
-  apiLimits: {},
-  accountBalance: '0.00',
-  betaExpiresAt: null,
-  tradingPreferences: {}
+  createdAt: new Date()
 };
 
 const mockNewUser: NewUser = {

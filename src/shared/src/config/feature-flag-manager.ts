@@ -87,6 +87,10 @@ export class FeatureFlagManager {
       'security.session_timeout': true,
       'security.audit_trail': true,
       
+      // Registration features
+      'registration.invitation_required': true,
+      'registration.bypass_for_existing': true,
+      
       // Experimental features
       'experimental.ai_assistant': false,
       'experimental.voice_commands': false,

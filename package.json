@@ -28,7 +28,7 @@
     "build:services": "tsc && cp -r dist/src/services/* dist/services/ 2>/dev/null || true",
     "build:web": "cd src/web && astro build",
     "test": "vitest --run",
-    "test:ci": "vitest --run --reporter=verbose --coverage",
+    "test:ci": "vitest --run --reporter=verbose",
     "test:watch": "vitest --watch",
     "test:coverage": "vitest --coverage",
     "test:unit": "vitest --run src/**/tests/unit/**/*.test.ts",

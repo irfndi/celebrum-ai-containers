@@ -15,7 +15,7 @@ export class SessionService {
   private kv: KVNamespace;
   private sessionTTL: number;
 
-  constructor(kv: KVNamespace, sessionTTL: number = 3600 * 24) { // default to 24 hours
+  constructor(kv: KVNamespace, sessionTTL: number = 900) { // default to 15 minutes
     this.kv = kv;
     this.sessionTTL = sessionTTL;
   }

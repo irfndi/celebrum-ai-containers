@@ -1,6 +1,5 @@
 import { Hono } from "hono";
 import { DurableObject } from "cloudflare:workers";
-import { Container } from "@cloudflare/containers";
 import type { Env } from "@celebrum-ai/shared";
 import { handleTelegramUpdate } from "./telegram-bot/src";
 
@@ -19,24 +18,40 @@ export class CelebrumAIStorage extends DurableObject {
   }
 }
 
-export class CelebrumContainer extends Container {
-  defaultPort = 8080;
-  sleepAfter = 60000; // 60 seconds
-  envVars = {
-    MESSAGE: "Hello from Celebrum AI Container!",
-  };
+// Container class will be conditionally defined based on build-time environment
+// This avoids runtime process.env access which is not available in Workers
+export let CelebrumContainer: unknown = undefined;
 
-  async onStart() {
-    console.log("CelebrumContainer started");
-  }
+// Only define container class if containers are enabled at build time
+// Note: This check happens at build time, not runtime
+if (typeof process !== 'undefined' && process.env && process.env.ENABLE_CONTAINERS !== "false") {
+  try {
+    // Try to import Container dynamically
+    const { Container } = require("@cloudflare/containers");
+    
+    CelebrumContainer = class extends Container {
+      defaultPort = 8080;
+      sleepAfter = 60000; // 60 seconds
+      envVars = {
+        MESSAGE: "Hello from Celebrum AI Container!",
+      };
 
-  async onStop() {
-    console.log("CelebrumContainer stopped");
-  }
+      async onStart() {
+        console.log("CelebrumContainer started");
+      }
 
-  async onError(error: Error) {
-    console.error("CelebrumContainer error:", error);
-  }
+      async onStop() {
+        console.log("CelebrumContainer stopped");
+      }
+
+      async onError(error: Error) {
+        console.error("CelebrumContainer error:", error);
+      }
+    };
+  } catch (error) {
+     console.warn("Container support not available, containers disabled:", (error as Error).message);
+     CelebrumContainer = undefined;
+   }
 }
 
 // Initialize Hono app with proper bindings

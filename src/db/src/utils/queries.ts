@@ -1,9 +1,11 @@
 import { eq, and, desc, sql } from 'drizzle-orm';
 import type { Database } from './connection.js';
-import { users, positions, opportunities, tradingStrategies } from '../schema/index.js';
+import { users, userUsernameHistory, positions, opportunities, tradingStrategies } from '../schema/index.js';
 import type { 
   User, 
   NewUser, 
+  UserUsernameHistory,
+  NewUserUsernameHistory,
   Position, 
   NewPosition, 
   Opportunity,
@@ -61,6 +63,45 @@ export class UserQueries {
     
     // D1Result doesn't have changes property, use success flag instead
     return result.success;
+  }
+}
+
+// Username History operations
+export class UserUsernameHistoryQueries {
+  constructor(private db: Database) {}
+
+  async findByTelegramId(telegramId: string): Promise<UserUsernameHistory[]> {
+    return await this.db
+      .select()
+      .from(userUsernameHistory)
+      .where(eq(userUsernameHistory.telegramId, telegramId))
+      .orderBy(desc(userUsernameHistory.changedAt));
+  }
+
+  async findByUserId(userId: number): Promise<UserUsernameHistory[]> {
+    return await this.db
+      .select()
+      .from(userUsernameHistory)
+      .where(eq(userUsernameHistory.userId, userId))
+      .orderBy(desc(userUsernameHistory.changedAt));
+  }
+
+  async create(historyEntry: NewUserUsernameHistory): Promise<UserUsernameHistory> {
+    const result = await this.db
+      .insert(userUsernameHistory)
+      .values(historyEntry)
+      .returning();
+    return result[0]!;
+  }
+
+  async getLatestUsername(telegramId: string): Promise<string | null> {
+    const result = await this.db
+      .select({ username: userUsernameHistory.username })
+      .from(userUsernameHistory)
+      .where(eq(userUsernameHistory.telegramId, telegramId))
+      .orderBy(desc(userUsernameHistory.changedAt))
+      .limit(1);
+    return result[0]?.username || null;
   }
 }
 

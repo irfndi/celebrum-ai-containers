@@ -19,9 +19,23 @@
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "prod-celebrum-ai",
-      "database_id": "879bf844-93b2-433d-9319-6e6065bbfdfd",
+      "database_name": "celebrum-db",
+      "database_id": "37da863b-3fb1-491a-94ad-42839afcb981",
       "migrations_dir": "src/db/sql/migrations"
+    }
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "CELEBRUM_KV",
+      "id": "075dc31a53344ebdab68461a95e9cfd4"
+    },
+    {
+      "binding": "PROD_BOT_MARKET_CACHE",
+      "id": "c5b936f1c0eb4f50ae9519f64bd3c5d9"
+    },
+    {
+      "binding": "PROD_BOT_SESSION_STORE",
+      "id": "d090d03b365b4619800d96ad1da5ac8c"
     }
   ],
   "durable_objects": {
@@ -31,13 +45,5 @@
         "name": "CELEBRUM_STORAGE"
       }
     ]
-  },
-  "migrations": [
-    {
-      "tag": "v1",
-      "new_classes": [
-        "CelebrumAIStorage"
-      ]
-    }
-  ]
+  }
 }

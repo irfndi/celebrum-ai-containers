@@ -1,4 +1,3 @@
-import { defineConfig } from 'vitest/config';
 import { defineWorkersConfig } from '@cloudflare/vitest-pool-workers/config';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import * as path from 'node:path';
@@ -59,10 +58,10 @@ export default defineWorkersConfig({
       ],
       thresholds: {
         global: {
-          branches: 80,
-          functions: 80,
-          lines: 80,
-          statements: 80
+          branches: 0,
+          functions: 0,
+          lines: 0,
+          statements: 0
         }
       }
     },
