@@ -498,6 +498,60 @@ describe('/start Command Handler', () => {
       expect(response?.text).not.toContain('/createinvites');
     });
 
+    test('should allow existing superadmin to use /start without invitation code', async () => {
+      // Setup: Add existing superadmin user
+      const superadminTelegramId = 33333;
+      mockDb.addUser({
+        id: '3',
+        telegram_id: superadminTelegramId.toString(),
+        first_name: 'SuperAdmin',
+        username: 'superadmin',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        role: 'superadmin'
+      });
+
+      // Test: Send /start command without invitation code
+      const startUpdate = createTestUpdate('/start', superadminTelegramId);
+      const response = await processTelegramUpdate(startUpdate, mockContext);
+
+      // Verify: Should welcome existing superadmin without requiring invitation code
+      expect(response).toBeTruthy();
+      expect(response?.method).toBe('sendMessage');
+      expect(response?.text).toContain('Welcome back');
+      expect(response?.text).toContain('Test'); // Uses Telegram first_name from createTestUpdate
+      expect(response?.text).toContain('Session ID:');
+      expect(response?.text).not.toContain('Invitation Required');
+      expect(response?.text).not.toContain('/start YOUR_INVITATION_CODE');
+    });
+
+    test('should allow existing premium user to use /start without invitation code', async () => {
+      // Setup: Add existing premium user
+      const premiumTelegramId = 44444;
+      mockDb.addUser({
+        id: '4',
+        telegram_id: premiumTelegramId.toString(),
+        first_name: 'Premium',
+        username: 'premium',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        role: 'premium'
+      });
+
+      // Test: Send /start command without invitation code
+      const startUpdate = createTestUpdate('/start', premiumTelegramId);
+      const response = await processTelegramUpdate(startUpdate, mockContext);
+
+      // Verify: Should welcome existing premium user without requiring invitation code
+      expect(response).toBeTruthy();
+      expect(response?.method).toBe('sendMessage');
+      expect(response?.text).toContain('Welcome back');
+      expect(response?.text).toContain('Test'); // Uses Telegram first_name from createTestUpdate
+      expect(response?.text).toContain('Session ID:');
+      expect(response?.text).not.toContain('Invitation Required');
+      expect(response?.text).not.toContain('/start YOUR_INVITATION_CODE');
+    });
+
     test('should deny createinvites command to non-superadmin', async () => {
       const regularTelegramId = 33333;
       mockDb.addUser({

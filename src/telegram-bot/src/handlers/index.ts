@@ -220,6 +220,7 @@ export function initializeHandlers(): void {
         welcomeMessage = `👋 <b>Welcome back, ${from.first_name}!</b>\n\nYour trading journey continues. What would you like to do today?\n\n(Session ID: ${session.sessionId})`;
       } else {
         // New user - check if invitation is required
+        // If bypass_for_existing is enabled and invitation is required, still require invitation for truly new users
         if (invitationRequired && !invitationCode) {
           return {
             method: 'sendMessage',
