@@ -4,8 +4,8 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc -w"
+    "build": "pnpm exec tsc",
+    "dev": "pnpm exec tsc -w"
   },
   "dependencies": {
     "@celebrum-ai/shared": "file:../../../shared",

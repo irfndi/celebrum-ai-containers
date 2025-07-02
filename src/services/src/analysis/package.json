@@ -5,10 +5,10 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "tsc --build",
+    "build": "pnpm exec tsc --build",
     "clean": "rm -rf dist",
     "lint": "oxlint .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "pnpm exec tsc --noEmit"
   },
   "dependencies": {
     "@celebrum-ai/shared": "file:../../../shared",
