@@ -1,0 +1,99 @@
+# Celebrum AI - Code Restructuring and CI/CD Setup
+
+## Project Overview
+Celebrum AI is an Arbitrage + Technical Analysis + AI platform for crypto trading opportunities. The project has been restructured from an old repository and needs code cleanup, dependency fixes, and proper CI/CD setup.
+
+## Current State
+- Code has been copied from old repository
+- Project structure includes: database/, telegram-bot/, website/, container_src/
+- Uses pnpm workspaces with TypeScript and Go
+- Cloudflare Workers containerized environment
+- Missing imports and dependencies need resolution
+- CI/CD scripts need adjustment for new repository structure
+
+## Requirements
+
+### 1. Code Restructuring and Import Fixes (COMPLETED)
+- Analyze all copied code for missing imports
+- Fix dependency issues between packages
+- Ensure proper module resolution across workspaces
+- Validate TypeScript configurations
+- Check Go module dependencies
+- Test all package builds individually
+
+### 2. Local CI/CD Script Updates (COMPLETED)
+- Review and update Makefile commands
+- Ensure all build scripts work with new structure
+- Update package.json scripts across workspaces
+- Validate development workflow commands
+- Test local build and deployment processes
+
+### 3. GitHub CI/CD Configuration (COMPLETED)
+- Update GitHub Actions workflows for new repository
+- Configure CI for monorepo structure with pnpm
+- Set up proper build matrix for different components
+- Configure deployment pipelines for Cloudflare
+- Add proper testing and linting workflows
+
+### 4. CI Validation (COMPLETED)
+- Ensure 'make ci' command passes successfully
+- All tests must pass
+- All linting checks must pass
+- All builds must complete successfully
+- No dependency or import errors
+
+### 5. Branch Management (COMPLETED)
+- Create new 'develop' branch from main
+- Set up proper Git workflow
+- Configure branch protection rules
+- Establish development workflow
+
+### 6. Beta Launch Features (NEW PRIORITY)
+
+#### 6.1 Landing Page (Astro-based)
+- Create a simple, modern landing page using existing Astro setup
+- Clean, professional design showcasing Celebrum AI's value proposition
+- Call-to-action for beta access
+- Responsive design for mobile and desktop
+- Fast loading times leveraging Astro's static generation
+- Integration with invitation system
+
+#### 6.2 Authentication Flow (/start)
+- Implement secure user onboarding with session management
+- Session validation and creation
+- User registration and login
+- Invitation code validation (beta-only feature)
+- Secure token management
+- Integration with existing database schema
+- Telegram bot integration for /start command
+
+#### 6.3 Feature Flag System
+- JSON-based configuration system for dynamic feature toggling
+- Runtime feature toggling without deployment
+- Admin interface for flag management
+- Support for user-specific and global flags
+- Integration with existing services
+- Easy disable mechanism for post-beta features
+
+#### 6.4 Invitation System
+- Invitation code generation (superadmin/admin only)
+- Code validation and redemption
+- Usage tracking and limits
+- Admin dashboard for invitation management
+- Easy disable mechanism for post-beta
+- Integration with user registration flow
+
+## Success Criteria
+- All code compiles without errors
+- No missing imports or dependency issues
+- Local CI passes completely
+- GitHub CI is properly configured
+- 'make ci' command succeeds
+- 'develop' branch is created and functional
+- All components can be built and deployed independently
+
+## Technical Constraints
+- Must maintain pnpm workspace structure
+- Must support Cloudflare Workers deployment
+- Must preserve existing TypeScript and Go architecture
+- Must maintain compatibility with existing Docker setup

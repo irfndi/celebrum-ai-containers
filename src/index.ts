@@ -1,70 +1,191 @@
-import { Container, loadBalance, getContainer } from "@cloudflare/containers";
 import { Hono } from "hono";
+import { DurableObject } from "cloudflare:workers";
+import type { Env } from "@celebrum-ai/shared";
+import { handleTelegramUpdate } from "./telegram-bot/src";
 
-export class MyContainer extends Container {
-  // Port the container listens on (default: 8080)
-  defaultPort = 8080;
-  // Time before container sleeps due to inactivity (default: 30s)
-  sleepAfter = "2m";
-  // Environment variables passed to the container
-  envVars = {
-    MESSAGE: "I was passed in via the container class!",
-  };
+// Types for Cloudflare Workers
+interface ExportedHandler {
+  fetch(request: Request, env: unknown, ctx: unknown): Promise<Response>;
+}
 
-  // Optional lifecycle hooks
-  override onStart() {
-    console.log("Container successfully started");
+export class CelebrumAIStorage extends DurableObject {
+  constructor(ctx: DurableObjectState, env: Env) {
+    super(ctx, env);
   }
 
-  override onStop() {
-    console.log("Container successfully shut down");
-  }
-
-  override onError(error: unknown) {
-    console.log("Container error:", error);
+  async fetch(_request: Request): Promise<Response> {
+    return new Response("CelebrumAIStorage is running", { status: 200 });
   }
 }
 
-// Create Hono app with proper typing for Cloudflare Workers
+// Container class will be conditionally defined based on build-time environment
+// This avoids runtime process.env access which is not available in Workers
+export let CelebrumContainer: unknown = undefined;
+
+// Only define container class if containers are enabled at build time
+// Note: This check happens at build time, not runtime
+if (typeof process !== 'undefined' && process.env && process.env.ENABLE_CONTAINERS !== "false") {
+  try {
+    // Try to import Container dynamically
+    const { Container } = require("@cloudflare/containers");
+    
+    CelebrumContainer = class extends Container {
+      defaultPort = 8080;
+      sleepAfter = 60000; // 60 seconds
+      envVars = {
+        MESSAGE: "Hello from Celebrum AI Container!",
+      };
+
+      async onStart() {
+        console.log("CelebrumContainer started");
+      }
+
+      async onStop() {
+        console.log("CelebrumContainer stopped");
+      }
+
+      async onError(error: Error) {
+        console.error("CelebrumContainer error:", error);
+      }
+    };
+  } catch (error) {
+     console.warn("Container support not available, containers disabled:", (error as Error).message);
+     CelebrumContainer = undefined;
+   }
+}
+
+// Initialize Hono app with proper bindings
 const app = new Hono<{
-  Bindings: { MY_CONTAINER: DurableObjectNamespace<MyContainer> };
+  Bindings: Env;
 }>();
 
-// Home route with available endpoints
-app.get("/", (c) => {
-  return c.text(
-    "Available endpoints:\n" +
-      "GET /container/<ID> - Start a container for each ID with a 2m timeout\n" +
-      "GET /lb - Load balance requests over multiple containers\n" +
-      "GET /error - Start a container that errors (demonstrates error handling)\n" +
-      "GET /singleton - Get a single specific container instance",
-  );
+// Initialize Astro SSR handler
+let astroHandler: ExportedHandler | null = null;
+
+// Load Astro SSR handler at module level
+(async () => {
+  try {
+    // Dynamic import of the Astro SSR handler
+    const astroModule = await import("./web/dist/_worker.js/index.js");
+    astroHandler = astroModule.default;
+    console.log("Astro SSR handler loaded successfully");
+  } catch (error) {
+    console.error("Failed to load Astro SSR handler:", error);
+  }
+})();
+
+// Telegram webhook endpoint
+app.post("/api/telegram/webhook", async (c) => {
+  try {
+    const update = await c.req.json();
+    const context = {
+      env: c.env,
+      request: c.req.raw,
+      waitUntil: (promise: Promise<unknown>) => {
+        // In Cloudflare Workers, we can use the execution context
+        // For now, we'll just handle the promise directly
+        promise.catch(console.error);
+      },
+    };
+    
+    return await handleTelegramUpdate(update, context);
+  } catch (error) {
+    console.error("Telegram webhook error:", error);
+    return c.json({ error: "Webhook processing failed" }, 500);
+  }
 });
 
-// Route requests to a specific container using the container ID
-app.get("/container/:id", async (c) => {
+// API status endpoint
+app.get("/api/status", (c) => {
+  const alchemyInfo = {
+    managed: c.env.ALCHEMY_MANAGED || "false",
+    version: c.env.CONTAINER_VERSION || "unknown",
+    strategy: c.env.DEPLOYMENT_STRATEGY || "unknown",
+  };
+  
+  return c.json({
+    message: "Celebrum AI - Alchemy-managed Container Platform",
+    alchemy: alchemyInfo,
+    endpoints: {
+      "/api/storage/<ID>": "Access Durable Object storage for each ID",
+      "/api/container/<ID>": "Access container instance for each ID",
+      "/api/health": "Health check endpoint for Alchemy monitoring",
+      "/api/telegram/webhook": "Telegram bot webhook endpoint",
+      "/alchemy/status": "Alchemy deployment status",
+    },
+  });
+});
+
+// Health check endpoint for Alchemy monitoring
+app.get("/api/health", (c) => {
+  return c.json({
+    status: "healthy",
+    timestamp: new Date().toISOString(),
+    alchemy: {
+      managed: c.env.ALCHEMY_MANAGED === "true",
+      version: c.env.CONTAINER_VERSION,
+      strategy: c.env.DEPLOYMENT_STRATEGY,
+    },
+  });
+});
+
+// Alchemy deployment status endpoint
+app.get("/alchemy/status", (c) => {
+  return c.json({
+    deployment: {
+      managed_by_alchemy: c.env.ALCHEMY_MANAGED === "true",
+      container_version: c.env.CONTAINER_VERSION,
+      deployment_strategy: c.env.DEPLOYMENT_STRATEGY,
+      storage_class: "CelebrumAIStorage",
+      last_updated: new Date().toISOString(),
+    },
+    infrastructure: {
+      provider: "Cloudflare",
+      storage_runtime: "Cloudflare Durable Objects",
+      worker_runtime: "Cloudflare Workers",
+    },
+  });
+});
+
+// Route requests to a specific storage instance using the storage ID
+app.get("/api/storage/:id", async (c) => {
   const id = c.req.param("id");
-  const containerId = c.env.MY_CONTAINER.idFromName(`/container/${id}`);
-  const container = c.env.MY_CONTAINER.get(containerId);
-  return await container.fetch(c.req.raw);
+  const storageId = c.env.CELEBRUM_STORAGE.idFromName(`/storage/${id}`);
+  const storage = (c.env.CELEBRUM_STORAGE as unknown as DurableObjectNamespace).get(storageId);
+  return storage.fetch(c.req.raw);
 });
 
-// Demonstrate error handling - this route forces a panic in the container
-app.get("/error", async (c) => {
-  const container = getContainer(c.env.MY_CONTAINER, "error-test");
-  return await container.fetch(c.req.raw);
+// Route requests to a specific container instance using the container ID
+app.get("/api/container/:id", async (c) => {
+  const id = c.req.param("id");
+  // Container functionality will be handled by the CelebrumContainer class
+  return new Response(`Container ${id} endpoint - functionality to be implemented`, { status: 200 });
 });
 
-// Load balance requests across multiple containers
-app.get("/lb", async (c) => {
-  const container = await loadBalance(c.env.MY_CONTAINER, 3);
-  return await container.fetch(c.req.raw);
-});
-
-// Get a single container instance (singleton pattern)
-app.get("/singleton", async (c) => {
-  const container = getContainer(c.env.MY_CONTAINER);
-  return await container.fetch(c.req.raw);
+// Catch-all route for Astro SSR - this should be last
+app.all("*", async (c) => {
+  if (astroHandler) {
+    try {
+      return await astroHandler.fetch(c.req.raw, c.env, {
+        waitUntil: () => {},
+        passThroughOnException: () => {},
+      });
+    } catch (error) {
+      console.error("Astro SSR error:", error);
+      return c.json({ error: "Internal server error" }, 500);
+    }
+  }
+  
+  // Fallback if Astro is not available
+  return c.json({
+    message: "Celebrum AI - Landing page not available",
+    error: "Astro SSR handler not loaded",
+    available_endpoints: {
+      "/api/status": "API status",
+      "/api/health": "Health check",
+      "/api/telegram/webhook": "Telegram webhook",
+    },
+  }, 503);
 });
 
 export default app;

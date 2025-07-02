@@ -1,0 +1,150 @@
+{
+  "kind": "cloudflare::Worker",
+  "id": "celebrum-ai-containers",
+  "fqn": "celebrum-ai/irfandi/celebrum-ai-containers",
+  "seq": 3,
+  "data": {},
+  "status": "updated",
+  "output": {
+    "Symbol(alchemy::ResourceKind)": "cloudflare::Worker",
+    "Symbol(alchemy::ResourceID)": "celebrum-ai-containers",
+    "Symbol(alchemy::ResourceFQN)": "celebrum-ai/irfandi/celebrum-ai-containers",
+    "Symbol(alchemy::ResourceScope)": {
+      "@scope": null
+    },
+    "Symbol(alchemy::ResourceSeq)": 3,
+    "name": "celebrum-ai-containers",
+    "entrypoint": "./src/index.ts",
+    "adopt": true,
+    "bindings": {
+      "DB": {
+        "Symbol(alchemy::ResourceKind)": "cloudflare::D1Database",
+        "Symbol(alchemy::ResourceID)": "celebrum-db",
+        "Symbol(alchemy::ResourceFQN)": "celebrum-ai/irfandi/celebrum-db",
+        "Symbol(alchemy::ResourceScope)": {
+          "@scope": null
+        },
+        "Symbol(alchemy::ResourceSeq)": 0,
+        "type": "d1",
+        "id": "37da863b-3fb1-491a-94ad-42839afcb981",
+        "name": "celebrum-db",
+        "fileSize": 12288,
+        "numTables": 0,
+        "version": "production",
+        "readReplication": {
+          "mode": "disabled"
+        },
+        "accountId": "4d12ccdb69bc57519b6aac269a04c9af"
+      },
+      "KV": {
+        "Symbol(alchemy::ResourceKind)": "cloudflare::KVNamespace",
+        "Symbol(alchemy::ResourceID)": "celebrum-kv",
+        "Symbol(alchemy::ResourceFQN)": "celebrum-ai/irfandi/celebrum-kv",
+        "Symbol(alchemy::ResourceScope)": {
+          "@scope": null
+        },
+        "Symbol(alchemy::ResourceSeq)": 1,
+        "type": "kv_namespace",
+        "namespaceId": "075dc31a53344ebdab68461a95e9cfd4",
+        "title": "celebrum-kv",
+        "createdAt": 1751086082472,
+        "modifiedAt": 1751086082472
+      },
+      "R2": {
+        "Symbol(alchemy::ResourceKind)": "cloudflare::R2Bucket",
+        "Symbol(alchemy::ResourceID)": "celebrum-r2-storage",
+        "Symbol(alchemy::ResourceFQN)": "celebrum-ai/irfandi/celebrum-r2-storage",
+        "Symbol(alchemy::ResourceScope)": {
+          "@scope": null
+        },
+        "Symbol(alchemy::ResourceSeq)": 2,
+        "name": "celebrum-r2-storage",
+        "location": "default",
+        "creationDate": {
+          "@date": "2025-06-28T04:48:10.699Z"
+        },
+        "jurisdiction": "default",
+        "type": "r2_bucket",
+        "accountId": "4d12ccdb69bc57519b6aac269a04c9af"
+      },
+      "CELEBRUM_STORAGE": {
+        "id": "celebrum-storage",
+        "type": "durable_object_namespace",
+        "className": "CelebrumAIStorage",
+        "scriptName": "celebrum-ai-containers",
+        "sqlite": true
+      }
+    },
+    "type": "service",
+    "id": "celebrum-ai-containers",
+    "compatibilityDate": "2025-06-27",
+    "compatibilityFlags": [],
+    "format": "esm",
+    "createdAt": 1751086288236,
+    "updatedAt": 1751086288236,
+    "url": "https://celebrum-ai-containers.irfandimarsya.workers.dev"
+  },
+  "props": {
+    "name": "celebrum-ai-containers",
+    "entrypoint": "./src/index.ts",
+    "adopt": true,
+    "bindings": {
+      "DB": {
+        "Symbol(alchemy::ResourceKind)": "cloudflare::D1Database",
+        "Symbol(alchemy::ResourceID)": "celebrum-db",
+        "Symbol(alchemy::ResourceFQN)": "celebrum-ai/irfandi/celebrum-db",
+        "Symbol(alchemy::ResourceScope)": {
+          "@scope": null
+        },
+        "Symbol(alchemy::ResourceSeq)": 0,
+        "type": "d1",
+        "id": "37da863b-3fb1-491a-94ad-42839afcb981",
+        "name": "celebrum-db",
+        "fileSize": 12288,
+        "numTables": 0,
+        "version": "production",
+        "readReplication": {
+          "mode": "disabled"
+        },
+        "accountId": "4d12ccdb69bc57519b6aac269a04c9af"
+      },
+      "KV": {
+        "Symbol(alchemy::ResourceKind)": "cloudflare::KVNamespace",
+        "Symbol(alchemy::ResourceID)": "celebrum-kv",
+        "Symbol(alchemy::ResourceFQN)": "celebrum-ai/irfandi/celebrum-kv",
+        "Symbol(alchemy::ResourceScope)": {
+          "@scope": null
+        },
+        "Symbol(alchemy::ResourceSeq)": 1,
+        "type": "kv_namespace",
+        "namespaceId": "075dc31a53344ebdab68461a95e9cfd4",
+        "title": "celebrum-kv",
+        "createdAt": 1751086082472,
+        "modifiedAt": 1751086082472
+      },
+      "R2": {
+        "Symbol(alchemy::ResourceKind)": "cloudflare::R2Bucket",
+        "Symbol(alchemy::ResourceID)": "celebrum-r2-storage",
+        "Symbol(alchemy::ResourceFQN)": "celebrum-ai/irfandi/celebrum-r2-storage",
+        "Symbol(alchemy::ResourceScope)": {
+          "@scope": null
+        },
+        "Symbol(alchemy::ResourceSeq)": 2,
+        "name": "celebrum-r2-storage",
+        "location": "default",
+        "creationDate": {
+          "@date": "2025-06-28T04:48:10.699Z"
+        },
+        "jurisdiction": "default",
+        "type": "r2_bucket",
+        "accountId": "4d12ccdb69bc57519b6aac269a04c9af"
+      },
+      "CELEBRUM_STORAGE": {
+        "id": "celebrum-storage",
+        "type": "durable_object_namespace",
+        "className": "CelebrumAIStorage",
+        "sqlite": true
+      }
+    }
+  }
+}

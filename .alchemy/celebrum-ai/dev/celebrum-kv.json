@@ -1,0 +1,26 @@
+{
+  "kind": "cloudflare::KVNamespace",
+  "id": "celebrum-kv",
+  "fqn": "celebrum-ai/dev/celebrum-kv",
+  "seq": 1,
+  "data": {},
+  "status": "created",
+  "output": {
+    "Symbol(alchemy::ResourceKind)": "cloudflare::KVNamespace",
+    "Symbol(alchemy::ResourceID)": "celebrum-kv",
+    "Symbol(alchemy::ResourceFQN)": "celebrum-ai/dev/celebrum-kv",
+    "Symbol(alchemy::ResourceScope)": {
+      "@scope": null
+    },
+    "Symbol(alchemy::ResourceSeq)": 1,
+    "type": "kv_namespace",
+    "namespaceId": "075dc31a53344ebdab68461a95e9cfd4",
+    "title": "celebrum-kv",
+    "createdAt": 1751284083291,
+    "modifiedAt": 1751284083292
+  },
+  "props": {
+    "title": "celebrum-kv",
+    "adopt": true
+  }
+}
