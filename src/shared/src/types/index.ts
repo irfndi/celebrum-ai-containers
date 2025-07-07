@@ -46,6 +46,7 @@ export interface Env {
   CELEBRUM_KV: KVNamespace;
   PROD_BOT_MARKET_CACHE: KVNamespace;
   PROD_BOT_SESSION_STORE: KVNamespace;
+  FEATURE_REGISTRATION_INVITATION_REQUIRED?: string;
   
   // Container
   CELEBRUM_CONTAINERS: DurableObjectNamespace<Container>;

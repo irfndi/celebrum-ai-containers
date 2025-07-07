@@ -9,6 +9,7 @@ import { SessionService, UserService, InvitationService } from '../../../shared/
 import { createFeatureFlagService } from '../../../shared/src/services/feature-flag-service';
 import { createDb } from '../../../db/src/utils/connection';
 import { ValidationError, NotFoundError } from '../../../shared/src/errors';
+import type { Database } from '../../../db/src/utils/connection';
 
 // Command handlers registry
 export const TELEGRAM_HANDLERS = new Map<string, TelegramHandler>();
@@ -187,20 +188,6 @@ export async function processCallbackQuery(
 
     const response = await handler.handler(modifiedUpdate, context);
     
-    // Always answer the callback query to remove loading state
-    if (response) {
-      // If we're sending a message, also answer the callback query
-      context.waitUntil(
-        fetch(`https://api.telegram.org/bot${context.env.TELEGRAM_BOT_TOKEN}/answerCallbackQuery`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            callback_query_id: callbackQuery.id
-          })
-        })
-      );
-    }
-
     return response;
 
   } catch (error) {
@@ -237,8 +224,9 @@ export function initializeHandlers(): void {
         };
       }
 
-      const db = (context.env.DB && 'select' in context.env.DB)
-        ? (context.env.DB as unknown)
+      // Use existing Drizzle DB instance from context.env.DB in tests or create a new one for D1Database
+      const db = (context.env.DB && 'select' in (context.env.DB as unknown as Database))
+        ? (context.env.DB as unknown as Database)
         : createDb(context.env.DB);
       const userService = new UserService(db);
       const invitationService = new InvitationService(db);
@@ -256,7 +244,7 @@ export function initializeHandlers(): void {
       const featureFlagService = createFeatureFlagService(context.env);
       // Determine invitation requirement: dynamic flag or override via environment variable
       const dynamicInvitation = await featureFlagService.isFeatureEnabled('registration.invitation_required');
-      const envInvitation = (context.env as unknown).FEATURE_REGISTRATION_INVITATION_REQUIRED;
+      const envInvitation = context.env.FEATURE_REGISTRATION_INVITATION_REQUIRED;
       const invitationRequired = typeof envInvitation === 'string'
         ? envInvitation.toLowerCase() === 'true'
         : dynamicInvitation;
@@ -411,8 +399,9 @@ export function initializeHandlers(): void {
 
       try {
         // Initialize services
-        const db = (context.env.DB && 'select' in context.env.DB)
-          ? (context.env.DB as unknown)
+        // Use existing Drizzle DB instance in tests or create a new one
+        const db = (context.env.DB && 'select' in (context.env.DB as unknown as Database))
+          ? (context.env.DB as unknown as Database)
           : createDb(context.env.DB);
         const userService = new UserService(db);
 
@@ -669,8 +658,9 @@ export function initializeHandlers(): void {
       if (!chatId || !from) return null;
 
       // Check if user is superadmin from database
-      const db = (context.env.DB && 'select' in context.env.DB)
-        ? (context.env.DB as unknown)
+      // Use existing Drizzle DB instance in tests or create a new one
+      const db = (context.env.DB && 'select' in (context.env.DB as unknown as Database))
+        ? (context.env.DB as unknown as Database)
         : createDb(context.env.DB);
       const userService = new UserService(db);
       const telegramId = from.id.toString();
@@ -705,9 +695,6 @@ export function initializeHandlers(): void {
       }
 
       try {
-        const db = (context.env.DB && 'select' in context.env.DB)
-          ? (context.env.DB as unknown)
-          : createDb(context.env.DB);
         const invitationService = new InvitationService(db);
         
         const codes = [];
@@ -766,8 +753,9 @@ export function initializeHandlers(): void {
       if (!chatId || !from) return null;
 
       // Check if user is superadmin from database
-      const db = (context.env.DB && 'select' in context.env.DB)
-        ? (context.env.DB as unknown)
+      // Use existing Drizzle DB instance in tests or create a new one
+      const db = (context.env.DB && 'select' in (context.env.DB as unknown as Database))
+        ? (context.env.DB as unknown as Database)
         : createDb(context.env.DB);
       const userService = new UserService(db);
       const telegramId = from.id.toString();
@@ -784,9 +772,6 @@ export function initializeHandlers(): void {
       }
 
       try {
-        const db = (context.env.DB && 'select' in context.env.DB)
-          ? (context.env.DB as unknown)
-          : createDb(context.env.DB);
         const invitationService = new InvitationService(db);
         const stats = await invitationService.getInvitationMetrics();
 
@@ -828,8 +813,9 @@ export function initializeHandlers(): void {
       if (!chatId || !from) return null;
 
       try {
-        const db = (context.env.DB && 'select' in context.env.DB)
-          ? (context.env.DB as unknown)
+        // Use existing Drizzle DB instance in tests or create a new one
+        const db = (context.env.DB && 'select' in (context.env.DB as unknown as Database))
+          ? (context.env.DB as unknown as Database)
           : createDb(context.env.DB);
         const userService = new UserService(db);
         const invitationService = new InvitationService(db);
