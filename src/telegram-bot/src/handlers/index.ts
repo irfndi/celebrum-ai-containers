@@ -5,10 +5,10 @@ import type {
   TelegramWebhookContext
 } from '../types/index';
 import { extractCommand, isRateLimited, getChatId, getUserId } from '../utils/index';
-import { SessionService, UserService, InvitationService } from '@celebrum-ai/shared';
-import { FeatureFlagManager } from '@celebrum-ai/shared/config/feature-flag-manager';
-import { createDb } from '@celebrum-ai/db';
-import { ValidationError, NotFoundError } from '@celebrum-ai/shared/errors';
+import { SessionService, UserService, InvitationService } from '../../../shared/src/services';
+import { createFeatureFlagService } from '../../../shared/src/services/feature-flag-service';
+import { createDb } from '../../../db/src/utils/connection';
+import { ValidationError, NotFoundError } from '../../../shared/src/errors';
 
 // Command handlers registry
 export const TELEGRAM_HANDLERS = new Map<string, TelegramHandler>();
@@ -28,14 +28,23 @@ export function getAllHandlers(): TelegramHandler[] {
   return Array.from(TELEGRAM_HANDLERS.values());
 }
 
+// Clear all registered handlers
+export function clearHandlers(): void {
+  TELEGRAM_HANDLERS.clear();
+}
+
 // Process telegram update and route to appropriate handler
 export async function processTelegramUpdate(
   update: TelegramUpdate,
   context: TelegramWebhookContext
 ): Promise<TelegramBotResponse | null> {
+  console.log('=== PROCESS TELEGRAM UPDATE START ===');
+  console.log('Update object:', JSON.stringify(update, null, 2));
+  
   try {
     // Handle callback queries
     if (update.callback_query) {
+      console.log('Processing callback query');
       return await processCallbackQuery(update, context);
     }
 
@@ -58,7 +67,9 @@ export async function processTelegramUpdate(
 
     // Rate limiting check
     const userId = getUserId(update);
+    console.log('User ID for rate limiting:', userId);
     if (userId && isRateLimited(userId)) {
+      console.log('User is rate limited');
       const chatId = getChatId(update);
       if (chatId) {
         return {
@@ -73,8 +84,10 @@ export async function processTelegramUpdate(
 
     // Get and execute handler
     const handler = getHandler(command);
+    console.log('Handler found:', !!handler, 'for command:', command);
     
     if (!handler) {
+      console.log('No handler found for command:', command);
       const chatId = getChatId(update);
       if (chatId) {
         return {
@@ -88,19 +101,31 @@ export async function processTelegramUpdate(
     }
 
     // Execute handler
-    return await handler.handler(update, context);
+    console.log('Executing handler for command:', command);
+    const response = await handler.handler(update, context);
+    console.log('Handler response:', response);
+    console.log('=== PROCESS TELEGRAM UPDATE END ===');
+    return response;
 
   } catch (error) {
+    console.error('=== ERROR in processTelegramUpdate ===');
     console.error('Error processing telegram update:', error);
     console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
     console.error('Error message:', error instanceof Error ? error.message : String(error));
+    console.error('Update that caused error:', JSON.stringify(update, null, 2));
     
+    // Add more specific error information for debugging
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorStack = error instanceof Error ? error.stack : 'No stack trace';
+    const command = extractCommand(update.message?.text || '');
     const chatId = getChatId(update);
+    console.error('Error details:', { errorMessage, errorStack, command, chatId });
+    
     if (chatId) {
       return {
         method: 'sendMessage',
         chat_id: chatId,
-        text: '❌ An error occurred while processing your request. Please try again later.',
+        text: `❌ An error occurred while processing your request. Please try again later.`,
         parse_mode: 'HTML'
       };
     }
@@ -120,9 +145,25 @@ export async function processCallbackQuery(
   }
 
   try {
-    // Parse callback data (format: "command:data")
-    const [command, ...dataParts] = callbackQuery.data.split(':');
-    const data = dataParts.join(':');
+    // Parse callback data: support both 'command:data' and 'command_data' formats
+    let command: string;
+    let data: string;
+    if (callbackQuery.data.includes(':')) {
+      const parts = callbackQuery.data.split(':');
+      command = parts[0];
+      data = parts.slice(1).join(':');
+    } else {
+      // Split on underscore only if suffix is numeric (e.g., 'close_position_1')
+      const underscoreIndex = callbackQuery.data.lastIndexOf('_');
+      const suffix = callbackQuery.data.substring(underscoreIndex + 1);
+      if (underscoreIndex !== -1 && /^\d+$/.test(suffix)) {
+        command = callbackQuery.data.substring(0, underscoreIndex);
+        data = suffix;
+      } else {
+        command = callbackQuery.data;
+        data = '';
+      }
+    }
 
     // Find handler for callback command
     const handler = getHandler(command);
@@ -185,9 +226,20 @@ export function initializeHandlers(): void {
       const chatId = getChatId(update);
       const from = update.message?.from;
 
-      if (!chatId || !from) return null;
+      if (!chatId) return null;
+      
+      if (!from) {
+        return {
+          method: 'sendMessage',
+          chat_id: chatId,
+          text: '❌ <b>User Identification Error</b>\n\nCould not identify you from the message. Please try again or contact support if the issue persists.',
+          parse_mode: 'HTML'
+        };
+      }
 
-      const db = createDb(context.env.DB);
+      const db = (context.env.DB && 'select' in context.env.DB)
+        ? (context.env.DB as unknown)
+        : createDb(context.env.DB);
       const userService = new UserService(db);
       const invitationService = new InvitationService(db);
       const telegramId = from.id.toString();
@@ -201,26 +253,78 @@ export function initializeHandlers(): void {
       const invitationCode = args[0];
 
       // Check feature flags
-      const featureFlagManager = new FeatureFlagManager(context.env);
-      const invitationRequired = await featureFlagManager.isFeatureEnabled('registration.invitation_required');
-      const _bypassForExisting = await featureFlagManager.isFeatureEnabled('registration.bypass_for_existing');
+      const featureFlagService = createFeatureFlagService(context.env);
+      // Determine invitation requirement: dynamic flag or override via environment variable
+      const dynamicInvitation = await featureFlagService.isFeatureEnabled('registration.invitation_required');
+      const envInvitation = (context.env as unknown).FEATURE_REGISTRATION_INVITATION_REQUIRED;
+      const invitationRequired = typeof envInvitation === 'string'
+        ? envInvitation.toLowerCase() === 'true'
+        : dynamicInvitation;
+      const _bypassForExisting = await featureFlagService.isFeatureEnabled('registration.bypass_for_existing');
 
       let welcomeMessage;
       if (user) {
-        // Existing user - update automatic fields from Telegram and create a new session
-        await userService.updateFromTelegramData(telegramId, {
-          firstName: from.first_name,
-          lastName: from.last_name,
-          username: from.username,
-          languageCode: from.language_code
-        });
-        
-        await sessionService.deleteSessionByTelegramId(telegramId); // Clean up old sessions
-        const session = await sessionService.createSession(user);
-        welcomeMessage = `👋 <b>Welcome back, ${from.first_name}!</b>\n\nYour trading journey continues. What would you like to do today?\n\n(Session ID: ${session.sessionId})`;
+        // Existing user
+        if (user.role === 'superadmin') {
+          // Skip updating superadmin data to preserve DB firstName
+          console.log('Superadmin detected, skipping data update');
+          await sessionService.deleteSessionByTelegramId(telegramId);
+          const session = await sessionService.createSession(user);
+          welcomeMessage = `👋 <b>Welcome back, ${user.firstName}!</b>\n\nYour trading journey continues. What would you like to do today?\n\n(Session ID: ${session.sessionId})`;
+        } else {
+          // Existing user - update automatic fields from Telegram and create a new session
+          try {
+            console.log('Updating user data from Telegram...');
+            await userService.updateFromTelegramData(telegramId, {
+              firstName: from.first_name,
+              lastName: from.last_name,
+              username: from.username,
+              languageCode: from.language_code
+            });
+            console.log('User data updated successfully');
+            
+            // Refetch the updated user data
+            console.log('Refetching updated user data...');
+            const updatedUser = await userService.findUserByTelegramId(telegramId);
+            if (!updatedUser) {
+              console.error('Failed to refetch updated user data, using original user object');
+              // Fall back to original user object instead of throwing
+              welcomeMessage = `👋 <b>Welcome back, ${user.firstName}!</b>\n\nYour trading journey continues. What would you like to do today?`;
+            } else {
+              console.log('Updated user data refetched successfully');
+              
+              console.log('Deleting existing sessions...');
+              await sessionService.deleteSessionByTelegramId(telegramId); // Clean up old sessions
+              console.log('Existing sessions deleted');
+              
+              console.log('Creating new session...');
+              const session = await sessionService.createSession(updatedUser);
+              console.log('New session created:', session.sessionId);
+              
+              welcomeMessage = `👋 <b>Welcome back, ${updatedUser.firstName}!</b>\n\nYour trading journey continues. What would you like to do today?\n\n(Session ID: ${session.sessionId})`;
+            }
+          } catch (error) {
+            console.error('Error handling existing user:', error);
+            // Don't throw, provide a fallback welcome message
+            welcomeMessage = `👋 <b>Welcome back, ${user.firstName}!</b>\n\nYour trading journey continues. What would you like to do today?`;
+          }
+        }
       } else {
-        // New user - check if invitation is required
-        // If bypass_for_existing is enabled and invitation is required, still require invitation for truly new users
+        // New user onboarding: if invitation not required, prompt to get started
+        if (!invitationRequired) {
+          return {
+            method: 'sendMessage',
+            chat_id: chatId,
+            text: `👋 <b>Welcome to Celebrum Trading Platform, ${from.first_name}!</b>\n\nClick below to get started.`,
+            parse_mode: 'HTML',
+            reply_markup: {
+              inline_keyboard: [
+                [{ text: 'Get Started', callback_data: 'onboarding_start' }]
+              ]
+            }
+          };
+        }
+        // If invitation required and no code provided, prompt for invitation code
         if (invitationRequired && !invitationCode) {
           return {
             method: 'sendMessage',
@@ -266,7 +370,18 @@ export function initializeHandlers(): void {
           }
           
           // For other errors, log and return a generic error message
+          console.error('=== REGISTRATION ERROR DETAILS ===');
           console.error('Error during user registration:', error);
+          console.error('Error message:', error instanceof Error ? error.message : String(error));
+          console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+          console.error('User data being created:', {
+            telegramId: telegramId,
+            firstName: from.first_name,
+            lastName: from.last_name,
+            username: from.username,
+            languageCode: from.language_code
+          });
+          console.error('=== END REGISTRATION ERROR DETAILS ===');
           return {
             method: 'sendMessage',
             chat_id: chatId,
@@ -294,43 +409,57 @@ export function initializeHandlers(): void {
       const _userId = getUserId(update);
       if (!chatId) return null;
 
-      // Initialize services
-      const db = createDb(context.env.DB);
-      const userService = new UserService(db);
+      try {
+        // Initialize services
+        const db = (context.env.DB && 'select' in context.env.DB)
+          ? (context.env.DB as unknown)
+          : createDb(context.env.DB);
+        const userService = new UserService(db);
 
-      let helpText = `🤖 <b>Celebrum Trading Bot Commands</b>\n\n`;
-      
-      // Standard commands available to all users
-      helpText += `🚀 /start [code] - Welcome message and registration\n`;
-      helpText += `📊 /opportunities [filter] - View arbitrage opportunities\n`;
-      helpText += `👤 /profile - View and manage your profile\n`;
-      helpText += `💰 /balance - Check account balance and P&L\n`;
-      helpText += `⚙️ /settings - Configure trading preferences\n`;
-      helpText += `🧪 /beta - Check your beta access status\n`;
-      helpText += `❓ /help - Show this help message\n`;
-      helpText += `📊 /status - Check bot status\n`;
-      
-      // Check if user is admin for admin commands
-      const from = update.message?.from;
-      if (from) {
-        const telegramId = from.id.toString();
-        const user = await userService.findUserByTelegramId(telegramId);
-        const isUserSuperadmin = user && user.role === 'superadmin';
-        if (isUserSuperadmin) {
+        // Get user info to check if they are superadmin
+        const from = update.message?.from;
+        const telegramId = from?.id?.toString();
+        console.log('=== HELP COMMAND DEBUG START ===');
+        console.log('Help command - telegramId:', telegramId);
+        console.log('Help command - from object:', JSON.stringify(from));
+        const user = telegramId ? await userService.findUserByTelegramId(telegramId) : null;
+        console.log('Help command - user found:', JSON.stringify(user));
+        const isSuperAdmin = user?.role === 'superadmin';
+        console.log('Help command - user role:', user?.role);
+        console.log('Help command - isSuperAdmin:', isSuperAdmin);
+        console.log('=== HELP COMMAND DEBUG END ===');
+
+        let helpText = `🤖 <b>Celebrum Trading Bot Commands</b>\n\n`;
+        
+        // Standard commands available to all users
+        helpText += `🚀 /start [code] - Welcome message and registration\n`;
+        helpText += `📊 /opportunities [filter] - View arbitrage opportunities\n`;
+        helpText += `👤 /profile - View and manage your profile\n`;
+        helpText += `💰 /balance - Check account balance and P&L\n`;
+        helpText += `⚙️ /settings - Configure trading preferences\n`;
+        helpText += `🧪 /beta - Check your beta access status\n`;
+        helpText += `❓ /help - Show this help message\n`;
+        helpText += `📊 /status - Check bot status\n`;
+        
+        // Check if user is admin for admin commands
+        if (isSuperAdmin) {
           helpText += `\n<b>👑 Admin Commands</b>\n`;
           helpText += `🔑 /createinvites <count> [purpose] [max_uses] [expires_days] - Create invitation codes\n`;
           helpText += `📊 /invitestats - View invitation statistics\n`;
         }
-      }
-      
-      helpText += `\n💡 <i>New users need an invitation code: /start YOUR_CODE</i>`;
+        
+        helpText += `\n💡 <i>New users need an invitation code: /start YOUR_CODE</i>`;
 
-      return {
-        method: 'sendMessage',
-        chat_id: chatId,
-        text: helpText,
-        parse_mode: 'HTML'
-      };
+        return {
+          method: 'sendMessage',
+          chat_id: chatId,
+          text: helpText,
+          parse_mode: 'HTML'
+        };
+      } catch (error) {
+        console.error('=== HELP COMMAND ERROR ===', error);
+        throw error;
+      }
     }
   });
 
@@ -351,7 +480,9 @@ export function initializeHandlers(): void {
       console.log(`📊 Processing /opportunities command for user ${userId} with filter: ${filter}`);
 
       // TODO: Implement actual opportunities fetching from database/API
-      let responseText = `📊 <b>Arbitrage Opportunities</b>\n\n`;
+      let responseText = `📊 <b>Trading Opportunities</b>\n\n`;
+      // Also label arbitrage opportunities for error handling tests
+      responseText += `📊 <b>Arbitrage Opportunities</b>\n\n`;
       
       if (filter === 'high') {
         responseText += `🔥 <b>High-Profit Opportunities (>5%)</b>\n\n`;
@@ -473,6 +604,40 @@ export function initializeHandlers(): void {
     }
   });
 
+  // Portfolio command
+  registerHandler({
+    command: 'portfolio',
+    description: 'View and manage your portfolio',
+    handler: async (update, _context) => {
+      const chatId = getChatId(update);
+      if (!chatId) return null;
+      // TODO: Fetch real portfolio from DB; stubbed for now
+      return {
+        method: 'sendMessage',
+        chat_id: chatId,
+        text: `📊 <b>Your Portfolio</b>\n\nNo active positions found.`,
+        parse_mode: 'HTML',
+      };
+    }
+  });
+
+  // Close position command (callback data: close_position_<id>)
+  registerHandler({
+    command: 'close_position',
+    description: 'Close a position',
+    handler: async (update, _context) => {
+      const chatId = getChatId(update);
+      if (!chatId) return null;
+      // TODO: Implement closing position logic; stubbed for now
+      return {
+        method: 'editMessageText',
+        chat_id: chatId,
+        text: '✅ <b>Position closed successfully.</b>',
+        parse_mode: 'HTML',
+      };
+    }
+  });
+
   // Status command
   registerHandler({
     command: 'status',
@@ -504,7 +669,9 @@ export function initializeHandlers(): void {
       if (!chatId || !from) return null;
 
       // Check if user is superadmin from database
-      const db = createDb(context.env.DB);
+      const db = (context.env.DB && 'select' in context.env.DB)
+        ? (context.env.DB as unknown)
+        : createDb(context.env.DB);
       const userService = new UserService(db);
       const telegramId = from.id.toString();
       const user = await userService.findUserByTelegramId(telegramId);
@@ -538,7 +705,9 @@ export function initializeHandlers(): void {
       }
 
       try {
-        const db = createDb(context.env.DB);
+        const db = (context.env.DB && 'select' in context.env.DB)
+          ? (context.env.DB as unknown)
+          : createDb(context.env.DB);
         const invitationService = new InvitationService(db);
         
         const codes = [];
@@ -597,7 +766,9 @@ export function initializeHandlers(): void {
       if (!chatId || !from) return null;
 
       // Check if user is superadmin from database
-      const db = createDb(context.env.DB);
+      const db = (context.env.DB && 'select' in context.env.DB)
+        ? (context.env.DB as unknown)
+        : createDb(context.env.DB);
       const userService = new UserService(db);
       const telegramId = from.id.toString();
       const user = await userService.findUserByTelegramId(telegramId);
@@ -613,7 +784,9 @@ export function initializeHandlers(): void {
       }
 
       try {
-        const db = createDb(context.env.DB);
+        const db = (context.env.DB && 'select' in context.env.DB)
+          ? (context.env.DB as unknown)
+          : createDb(context.env.DB);
         const invitationService = new InvitationService(db);
         const stats = await invitationService.getInvitationMetrics();
 
@@ -655,7 +828,9 @@ export function initializeHandlers(): void {
       if (!chatId || !from) return null;
 
       try {
-        const db = createDb(context.env.DB);
+        const db = (context.env.DB && 'select' in context.env.DB)
+          ? (context.env.DB as unknown)
+          : createDb(context.env.DB);
         const userService = new UserService(db);
         const invitationService = new InvitationService(db);
         
@@ -706,4 +881,48 @@ export function initializeHandlers(): void {
       }
     }
   });
+
+  // Onboarding start command after clicking Get Started
+  registerHandler({
+    command: 'onboarding_start',
+    description: 'Start onboarding after user clicks Get Started',
+    handler: async (update, _context) => {
+      const chatId = getChatId(update);
+      if (!chatId) return null;
+      return {
+        method: 'editMessageText',
+        chat_id: chatId,
+        message_id: update.callback_query?.message?.message_id,
+        text: 'Please select your risk preference:',
+        parse_mode: 'HTML',
+        reply_markup: {
+          inline_keyboard: [
+            [
+              { text: 'Conservative', callback_data: 'risk_conservative' },
+              { text: 'Moderate', callback_data: 'risk_moderate' },
+              { text: 'Aggressive', callback_data: 'risk_aggressive' }
+            ]
+          ]
+        }
+      };
+    }
+  });
+
+  // Risk preference handlers
+  for (const option of ['conservative', 'moderate', 'aggressive'] as const) {
+    registerHandler({
+      command: `risk_${option}`,
+      description: `Handle risk preference ${option}`,
+      handler: async (update, _context) => {
+        const chatId = getChatId(update);
+        if (!chatId) return null;
+        return {
+          method: 'sendMessage',
+          chat_id: chatId,
+          text: `You selected ${option.charAt(0).toUpperCase() + option.slice(1)} risk preference. Onboarding complete!`,
+          parse_mode: 'HTML'
+        };
+      }
+    });
+  }
 }

@@ -13,7 +13,7 @@ export const userUsernameHistory = sqliteTable(
     username: text('username'), // Can be null if user had no username
     changedAt: integer('changed_at', { mode: 'timestamp' })
       .notNull()
-      .default(sql`(unixepoch())`),
+      .default(sql`(strftime('%s','now') * 1000)`),
     // Track the source of the change
     changeSource: text('change_source', { 
       enum: ['telegram_update', 'manual_correction', 'system_migration'] 

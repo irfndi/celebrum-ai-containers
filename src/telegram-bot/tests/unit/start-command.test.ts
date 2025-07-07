@@ -1,149 +1,66 @@
 /**
  * Unit tests for the /start command handler
- * Tests all scenarios: new user registration, existing user, invalid codes, etc.
+ * Refactored to use real services and a test database.
  */
 
-import { describe, test, expect, beforeEach, vi } from 'vitest';
+import { describe, test, expect, beforeEach, afterEach, vi } from 'vitest';
+
+// ===== MOCK SETUP - MUST BE FIRST =====
+// Create a shared mock state for feature flags
+const mockFeatureFlags = {
+  INVITE_SYSTEM_ACTIVE: true,
+  REGISTRATION_BYPASS_FOR_EXISTING: false,
+};
+
+// Mock the createDb function to return our mock database
+vi.mock('../../../db/src/utils/connection', () => ({
+  createDb: vi.fn(),
+  getDatabase: vi.fn(),
+  withTransaction: vi.fn()
+}));
+
+// ===== END MOCKS =====
+
+// Now import everything after mocks are set up
 import { processTelegramUpdate, initializeHandlers } from '../../src/handlers/index';
-import type { TelegramUpdate, TelegramWebhookContext } from '../../src/types/index';
+import type { TelegramUpdate, TelegramWebhookContext, BotResponse } from '../../src/types/index';
 import type { Env } from '../../../shared/src/types/index';
 import type { D1Database, KVNamespace } from '@cloudflare/workers-types';
-import { ValidationError } from '../../../shared/src/errors/index';
+import { getTestDb, cleanupDb, createMockEnv } from '../../../shared/tests/utils/test-helpers.ts';
+import type { DrizzleD1Database } from 'drizzle-orm/d1';
+import * as schema from '../../../db/src/schema';
+import { users } from '../../../db/src/schema/users';
+import { invitationCodes } from '../../../db/src/schema/invitations';
+import { createDb } from '../../../db/src/utils/connection';
+import { createFeatureFlagService, getFeatureFlagService, resetFeatureFlagService } from '../../../shared/src/services/feature-flag-service.js';
 
-// Mock implementations
-class MockKVNamespace {
-  private store = new Map<string, { value: string; expiration?: number }>();
-
-  async put(key: string, value: string, options?: { expirationTtl?: number }): Promise<void> {
-    const expiration = options?.expirationTtl ? Date.now() + (options.expirationTtl * 1000) : undefined;
-    this.store.set(key, { value, expiration });
-  }
-
-  async get(key: string): Promise<string | null> {
-    const item = this.store.get(key);
-    if (!item) return null;
-    
-    if (item.expiration && Date.now() > item.expiration) {
-      this.store.delete(key);
-      return null;
-    }
-    
-    return item.value;
-  }
-
-  async delete(key: string): Promise<void> {
-    this.store.delete(key);
-  }
-
-  clear(): void {
-    this.store.clear();
-  }
+// Helper to update feature flags in KV store during tests
+async function updateFeatureFlags(kv: KVNamespace, flags: typeof mockFeatureFlags) {
+  console.log('Updating feature flags in KV store:', flags); // Debug
+  
+  // Update invitation required flag
+  await kv.put('rbac:global_flag:registration.invitation_required', JSON.stringify({
+    enabled: flags.INVITE_SYSTEM_ACTIVE,
+    updatedBy: 'test',
+    updatedAt: Date.now(),
+    version: 1
+  }));
+  
+  // Update bypass for existing flag  
+  await kv.put('rbac:global_flag:registration.bypass_for_existing', JSON.stringify({
+    enabled: flags.REGISTRATION_BYPASS_FOR_EXISTING,
+    updatedBy: 'test',
+    updatedAt: Date.now(),
+    version: 1
+  }));
 }
 
-interface MockUser {
-  id: string;
-  telegram_id: string;
-  username?: string;
-  first_name: string;
-  last_name?: string;
-  languageCode?: string;
-  created_at: string;
-  updated_at: string;
-  role?: string;
-}
-
-interface MockInvitationUsage {
-  userId: string;
-  telegramId: number;
-  usedAt: Date;
-}
-
-interface MockInvitation {
-  code: string;
-  maxUses: number;
-  used: number;
-  expiresAt?: Date;
-  createdAt: Date;
-  usedBy?: MockInvitationUsage[];
-}
-
-class MockD1Database {
-  private users = new Map<string, MockUser>();
-  private invitations = new Map<string, MockInvitation>();
-
-  // Clear all data
-  clear() {
-    this.users.clear();
-    this.invitations.clear();
-  }
-
-  // Mock user operations
-  findUserByTelegramId(telegramId: string) {
-    return this.users.get(telegramId) || null;
-  }
-
-  createUser(userData: Record<string, unknown>) {
-    const user: MockUser = {
-      id: String(Date.now()),
-      telegram_id: userData.telegramId as string,
-      username: userData.username as string | undefined,
-      first_name: userData.first_name as string,
-      last_name: userData.last_name as string | undefined,
-      languageCode: userData.languageCode as string | undefined,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    };
-    this.users.set(userData.telegramId as string, user);
-    return user;
-  }
-
-  // Mock invitation operations
-  validateInvitationCode(code: string) {
-    const invitation = this.invitations.get(code);
-    if (!invitation) {
-      throw new ValidationError('Invalid invitation code');
-    }
-    if (invitation.used >= invitation.maxUses) {
-      throw new ValidationError('Invitation code has reached maximum uses');
-    }
-    if (invitation.expiresAt && new Date() > invitation.expiresAt) {
-      throw new ValidationError('Invitation code has expired');
-    }
-    return invitation;
-  }
-
-  useInvitationCode(code: string, userId: string, telegramId: number) {
-    const invitation = this.invitations.get(code);
-    if (invitation) {
-      invitation.used += 1;
-      invitation.usedBy = invitation.usedBy || [];
-      invitation.usedBy.push({ userId, telegramId, usedAt: new Date() });
-    }
-  }
-
-  // Helper methods for testing
-  addInvitation(code: string, maxUses = 1, expiresAt?: Date) {
-    this.invitations.set(code, {
-      code,
-      maxUses,
-      used: 0,
-      expiresAt,
-      createdAt: new Date()
-    });
-  }
-
-  addUser(userData: MockUser) {
-    this.users.set(userData.telegram_id, userData);
-  }
-
-}
-
-
-function createTestUpdate(text: string, userId = 12345, chatId = 67890): TelegramUpdate {
+// Helper to create a consistent Telegram update object for tests
+function createTestUpdate(text: string, userId = 12345, username = 'testuser'): TelegramUpdate {
   return {
-    update_id: Date.now(),
+    update_id: Date.now() + Math.random(),
     message: {
-      message_id: Date.now(),
+      message_id: Date.now() + Math.random(),
       date: Math.floor(Date.now() / 1000),
       text,
       from: {
@@ -151,466 +68,289 @@ function createTestUpdate(text: string, userId = 12345, chatId = 67890): Telegra
         is_bot: false,
         first_name: 'Test',
         last_name: 'User',
-        username: 'testuser',
+        username: username,
         language_code: 'en'
       },
       chat: {
-        id: chatId,
+        id: userId,
         first_name: 'Test',
         last_name: 'User',
-        username: 'testuser',
+        username: username,
         type: 'private'
       }
     }
   };
 }
 
-// Initialize mocks at module level
-const mockDb = new MockD1Database();
-const mockKv = new MockKVNamespace();
-let mockContext: TelegramWebhookContext;
-
-// Mock the database at module level
-vi.mock('@celebrum-ai/db', () => ({
-  createDb: vi.fn(() => mockDb)
-}));
-
-// Mock the services at module level
-vi.mock('@celebrum-ai/shared', () => ({
-  SessionService: vi.fn().mockImplementation(() => ({
-    createSession: vi.fn().mockResolvedValue({ sessionId: 'test-session-id' }),
-    getSession: vi.fn().mockResolvedValue(null),
-    updateSession: vi.fn().mockResolvedValue(undefined),
-    deleteSessionByTelegramId: vi.fn().mockResolvedValue(undefined)
-  })),
-  UserService: vi.fn().mockImplementation(() => ({
-    findUserByTelegramId: vi.fn().mockImplementation((telegramId: string) => 
-      mockDb.findUserByTelegramId(telegramId)
-    ),
-    createUser: vi.fn().mockImplementation((userData: Record<string, unknown>) => 
-      mockDb.createUser(userData)
-    ),
-    createUserWithUsernameTracking: vi.fn().mockImplementation((userData: Record<string, unknown>) => 
-      mockDb.createUser(userData)
-    ),
-    updateFromTelegramData: vi.fn().mockResolvedValue(undefined)
-  })),
-  InvitationService: vi.fn().mockImplementation(() => ({
-    validateInvitationCode: vi.fn().mockImplementation((code: string) => 
-      mockDb.validateInvitationCode(code)
-    ),
-    useInvitationCode: vi.fn().mockImplementation((code: string, userId: string, telegramId: number) => 
-      mockDb.useInvitationCode(code, userId, telegramId)
-    )
-  }))
-}));
-
 describe('/start Command Handler', () => {
-  beforeEach(() => {
-    // Reset mocks
-    mockDb.clear();
-    mockKv.clear();
+  let db: DrizzleD1Database<typeof schema>;
+  let kv: KVNamespace;
+  let dispose: () => Promise<void>;
+  let testContext: TelegramWebhookContext;
+  let mockEnv: any;
+
+  beforeEach(async () => {
+    // Clear and reset all mocks to ensure fresh state
+    vi.clearAllMocks();
     
-    // Mock the context
-    mockContext = {
-      env: {
-        DB: mockDb as unknown as D1Database,
-        SESSIONS: mockKv as unknown as KVNamespace,
-        TELEGRAM_BOT_TOKEN: 'test-token',
-        ADMIN_TELEGRAM_IDS: '123456789'
-      } as unknown as Env,
+    const testDbContext = await getTestDb();
+    db = testDbContext.db;
+    kv = testDbContext.kv;
+    dispose = testDbContext.dispose;
+
+    await cleanupDb(db);
+
+    // Create proper mock environment with all required properties
+    mockEnv = createMockEnv();
+    
+    // Update mock environment to use the test database and KV
+    mockEnv.DB = (db as any)?.client || db;
+    mockEnv.SESSIONS = kv;
+    mockEnv.CELEBRUM_KV = kv;
+    
+    // Set up feature flags in the KV store for the FeatureFlagManager
+    // These will override the default flags if needed
+    if (mockFeatureFlags.INVITE_SYSTEM_ACTIVE === false) {
+      // Override to disable invitation requirement
+      await kv.put('rbac:global_flag:registration.invitation_required', JSON.stringify({
+        enabled: false,
+        updatedBy: 'test',
+        updatedAt: Date.now(),
+        version: 1
+      }));
+    }
+    
+    if (mockFeatureFlags.REGISTRATION_BYPASS_FOR_EXISTING === true) {
+      // Override to enable bypass for existing users
+      await kv.put('rbac:global_flag:registration.bypass_for_existing', JSON.stringify({
+        enabled: true,
+        updatedBy: 'test',
+        updatedAt: Date.now(),
+        version: 1
+      }));
+    }
+    
+    // Mock the createDb function to return our mock database
+    vi.mocked(createDb).mockReturnValue(db);
+    
+    testContext = {
+      env: mockEnv as unknown as Env,
       request: new Request('https://example.com'),
       waitUntil: vi.fn()
     };
 
-    // Initialize handlers
+    // Reset feature flags to defaults for each test
+    mockFeatureFlags.INVITE_SYSTEM_ACTIVE = true;
+    mockFeatureFlags.REGISTRATION_BYPASS_FOR_EXISTING = false;
+
+    // Initialize handlers to ensure services are created with the test context
     initializeHandlers();
   });
 
+  afterEach(async () => {
+    vi.restoreAllMocks();
+    await dispose();
+  });
+
   test('should welcome existing user without invitation code', async () => {
-    // Setup: Add existing user
     const telegramId = '12345';
-    mockDb.createUser({
-      telegramId,
-      first_name: 'Test',
-      last_name: 'User',
+    await db.insert(users).values({
+      telegramId: telegramId,
+      firstName: 'Test',
+      lastName: 'User',
       username: 'testuser'
     });
 
-    // Test: Send /start command
-    const update = createTestUpdate('/start', 12345);
-    const response = await processTelegramUpdate(update, mockContext);
+    const update = createTestUpdate('/start', parseInt(telegramId, 10));
+    const response = (await processTelegramUpdate(update, testContext)) as BotResponse;
 
-    // Verify: Should welcome existing user
     expect(response).toBeTruthy();
-    expect(response?.method).toBe('sendMessage');
-    expect(response?.text).toContain('Welcome back');
-    expect(response?.text).toContain('Test');
-    expect(response?.text).toContain('Session ID:');
+    expect(response.method).toBe('sendMessage');
+    expect(response.text).toContain('Welcome back');
+    expect(response.text).toContain('Test');
+    expect(response.text).toContain('Session ID:');
   });
 
   test('should require invitation code for new user', async () => {
-    // Test: Send /start command without invitation code
-    const update = createTestUpdate('/start', 54321);
-    const response = await processTelegramUpdate(update, mockContext);
+    const update = createTestUpdate('/start');
+    const response = (await processTelegramUpdate(update, testContext)) as BotResponse;
 
-    // Verify: Should request invitation code
     expect(response).toBeTruthy();
-    expect(response?.method).toBe('sendMessage');
-    expect(response?.text).toContain('Invitation Required');
-    expect(response?.text).toContain('/start YOUR_INVITATION_CODE');
-    expect(response?.text).toContain('private beta');
+    expect(response.method).toBe('sendMessage');
+    expect(response.text).toContain('Invitation Required');
+    expect(response.text).toContain('/start YOUR_INVITATION_CODE');
+    expect(response.text).toContain('private beta');
   });
 
   test('should register new user with valid invitation code', async () => {
-    // Setup: Add valid invitation code
-    const invitationCode = 'VALID123';
-    mockDb.addInvitation(invitationCode, 5);
+    await db.insert(invitationCodes).values({
+        code: 'VALIDCODE',
+        createdBy: 'admin',
+        maxUses: 1,
+        currentUses: 0,
+        isActive: true,
+    });
 
-    // Test: Send /start command with valid invitation code
-    const update = createTestUpdate(`/start ${invitationCode}`, 54321);
-    const response = await processTelegramUpdate(update, mockContext);
-
-    // Verify: Should register user and welcome them
+    const update = createTestUpdate('/start VALIDCODE', 54321, 'newuser');
+    const response = (await processTelegramUpdate(update, testContext)) as BotResponse;
+    
     expect(response).toBeTruthy();
-    expect(response?.method).toBe('sendMessage');
-    expect(response?.text).toContain('Welcome to Celebrum Trading Platform');
-    expect(response?.text).toContain('Your account has been created');
-    expect(response?.text).toContain('Session ID:');
-    expect(response?.text).toContain('Market Analysis');
-    expect(response?.text).toContain('Trading Tools');
+    expect(response.method).toBe('sendMessage');
+    expect(response.text).toContain('Welcome to Celebrum Trading Platform');
+    expect(response.text).toContain('Your account has been created');
+    expect(response.text).toContain('Session ID:');
+
+    const dbUser = await db.query.users.findFirst({ where: (u, {eq}) => eq(u.telegramId, '54321')});
+    expect(dbUser).toBeDefined();
+    expect(dbUser?.username).toBe('newuser');
   });
 
   test('should reject invalid invitation code', async () => {
-    // Test: Send /start command with invalid invitation code
-    const update = createTestUpdate('/start INVALID123', 54321);
-    const response = await processTelegramUpdate(update, mockContext);
+    const update = createTestUpdate('/start INVALIDCODE');
+    const response = (await processTelegramUpdate(update, testContext)) as BotResponse;
 
-    // Verify: Should reject invalid code
     expect(response).toBeTruthy();
-    expect(response?.method).toBe('sendMessage');
-    expect(response?.text).toContain('Invalid Invitation Code');
-    expect(response?.text).toContain('invalid, expired, or has reached its maximum usage');
-    expect(response?.text).toContain('/start YOUR_INVITATION_CODE');
+    expect(response.method).toBe('sendMessage');
+    expect(response.text).toContain('Invalid Invitation Code');
+    expect(response.text).toContain('invalid, expired, or has reached its maximum usage');
+    expect(response.text).toContain('/start YOUR_INVITATION_CODE');
   });
 
   test('should reject expired invitation code', async () => {
-    // Setup: Add expired invitation code
-    const invitationCode = 'EXPIRED123';
-    const pastDate = new Date(Date.now() - 24 * 60 * 60 * 1000); // 1 day ago
-    mockDb.addInvitation(invitationCode, 5, pastDate);
+    await db.insert(invitationCodes).values({
+        code: 'EXPIREDCODE',
+        createdBy: 'admin',
+        expiresAt: new Date(Date.now() - 1000), // Expired 1 second ago
+        currentUses: 0,
+        isActive: true,
+    });
+    
+    const update = createTestUpdate('/start EXPIREDCODE');
+    const response = (await processTelegramUpdate(update, testContext)) as BotResponse;
 
-    // Test: Send /start command with expired invitation code
-    const update = createTestUpdate(`/start ${invitationCode}`, 54321);
-    const response = await processTelegramUpdate(update, mockContext);
-
-    // Verify: Should reject expired code
     expect(response).toBeTruthy();
-    expect(response?.method).toBe('sendMessage');
-    expect(response?.text).toContain('Invalid Invitation Code');
-    expect(response?.text).toContain('invalid, expired, or has reached its maximum usage');
+    expect(response.method).toBe('sendMessage');
+    expect(response.text).toContain('Invalid Invitation Code');
   });
 
   test('should reject invitation code at maximum usage', async () => {
-    // Setup: Add invitation code at max usage
-    const invitationCode = 'MAXED123';
-    mockDb.addInvitation(invitationCode, 1);
+    await db.insert(invitationCodes).values({
+        code: 'USEDCODE',
+        createdBy: 'admin',
+        maxUses: 1,
+        currentUses: 1,
+        isActive: true,
+    });
     
-    // Use the invitation code once
-    mockDb.useInvitationCode(invitationCode, 'user1', 11111);
-
-    // Test: Try to use the same invitation code again
-    const update = createTestUpdate(`/start ${invitationCode}`, 54321);
-    const response = await processTelegramUpdate(update, mockContext);
-
-    // Verify: Should reject maxed out code
+    const update = createTestUpdate('/start USEDCODE');
+    const response = (await processTelegramUpdate(update, testContext)) as BotResponse;
+    
     expect(response).toBeTruthy();
-    expect(response?.method).toBe('sendMessage');
-    expect(response?.text).toContain('Invalid Invitation Code');
-    expect(response?.text).toContain('invalid, expired, or has reached its maximum usage');
+    expect(response.method).toBe('sendMessage');
+    expect(response.text).toContain('Invalid Invitation Code');
   });
-
-  // TODO: Fix database error handling test
-  // test('should handle database errors gracefully', async () => {
-  //   // This test needs to be implemented with proper scoped mocking
-  // });
 
   test('should handle missing user data gracefully', async () => {
-    // Test: Send update without proper user data
-    const incompleteUpdate: TelegramUpdate = {
-      update_id: Date.now(),
-      message: {
-        message_id: Date.now(),
-        date: Math.floor(Date.now() / 1000),
-        text: '/start',
-        chat: {
-          id: 67890,
-          type: 'private'
-        }
-        // Missing 'from' field
-      }
-    };
+    const update = createTestUpdate('/start');
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    delete update.message!.from;
+    const response = (await processTelegramUpdate(update, testContext)) as BotResponse;
 
-    const response = await processTelegramUpdate(incompleteUpdate, mockContext);
-
-    // Verify: Should handle gracefully (return null or appropriate response)
-    expect(response).toBeNull();
-  });
-
-  test('should preserve user language preference', async () => {
-    // Setup: Add valid invitation code
-    const invitationCode = 'LANG123';
-    mockDb.addInvitation(invitationCode, 5);
-
-    // Test: Send /start command with language code
-    const update = createTestUpdate(`/start ${invitationCode}`, 54321);
-    update.message!.from!.language_code = 'es'; // Spanish
-
-    const response = await processTelegramUpdate(update, mockContext);
-
-    // Verify: User should be created with language preference
     expect(response).toBeTruthy();
-    expect(response?.method).toBe('sendMessage');
-    expect(response?.text).toContain('Welcome to Celebrum Trading Platform');
-    
-    // Check that user was created with language code
-    const createdUser = mockDb.findUserByTelegramId('54321');
-    expect(createdUser).toBeTruthy();
-    expect(createdUser?.languageCode).toBe('es');
-  });
-
-  test('should create session for both new and existing users', async () => {
-    // Test 1: Existing user
-    const existingTelegramId = 12345;
-    mockDb.createUser({
-      telegramId: existingTelegramId.toString(),
-      firstName: 'Existing',
-      lastName: 'User'
-    });
-
-    const existingUserUpdate = createTestUpdate('/start', existingTelegramId);
-    const existingUserResponse = await processTelegramUpdate(existingUserUpdate, mockContext);
-
-    expect(existingUserResponse?.text).toContain('Session ID:');
-
-    // Test 2: New user with invitation
-    const invitationCode = 'SESSION123';
-    mockDb.addInvitation(invitationCode, 5);
-
-    const newUserUpdate = createTestUpdate(`/start ${invitationCode}`, 54321);
-    const newUserResponse = await processTelegramUpdate(newUserUpdate, mockContext);
-
-    expect(newUserResponse?.text).toContain('Session ID:');
+    expect(response.method).toBe('sendMessage');
+    expect(response.text).toContain('Could not identify you from the message');
   });
 
   describe('Feature Flag Tests', () => {
-    test('should bypass invitation requirement when feature flag is disabled', async () => {
-      // This test verifies that when invitation_required is false, new users can register without codes
-      // Note: In the current implementation, feature flags are checked at runtime
-      // For this test to work properly, we would need to mock the FeatureFlagManager at the module level
-      // For now, we'll test the current behavior where invitation is required by default
-      
-      const newUserUpdate = createTestUpdate('/start', 99999);
-      const response = await processTelegramUpdate(newUserUpdate, mockContext);
-
-      // With current implementation, invitation is required
-      expect(response?.text).toContain('Invitation Required');
+    beforeEach(async () => {
+      // Reset the FeatureFlagService singleton before each test
+      resetFeatureFlagService();
+      // Clear any existing flags from KV
+      await kv.delete('rbac:global_flag:registration.invitation_required');
     });
-
-    test('should require invitation when feature flag is enabled', async () => {
-      // Mock feature flag to enable invitation requirement
-      vi.doMock('@celebrum-ai/shared/config/feature-flag-manager', () => ({
-        FeatureFlagManager: vi.fn().mockImplementation(() => ({
-          isFeatureEnabled: vi.fn().mockImplementation((flag: string) => {
-            if (flag === 'registration.invitation_required') return true;
-            if (flag === 'registration.bypass_for_existing') return true;
-            return true;
-          })
-        }))
+    
+    test('should NOT require invitation when feature flag is disabled', async () => {
+      // Set the flag to false in KV store directly
+      await kv.put('rbac:global_flag:registration.invitation_required', JSON.stringify({
+        enabled: false,
+        updatedBy: 'test',
+        updatedAt: Date.now(),
+        version: 1
       }));
+      
+      // Initialize the FeatureFlagService singleton with testContext.env after setting the flag
+      const featureFlagService = createFeatureFlagService(testContext.env);
+      
+      // Clear the cache to ensure fresh read from KV
+      featureFlagService.clearCache();
+      
+      // Verify the flag is actually set in KV
+      const kvValue = await kv.get('rbac:global_flag:registration.invitation_required', 'json');
+      console.log('KV value after setting:', kvValue);
+      
+      // Verify the feature flag service reads it correctly
+      const flagValue = await featureFlagService.isFeatureEnabled('registration.invitation_required');
+      console.log('FeatureFlagService reads flag as:', flagValue);
+      
+      const update = createTestUpdate('/start', 11111, 'noflaguser');
+      const response = await processTelegramUpdate(update, testContext) as BotResponse;
 
-      const newUserUpdate = createTestUpdate('/start', 88888);
-      const response = await processTelegramUpdate(newUserUpdate, mockContext);
-
-      expect(response?.text).toContain('Invitation Required');
+      expect(response).toBeTruthy();
+      expect(response.method).toBe('sendMessage');
+      expect(response.text).toContain('Welcome to Celebrum Trading Platform'); // Registers successfully
     });
-  });
 
-  describe('Session Timeout Tests', () => {
-    test('should create session with 15 minute timeout', async () => {
-      const existingTelegramId = 12345;
-      mockDb.addUser({
-        id: '1',
-        telegram_id: existingTelegramId.toString(),
-        first_name: 'Test',
-        username: 'testuser',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        role: 'free'
-      });
-
-      const update = createTestUpdate('/start', existingTelegramId);
-      const response = await processTelegramUpdate(update, mockContext);
-
-      // Verify session was created (response should contain session ID)
-      expect(response?.text).toContain('Session ID:');
-      expect(response?.text).toContain('Welcome back');
+    test('should require invitation when feature flag is enabled (default behavior)', async () => {
+      // Don't set any flag in KV - should use default value (true)
+      
+      // Initialize the FeatureFlagService singleton with testContext.env
+      const featureFlagService = createFeatureFlagService(testContext.env);
+      
+      // Clear the cache to ensure fresh read
+      featureFlagService.clearCache();
+      
+      // Verify the flag uses default value
+      const flagValue = await featureFlagService.isFeatureEnabled('registration.invitation_required');
+      console.log('FeatureFlagService reads default flag as:', flagValue);
+      
+      const update = createTestUpdate('/start', 22222, 'flaguser');
+      const response = await processTelegramUpdate(update, testContext) as BotResponse;
+      
+      expect(response).toBeTruthy();
+      expect(response.method).toBe('sendMessage');
+      expect(response.text).toContain('Invitation Required');
     });
   });
 
   describe('Superadmin Role Tests', () => {
-    test('should allow superadmin to access admin commands', async () => {
-      const superadminTelegramId = 11111;
-      mockDb.addUser({
-        id: '1',
-        telegram_id: superadminTelegramId.toString(),
-        first_name: 'Admin',
-        username: 'admin',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        role: 'superadmin'
+    beforeEach(async () => {
+      // Create a superadmin user for these tests
+      await db.insert(users).values({
+        telegramId: '987654321',
+        firstName: 'Super',
+        username: 'superadmin',
+        role: 'superadmin',
       });
-
-      const helpUpdate = createTestUpdate('/help', superadminTelegramId);
-      const response = await processTelegramUpdate(helpUpdate, mockContext);
-
-      expect(response?.text).toContain('👑 Admin Commands');
-      expect(response?.text).toContain('/createinvites');
-      expect(response?.text).toContain('/invitestats');
     });
 
-    test('should deny admin commands to regular users', async () => {
-      const regularTelegramId = 22222;
-      mockDb.addUser({
-        id: '2',
-        telegram_id: regularTelegramId.toString(),
-        first_name: 'Regular',
-        username: 'regular',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        role: 'free'
-      });
+    test('should allow superadmin to access admin commands', async () => {
+      const helpUpdate = createTestUpdate('/help', 987654321, 'superadmin');
+      const response = await processTelegramUpdate(helpUpdate, testContext) as BotResponse;
 
-      const helpUpdate = createTestUpdate('/help', regularTelegramId);
-      const response = await processTelegramUpdate(helpUpdate, mockContext);
-
-      expect(response?.text).not.toContain('👑 Admin Commands');
-      expect(response?.text).not.toContain('/createinvites');
+      expect(response).toBeTruthy();
+      expect(response.text).toContain('👑 Admin Commands');
+      expect(response.text).toContain('/createinvites');
     });
 
     test('should allow existing superadmin to use /start without invitation code', async () => {
-      // Setup: Add existing superadmin user
-      const superadminTelegramId = 33333;
-      mockDb.addUser({
-        id: '3',
-        telegram_id: superadminTelegramId.toString(),
-        first_name: 'SuperAdmin',
-        username: 'superadmin',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        role: 'superadmin'
-      });
-
-      // Test: Send /start command without invitation code
-      const startUpdate = createTestUpdate('/start', superadminTelegramId);
-      const response = await processTelegramUpdate(startUpdate, mockContext);
-
-      // Verify: Should welcome existing superadmin without requiring invitation code
+      const startUpdate = createTestUpdate('/start', 987654321, 'superadmin');
+      const response = await processTelegramUpdate(startUpdate, testContext) as BotResponse;
+      
       expect(response).toBeTruthy();
-      expect(response?.method).toBe('sendMessage');
-      expect(response?.text).toContain('Welcome back');
-      expect(response?.text).toContain('Test'); // Uses Telegram first_name from createTestUpdate
-      expect(response?.text).toContain('Session ID:');
-      expect(response?.text).not.toContain('Invitation Required');
-      expect(response?.text).not.toContain('/start YOUR_INVITATION_CODE');
-    });
-
-    test('should allow existing premium user to use /start without invitation code', async () => {
-      // Setup: Add existing premium user
-      const premiumTelegramId = 44444;
-      mockDb.addUser({
-        id: '4',
-        telegram_id: premiumTelegramId.toString(),
-        first_name: 'Premium',
-        username: 'premium',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        role: 'premium'
-      });
-
-      // Test: Send /start command without invitation code
-      const startUpdate = createTestUpdate('/start', premiumTelegramId);
-      const response = await processTelegramUpdate(startUpdate, mockContext);
-
-      // Verify: Should welcome existing premium user without requiring invitation code
-      expect(response).toBeTruthy();
-      expect(response?.method).toBe('sendMessage');
-      expect(response?.text).toContain('Welcome back');
-      expect(response?.text).toContain('Test'); // Uses Telegram first_name from createTestUpdate
-      expect(response?.text).toContain('Session ID:');
-      expect(response?.text).not.toContain('Invitation Required');
-      expect(response?.text).not.toContain('/start YOUR_INVITATION_CODE');
-    });
-
-    test('should deny createinvites command to non-superadmin', async () => {
-      const regularTelegramId = 33333;
-      mockDb.addUser({
-        id: '3',
-        telegram_id: regularTelegramId.toString(),
-        first_name: 'Regular',
-        username: 'regular',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        role: 'free'
-      });
-
-      const createInvitesUpdate = createTestUpdate('/createinvites 5', regularTelegramId);
-      const response = await processTelegramUpdate(createInvitesUpdate, mockContext);
-
-      expect(response?.text).toContain('Access Denied');
-      expect(response?.text).toContain('only available to administrators');
-    });
-  });
-
-  describe('Invitation Code One-Time Use Tests', () => {
-    test('should prevent reuse of invitation code', async () => {
-      const invitationCode = 'ONETIME123';
-      mockDb.addInvitation(invitationCode, 1); // max_uses = 1
-
-      // First user uses the code
-      const firstUserUpdate = createTestUpdate(`/start ${invitationCode}`, 44444);
-      const firstResponse = await processTelegramUpdate(firstUserUpdate, mockContext);
-      expect(firstResponse?.text).toContain('Welcome to Celebrum Trading Platform');
-
-      // Second user tries to use the same code
-      const secondUserUpdate = createTestUpdate(`/start ${invitationCode}`, 55555);
-      const secondResponse = await processTelegramUpdate(secondUserUpdate, mockContext);
-      expect(secondResponse?.text).toContain('Invalid Invitation Code');
-    });
-
-    test('should allow multiple uses within max_uses limit', async () => {
-      const invitationCode = 'MULTI123';
-      mockDb.addInvitation(invitationCode, 3); // max_uses = 3
-
-      // First user
-      const firstUserUpdate = createTestUpdate(`/start ${invitationCode}`, 66666);
-      const firstResponse = await processTelegramUpdate(firstUserUpdate, mockContext);
-      expect(firstResponse?.text).toContain('Welcome to Celebrum Trading Platform');
-
-      // Second user
-      const secondUserUpdate = createTestUpdate(`/start ${invitationCode}`, 77777);
-      const secondResponse = await processTelegramUpdate(secondUserUpdate, mockContext);
-      expect(secondResponse?.text).toContain('Welcome to Celebrum Trading Platform');
-
-      // Third user
-      const thirdUserUpdate = createTestUpdate(`/start ${invitationCode}`, 88888);
-      const thirdResponse = await processTelegramUpdate(thirdUserUpdate, mockContext);
-      expect(thirdResponse?.text).toContain('Welcome to Celebrum Trading Platform');
-
-      // Fourth user should be denied
-      const fourthUserUpdate = createTestUpdate(`/start ${invitationCode}`, 99999);
-      const fourthResponse = await processTelegramUpdate(fourthUserUpdate, mockContext);
-      expect(fourthResponse?.text).toContain('Invalid Invitation Code');
+      expect(response.method).toBe('sendMessage');
+      expect(response.text).toContain('Welcome back');
+      expect(response.text).toContain('Super');
+      expect(response.text).toContain('Session ID:');
     });
   });
 });

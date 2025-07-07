@@ -1,5 +1,5 @@
-import type { User, NewUser, UserUsernameHistory, NewUserUsernameHistory } from '@celebrum-ai/db/schema';
-import { UserQueries, UserUsernameHistoryQueries, type Database } from '@celebrum-ai/db';
+import type { User, NewUser, UserUsernameHistory, NewUserUsernameHistory } from '../../../db/src/schema';
+import { UserQueries, UserUsernameHistoryQueries, type Database } from '../../../db/src/index';
 
 export class UserService {
   private userQueries: UserQueries;
@@ -10,8 +10,9 @@ export class UserService {
     this.usernameHistoryQueries = new UserUsernameHistoryQueries(db);
   }
 
-  async findUserByTelegramId(telegramId: string): Promise<User | undefined> {
-    return this.userQueries.findByTelegramId(telegramId);
+  async findUserByTelegramId(telegramId: string): Promise<User | null> {
+    const result = await this.userQueries.findByTelegramId(telegramId);
+    return result;
   }
 
   async createUser(userData: Partial<NewUser>): Promise<User> {
@@ -59,16 +60,20 @@ export class UserService {
       );
     }
 
-    // Update automatic fields only
+    // Update automatic fields only - but preserve existing values if they exist
     const updates: Partial<NewUser> = {
+      // Override firstName and lastName with Telegram data
       firstName: telegramData.firstName,
       lastName: telegramData.lastName,
+      // Always update username as it can change in Telegram
       username: telegramData.username,
+      // Override languageCode with Telegram data
       languageCode: telegramData.languageCode,
       lastActiveAt: new Date(),
     };
 
-    return this.userQueries.update(existingUser.id, updates);
+    const result = await this.userQueries.update(existingUser.id, updates);
+    return result;
   }
 
   /**

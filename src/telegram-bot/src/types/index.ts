@@ -65,6 +65,9 @@ export interface TelegramBotResponse {
   show_alert?: boolean;
 }
 
+// Alias for compatibility with tests
+export type BotResponse = TelegramBotResponse;
+
 export interface TelegramInlineKeyboard {
   inline_keyboard: TelegramInlineKeyboardButton[][];
 }

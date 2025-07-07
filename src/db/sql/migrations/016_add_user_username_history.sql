@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS user_username_history (
   user_id INTEGER NOT NULL,
   telegram_id TEXT NOT NULL,
   username TEXT, -- Can be null if user had no username
-  changed_at INTEGER NOT NULL DEFAULT (unixepoch()),
+  changed_at INTEGER NOT NULL DEFAULT (strftime('%s','now') * 1000),
   change_source TEXT NOT NULL DEFAULT 'telegram_update' CHECK (change_source IN ('telegram_update', 'manual_correction', 'system_migration')),
   
   -- Foreign key constraint

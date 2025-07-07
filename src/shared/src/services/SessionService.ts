@@ -1,5 +1,5 @@
 import type { KVNamespace } from '@cloudflare/workers-types';
-import type { User } from '@celebrum-ai/db/schema';
+import type { User } from '../../../db/src/schema';
 
 export interface Session {
   id: string;

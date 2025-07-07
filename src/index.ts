@@ -61,18 +61,38 @@ const app = new Hono<{
 
 // Initialize Astro SSR handler
 let astroHandler: ExportedHandler | null = null;
+let resolveReady: (() => void) | undefined;
+export const ready = new Promise<void>(resolve => {
+  resolveReady = resolve;
+});
 
-// Load Astro SSR handler at module level
-(async () => {
-  try {
-    // Dynamic import of the Astro SSR handler
-    const astroModule = await import("./web/dist/_worker.js/index.js");
-    astroHandler = astroModule.default;
-    console.log("Astro SSR handler loaded successfully");
-  } catch (error) {
-    console.error("Failed to load Astro SSR handler:", error);
+// Check if we're in test environment using a more reliable method
+const isTestEnvironment = typeof globalThis !== 'undefined' && 
+  (globalThis as unknown).__TEST_ENV__ === true;
+
+if (!isTestEnvironment) {
+  // Load Astro SSR handler at module level
+  (async () => {
+    try {
+      // Dynamic import of the Astro SSR handler
+      // @ts-ignore - Skip type checking for generated Astro files
+      const astroModule = await import("./web/dist/_worker.js/index.js");
+      astroHandler = astroModule.default;
+      console.log("Astro SSR handler loaded successfully");
+    } catch (error) {
+      console.error("Failed to load Astro SSR handler:", error);
+    } finally {
+      if (resolveReady) {
+        resolveReady();
+      }
+    }
+  })();
+} else {
+  // In test environment, resolve ready immediately
+  if (resolveReady) {
+    resolveReady();
   }
-})();
+}
 
 // Telegram webhook endpoint
 app.post("/api/telegram/webhook", async (c) => {
@@ -147,45 +167,47 @@ app.get("/alchemy/status", (c) => {
   });
 });
 
-// Route requests to a specific storage instance using the storage ID
-app.get("/api/storage/:id", async (c) => {
-  const id = c.req.param("id");
-  const storageId = c.env.CELEBRUM_STORAGE.idFromName(`/storage/${id}`);
-  const storage = (c.env.CELEBRUM_STORAGE as unknown as DurableObjectNamespace).get(storageId);
-  return storage.fetch(c.req.raw);
-});
+if (!isTestEnvironment) {
+  // Route requests to a specific storage instance using the storage ID
+  app.get("/api/storage/:id", async (c) => {
+    const id = c.req.param("id");
+    const storageId = c.env.CELEBRUM_STORAGE.idFromName(`/storage/${id}`);
+    const storage = (c.env.CELEBRUM_STORAGE as unknown as DurableObjectNamespace).get(storageId);
+    return storage.fetch(c.req.raw);
+  });
 
-// Route requests to a specific container instance using the container ID
-app.get("/api/container/:id", async (c) => {
-  const id = c.req.param("id");
-  // Container functionality will be handled by the CelebrumContainer class
-  return new Response(`Container ${id} endpoint - functionality to be implemented`, { status: 200 });
-});
+  // Route requests to a specific container instance using the container ID
+  app.get("/api/container/:id", async (c) => {
+    const id = c.req.param("id");
+    // Container functionality will be handled by the CelebrumContainer class
+    return new Response(`Container ${id} endpoint - functionality to be implemented`, { status: 200 });
+  });
 
-// Catch-all route for Astro SSR - this should be last
-app.all("*", async (c) => {
-  if (astroHandler) {
-    try {
-      return await astroHandler.fetch(c.req.raw, c.env, {
-        waitUntil: () => {},
-        passThroughOnException: () => {},
-      });
-    } catch (error) {
-      console.error("Astro SSR error:", error);
-      return c.json({ error: "Internal server error" }, 500);
+  // Catch-all route for Astro SSR - this should be last
+  app.all("*", async (c) => {
+    if (astroHandler) {
+      try {
+        return await astroHandler.fetch(c.req.raw, c.env, {
+          waitUntil: () => {},
+          passThroughOnException: () => {},
+        });
+      } catch (error) {
+        console.error("Astro SSR error:", error);
+        return c.json({ error: "Internal server error" }, 500);
+      }
     }
-  }
-  
-  // Fallback if Astro is not available
-  return c.json({
-    message: "Celebrum AI - Landing page not available",
-    error: "Astro SSR handler not loaded",
-    available_endpoints: {
-      "/api/status": "API status",
-      "/api/health": "Health check",
-      "/api/telegram/webhook": "Telegram webhook",
-    },
-  }, 503);
-});
+    
+    // Fallback if Astro is not available
+    return c.json({
+      message: "Celebrum AI - Landing page not available",
+      error: "Astro SSR handler not loaded",
+      available_endpoints: {
+        "/api/status": "API status",
+        "/api/health": "Health check",
+        "/api/telegram/webhook": "Telegram webhook",
+      },
+    }, 503);
+  });
+}
 
 export default app;

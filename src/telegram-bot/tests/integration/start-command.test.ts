@@ -231,7 +231,7 @@ describe('/start Command Implementation', () => {
     it('should create a new user when telegram user does not exist', async () => {
       // Check user doesn't exist
       const existingUser = await userService.findUserByTelegramId(mockTelegramUser.id.toString());
-      expect(existingUser).toBeUndefined();
+      expect(existingUser).toBeNull();
 
       // Create new user
       const newUserData: Partial<NewUser> = {
@@ -498,7 +498,7 @@ describe('/start Command Implementation', () => {
     it('should handle complete new user /start flow', async () => {
       // Step 1: Check if user exists (should be null)
       let user = await userService.findUserByTelegramId(mockTelegramUser.id.toString());
-      expect(user).toBeUndefined();
+      expect(user).toBeNull();
 
       // Step 2: Create new user
       const newUserData: Partial<NewUser> = {

@@ -45,5 +45,53 @@
         "name": "CELEBRUM_STORAGE"
       }
     ]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_classes": [
+        "CelebrumAIStorage"
+      ]
+    }
+  ],
+  "env": {
+    "test": {
+      "vars": {
+        "STAGE": "test",
+        "ENVIRONMENT": "test",
+        "ALCHEMY_MANAGED": "true",
+        "CONTAINER_VERSION": "1.0.0",
+        "DEPLOYMENT_STRATEGY": "alchemy"
+      },
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "celebrum-ai-test",
+          "database_id": "test-database-id"
+        }
+      ],
+      "kv_namespaces": [
+        {
+          "binding": "CELEBRUM_KV",
+          "id": "test-kv-namespace"
+        },
+        {
+          "binding": "PROD_BOT_MARKET_CACHE",
+          "id": "test-market-cache"
+        },
+        {
+          "binding": "PROD_BOT_SESSION_STORE",
+          "id": "test-session-store"
+        }
+      ],
+      "durable_objects": {
+        "bindings": [
+          {
+            "class_name": "CelebrumAIStorage",
+            "name": "CELEBRUM_STORAGE"
+          }
+        ]
+      }
+    }
   }
 }

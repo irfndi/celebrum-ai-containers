@@ -10,19 +10,7 @@ import { processTelegramUpdate } from '../../src/handlers/index';
 
 // Mock the processTelegramUpdate function and initializeHandlers
 vi.mock('../../src/handlers/index', () => ({
-  processTelegramUpdate: vi.fn().mockImplementation((update) => {
-    // Return null for empty updates to trigger the { ok: true } response
-    if (!update || !update.message) {
-      return Promise.resolve(null);
-    }
-    // Return normal Telegram API response for valid updates
-    return Promise.resolve({
-      method: 'sendMessage',
-      chat_id: 12345,
-      text: 'Test response',
-      parse_mode: 'HTML'
-    });
-  }),
+  processTelegramUpdate: vi.fn(),
   initializeHandlers: vi.fn()
 }));
 
@@ -69,6 +57,19 @@ describe('Telegram Webhook Endpoint', () => {
   beforeEach(() => {
     mockContext = createMockContext();
     vi.clearAllMocks();
+
+    // Reset the mock before each test
+    vi.mocked(processTelegramUpdate).mockImplementation((update) => {
+      if (!update || !update.message) {
+        return Promise.resolve(null);
+      }
+      return Promise.resolve({
+        method: 'sendMessage',
+        chat_id: 12345,
+        text: 'Test response',
+        parse_mode: 'HTML'
+      });
+    });
   });
 
   test('should return 200 OK for valid Telegram update', async () => {
@@ -120,14 +121,8 @@ describe('Telegram Webhook Endpoint', () => {
     // The error should be caught in the try-catch block above
   });
 
-  test('should return 405 Method Not Allowed for non-POST requests', async () => {
-    // Create a GET request
-    const _request = new Request('https://example.com/api/telegram/webhook', {
-      method: 'GET'
-    });
-
-    // This test is for the HTTP method validation (would be handled by the main router)
-    // For unit testing, we'll just verify the function works with valid data
+  test('should correctly process a valid update', async () => {
+    // This test ensures the happy path works as expected.
     const update = createSampleUpdate();
     const response = await handleTelegramUpdate(update, mockContext);
 
@@ -135,6 +130,11 @@ describe('Telegram Webhook Endpoint', () => {
     expect(response.status).toBe(200);
     const responseData = await response.json();
     expect(responseData.method).toBe('sendMessage');
+  });
+
+  test.todo('should return 405 Method Not Allowed for non-POST requests', () => {
+    // This should be handled by the router/framework layer (e.g., Hono, Express).
+    // The handler unit test should focus on correctly processing a given update.
   });
 
   test('should handle errors during update processing', async () => {
