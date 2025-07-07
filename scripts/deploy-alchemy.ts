@@ -95,10 +95,15 @@ class AlchemyDeployment {
         return;
       }
       
-      // Import and execute the Alchemy configuration
-      // The deployment happens automatically when alchemy.run.ts is imported
+      // Import and execute the Alchemy configuration (creates and updates resources)
       await import('../alchemy.run.ts');
       
+      // Apply Durable Object migrations via Wrangler
+      console.log('🔄 Applying Durable Object migrations via wrangler deploy...');
+      execSync('wrangler deploy', {
+        stdio: this.options.verbose ? 'inherit' : 'pipe',
+        cwd: process.cwd(),
+      });
       console.log('✅ Infrastructure deployed successfully');
     } catch (error) {
       throw new Error(`Failed to deploy infrastructure: ${error}`);

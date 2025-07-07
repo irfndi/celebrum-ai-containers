@@ -38,6 +38,7 @@ export default defineWorkersConfig({
 						"undici",
 						"@cloudflare/workers-types",
 						"@cloudflare/vitest-pool-workers",
+						"src/db/src/schema/**",
 					],
 				},
 			},

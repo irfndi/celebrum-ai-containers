@@ -187,7 +187,7 @@ export async function processCallbackQuery(
     };
 
     const response = await handler.handler(modifiedUpdate, context);
-    
+
     return response;
 
   } catch (error) {
@@ -260,41 +260,41 @@ export function initializeHandlers(): void {
           const session = await sessionService.createSession(user);
           welcomeMessage = `👋 <b>Welcome back, ${user.firstName}!</b>\n\nYour trading journey continues. What would you like to do today?\n\n(Session ID: ${session.sessionId})`;
         } else {
-          // Existing user - update automatic fields from Telegram and create a new session
-          try {
-            console.log('Updating user data from Telegram...');
-            await userService.updateFromTelegramData(telegramId, {
-              firstName: from.first_name,
-              lastName: from.last_name,
-              username: from.username,
-              languageCode: from.language_code
-            });
-            console.log('User data updated successfully');
-            
-            // Refetch the updated user data
-            console.log('Refetching updated user data...');
-            const updatedUser = await userService.findUserByTelegramId(telegramId);
-            if (!updatedUser) {
-              console.error('Failed to refetch updated user data, using original user object');
-              // Fall back to original user object instead of throwing
-              welcomeMessage = `👋 <b>Welcome back, ${user.firstName}!</b>\n\nYour trading journey continues. What would you like to do today?`;
-            } else {
-              console.log('Updated user data refetched successfully');
-              
-              console.log('Deleting existing sessions...');
-              await sessionService.deleteSessionByTelegramId(telegramId); // Clean up old sessions
-              console.log('Existing sessions deleted');
-              
-              console.log('Creating new session...');
-              const session = await sessionService.createSession(updatedUser);
-              console.log('New session created:', session.sessionId);
-              
-              welcomeMessage = `👋 <b>Welcome back, ${updatedUser.firstName}!</b>\n\nYour trading journey continues. What would you like to do today?\n\n(Session ID: ${session.sessionId})`;
-            }
-          } catch (error) {
-            console.error('Error handling existing user:', error);
-            // Don't throw, provide a fallback welcome message
+        // Existing user - update automatic fields from Telegram and create a new session
+        try {
+          console.log('Updating user data from Telegram...');
+          await userService.updateFromTelegramData(telegramId, {
+            firstName: from.first_name,
+            lastName: from.last_name,
+            username: from.username,
+            languageCode: from.language_code
+          });
+          console.log('User data updated successfully');
+          
+          // Refetch the updated user data
+          console.log('Refetching updated user data...');
+          const updatedUser = await userService.findUserByTelegramId(telegramId);
+          if (!updatedUser) {
+            console.error('Failed to refetch updated user data, using original user object');
+            // Fall back to original user object instead of throwing
             welcomeMessage = `👋 <b>Welcome back, ${user.firstName}!</b>\n\nYour trading journey continues. What would you like to do today?`;
+          } else {
+            console.log('Updated user data refetched successfully');
+            
+            console.log('Deleting existing sessions...');
+            await sessionService.deleteSessionByTelegramId(telegramId); // Clean up old sessions
+            console.log('Existing sessions deleted');
+            
+            console.log('Creating new session...');
+            const session = await sessionService.createSession(updatedUser);
+            console.log('New session created:', session.sessionId);
+            
+            welcomeMessage = `👋 <b>Welcome back, ${updatedUser.firstName}!</b>\n\nYour trading journey continues. What would you like to do today?\n\n(Session ID: ${session.sessionId})`;
+          }
+        } catch (error) {
+          console.error('Error handling existing user:', error);
+          // Don't throw, provide a fallback welcome message
+          welcomeMessage = `👋 <b>Welcome back, ${user.firstName}!</b>\n\nYour trading journey continues. What would you like to do today?`;
           }
         }
       } else {
