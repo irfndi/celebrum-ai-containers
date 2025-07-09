@@ -32,9 +32,11 @@ jobs:
         cache: 'pnpm'
         
     - name: Install system packages for native modules
-      run: sudo apt-get update && sudo apt-get install -y libsqlite3-dev build-essential python3
+      run: sudo apt-get update && sudo apt-get install -y libsqlite3-dev build-essential python3 python-is-python3
     - name: Enable native module builds
-      run: echo "npm_config_build_from_source=true" >> $GITHUB_ENV
+      run: |
+        echo "npm_config_build_from_source=true" >> $GITHUB_ENV
+        echo "npm_config_python=python3" >> $GITHUB_ENV
     - name: Install dependencies
       run: pnpm install --frozen-lockfile --workspace-root
       
@@ -97,9 +99,11 @@ jobs:
         cache: 'pnpm'
         
     - name: Install system packages for native modules
-      run: sudo apt-get update && sudo apt-get install -y libsqlite3-dev build-essential python3
+      run: sudo apt-get update && sudo apt-get install -y libsqlite3-dev build-essential python3 python-is-python3
     - name: Enable native module builds
-      run: echo "npm_config_build_from_source=true" >> $GITHUB_ENV
+      run: |
+        echo "npm_config_build_from_source=true" >> $GITHUB_ENV
+        echo "npm_config_python=python3" >> $GITHUB_ENV
     - name: Install dependencies
       run: pnpm install --frozen-lockfile --workspace-root
       
