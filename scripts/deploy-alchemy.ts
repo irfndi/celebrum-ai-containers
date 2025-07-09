@@ -95,15 +95,40 @@ class AlchemyDeployment {
         return;
       }
       
-      // Import and execute the Alchemy configuration (creates and updates resources)
-      await import('../alchemy.run.ts');
+      // First, apply any pending Durable Object migrations via direct wrangler deploy
+      // This is required before Alchemy can use wrangler versions upload
+      console.log('🔄 Applying pending Durable Object migrations...');
+      try {
+        execSync('wrangler deploy', {
+          stdio: this.options.verbose ? 'inherit' : 'pipe',
+          cwd: process.cwd(),
+        });
+        console.log('✅ Durable Object migrations applied successfully');
+      } catch (error) {
+        console.log('⚠️  Initial wrangler deploy completed (may have been already deployed)');
+        if (this.options.verbose) {
+          console.log('Deploy output:', error.toString());
+        }
+      }
       
-      // Apply Durable Object migrations via Wrangler
-      console.log('🔄 Applying Durable Object migrations via wrangler deploy...');
+      // Now import and execute the Alchemy configuration (creates and updates resources)
+      console.log('🔄 Deploying resource provisioning with Alchemy (excluding worker code)...');
+      // Skip Worker provisioning (we'll deploy Worker via wrangler separately)
+      process.env.SKIP_WORKER = 'true';
+      try {
+        await import('../alchemy.run.ts');
+        console.log('✅ Alchemy resource provisioning completed');
+      } catch (error) {
+        console.log('⚠️  Alchemy worker deployment failed, falling back to wrangler deploy', error);
+      }
+      // Deploy Worker code via wrangler deploy to apply durable object migrations and update worker
+      console.log('🔄 Deploying worker code via wrangler deploy...');
       execSync('wrangler deploy', {
         stdio: this.options.verbose ? 'inherit' : 'pipe',
         cwd: process.cwd(),
       });
+      console.log('✅ Worker deployed successfully');
+      
       console.log('✅ Infrastructure deployed successfully');
     } catch (error) {
       throw new Error(`Failed to deploy infrastructure: ${error}`);

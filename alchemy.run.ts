@@ -1,6 +1,11 @@
 import alchemy from "alchemy";
 import { Worker, D1Database, KVNamespace, R2Bucket, DurableObjectNamespace } from "alchemy/cloudflare";
 
+// Allow skipping Worker provisioning to avoid version upload errors
+const skipWorker = process.env.SKIP_WORKER === 'true';
+// Export stub for worker; will be assigned if not skipped
+export let worker;
+
 // Create app with proper scope configuration
 const app = await alchemy("celebrum-ai", {
   stage: process.env.NODE_ENV === "production" ? "prod" : "dev"
@@ -63,22 +68,23 @@ if (durableContainer) {
   bindings.CELEBRUM_CONTAINER = durableContainer;
 }
 
-const worker = await Worker("celebrum-ai-containers", {
-  name: "celebrum-ai-containers",
-  entrypoint: "./src/index.ts",
-  adopt: true,
-  bindings,
-});
+if (!skipWorker) {
+  // Provision and deploy Worker resource
+  worker = await Worker("celebrum-ai-containers", {
+    name: "celebrum-ai-containers",
+    entrypoint: "./src/index.ts",
+    adopt: true,
+    bindings,
+  });
+  // Log Worker URL
+  console.log({ url: worker.url });
+}
 
-// Export resources
-export { worker, database, kvNamespace, r2Bucket, durableStorage };
+// Export resource handles (Worker may be undefined if skipped)
+export { database, kvNamespace, r2Bucket, durableStorage };
 
 // Conditionally export container if it exists
 export const container = durableContainer || undefined;
-
-console.log({
-  url: worker.url,
-});
 
 // Export the app for deployment scripts
 export { app };
