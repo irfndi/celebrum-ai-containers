@@ -49,7 +49,7 @@
     "db:studio": "drizzle-kit studio --config=src/db/drizzle.config.ts",
     "db:push": "drizzle-kit push --config=src/db/drizzle.config.ts",
     "build:test": "tsc -p tsconfig.test.json",
-    "preinstall": "pnpm rebuild better-sqlite3 --build-from-source --sqlite3=./sqlite-amalgamation"
+    "preinstall": "npm install better-sqlite3 --no-save --build-from-source"
   },
   "dependencies": {
     "@astrojs/node": "^9.3.0",
