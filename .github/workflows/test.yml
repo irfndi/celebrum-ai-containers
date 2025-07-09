@@ -14,7 +14,7 @@ jobs:
     
     strategy:
       matrix:
-        node-version: [20.x]
+        node-version: [22.x]
     
     steps:
     - name: Checkout code
@@ -89,14 +89,14 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: 20.x
+        node-version: 22.x
         cache: 'pnpm'
         
     - name: Install dependencies
       run: pnpm install --frozen-lockfile --workspace-root
       
     - name: Rebuild native modules for SQLite
-      run: pnpm rebuild better-sqlite3
+      run: pnpm rebuild better-sqlite3 --workspace-root
       
     - name: Run ${{ matrix.test-type }} tests
       run: pnpm test:${{ matrix.test-type }}
@@ -118,7 +118,7 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: 20.x
+        node-version: 22.x
         cache: 'pnpm'
         
     - name: Install dependencies
@@ -149,7 +149,7 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: 20.x
+        node-version: 22.x
         cache: 'pnpm'
         
     - name: Install dependencies
