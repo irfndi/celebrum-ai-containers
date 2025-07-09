@@ -39,8 +39,8 @@ jobs:
         echo "npm_config_python=python3" >> $GITHUB_ENV
     - name: Install dependencies
       run: pnpm install --frozen-lockfile --workspace-root
-    - name: Rebuild native modules for SQLite
-      run: npm_config_build_from_source=true npm_config_python=python3 pnpm rebuild better-sqlite3 --workspace-root
+    - name: Reinstall better-sqlite3 from source
+      run: npm_config_build_from_source=true npm_config_python=python3 npm install better-sqlite3 --no-save --build-from-source
       
     - name: Type checking
       run: pnpm typecheck
@@ -108,8 +108,8 @@ jobs:
         echo "npm_config_python=python3" >> $GITHUB_ENV
     - name: Install dependencies
       run: pnpm install --frozen-lockfile --workspace-root
-    - name: Rebuild native modules for SQLite
-      run: npm_config_build_from_source=true npm_config_python=python3 pnpm rebuild better-sqlite3 --workspace-root
+    - name: Reinstall better-sqlite3 from source
+      run: npm_config_build_from_source=true npm_config_python=python3 npm install better-sqlite3 --no-save --build-from-source
       
     - name: Run ${{ matrix.test-type }} tests
       run: pnpm test:${{ matrix.test-type }}
@@ -136,8 +136,8 @@ jobs:
         
     - name: Install dependencies
       run: pnpm install --frozen-lockfile --workspace-root
-    - name: Rebuild native modules for SQLite
-      run: npm_config_build_from_source=true npm_config_python=python3 pnpm rebuild better-sqlite3 --workspace-root
+    - name: Reinstall better-sqlite3 from source
+      run: npm_config_build_from_source=true npm_config_python=python3 npm install better-sqlite3 --no-save --build-from-source
       
     - name: Run performance tests
       run: pnpm test:e2e --reporter=json --outputFile=performance-results.json
@@ -169,8 +169,8 @@ jobs:
         
     - name: Install dependencies
       run: pnpm install --frozen-lockfile --workspace-root
-    - name: Rebuild native modules for SQLite
-      run: npm_config_build_from_source=true npm_config_python=python3 pnpm rebuild better-sqlite3 --workspace-root
+    - name: Reinstall better-sqlite3 from source
+      run: npm_config_build_from_source=true npm_config_python=python3 npm install better-sqlite3 --no-save --build-from-source
       
     - name: Run security audit
       run: pnpm audit --audit-level moderate
