@@ -2,8 +2,11 @@ import { defineWorkersConfig } from '@cloudflare/vitest-pool-workers/config';
 
 export default defineWorkersConfig({
 	test: {
-    watch: false,
-    reporters: ['basic'],
+		watch: false,
+		// Replace basic reporter with JUnit for CI test results
+		reporters: [
+			['junit', { outputFile: 'test-results.xml' }]
+		],
 		exclude: [
 			'**/node_modules/**',
 			'**/dist/**',
@@ -35,7 +38,6 @@ export default defineWorkersConfig({
 						"hono", 
 						"grammy", 
 						"drizzle-orm", 
-						"undici",
 						"@cloudflare/workers-types",
 						"@cloudflare/vitest-pool-workers",
 						"src/db/src/schema/**",

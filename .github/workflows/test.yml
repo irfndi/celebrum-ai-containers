@@ -95,6 +95,9 @@ jobs:
     - name: Install dependencies
       run: pnpm install --frozen-lockfile --workspace-root
       
+    - name: Rebuild native modules for SQLite
+      run: pnpm rebuild better-sqlite3
+      
     - name: Run ${{ matrix.test-type }} tests
       run: pnpm test:${{ matrix.test-type }}
       
