@@ -209,7 +209,9 @@ export function initializeHandlers(): void {
     description: 'Start the bot and create/authenticate your account',
     handler: async (update, context) => {
       console.log('Start command triggered for user:', update.message?.from?.id);
-      const sessionService = new SessionService(context.env.SESSIONS);
+      // Use KV session store binding; support both SESSIONS (for tests) and PROD_BOT_SESSION_STORE (for production)
+      const sessionKv = context.env.SESSIONS ?? context.env.PROD_BOT_SESSION_STORE;
+      const sessionService = new SessionService(sessionKv);
       const chatId = getChatId(update);
       const from = update.message?.from;
 
