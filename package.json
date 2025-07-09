@@ -48,8 +48,7 @@
     "db:migrate": "drizzle-kit migrate --config=src/db/drizzle.config.ts",
     "db:studio": "drizzle-kit studio --config=src/db/drizzle.config.ts",
     "db:push": "drizzle-kit push --config=src/db/drizzle.config.ts",
-    "build:test": "tsc -p tsconfig.test.json",
-    "preinstall": "npm install better-sqlite3 --no-save --build-from-source"
+    "build:test": "tsc -p tsconfig.test.json"
   },
   "dependencies": {
     "@astrojs/node": "^9.3.0",
