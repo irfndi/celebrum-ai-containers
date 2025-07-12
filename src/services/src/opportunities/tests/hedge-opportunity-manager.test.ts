@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { OpportunityManager } from '../src/opportunity-manager';
 import type { HedgeOpportunity, HedgeExecutionResult } from '../src/opportunity-manager';
-import { setupRobustCCXTMock } from '../../../shared/tests/utils/enhanced-mock';
+import { setupRobustCCXTMock } from '../../../../shared/tests/utils/enhanced-mock';
 
 setupRobustCCXTMock();
 

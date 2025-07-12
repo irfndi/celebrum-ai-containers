@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, beforeAll, vi } from 'vitest';
 import type { MarketDataPoint } from '@celebrum-ai/shared/types/market';
 import type { UserRoleType, SubscriptionTierType } from '@celebrum-ai/shared/types/user';
 import type { ArbitrageOpportunity } from '@celebrum-ai/shared/types/arbitrage';
-import { setupRobustCCXTMock } from '../../../shared/tests/utils/enhanced-mock';
+import { setupRobustCCXTMock } from '../../../../shared/tests/utils/enhanced-mock';
 
 setupRobustCCXTMock();
 

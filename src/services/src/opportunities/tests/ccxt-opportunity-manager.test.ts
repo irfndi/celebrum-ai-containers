@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import type { MarketDataPoint } from '@celebrum-ai/shared/types/market';
-import { setupRobustCCXTMock } from '../../../shared/tests/utils/enhanced-mock';
+import { setupRobustCCXTMock } from '../../../../shared/tests/utils/enhanced-mock';
 
 setupRobustCCXTMock();
 
