@@ -34,7 +34,7 @@
     <div class="container">
         <div class="header">
             <h1>🧪 Celebrum AI Test Report</h1>
-            <p>Generated on 7/12/2025, 8:52:07 AM</p>
+            <p>Generated on 7/12/2025, 9:01:28 AM</p>
         </div>
         
         <div class="summary">
@@ -44,162 +44,34 @@
             </div>
             <div class="summary-card">
                 <h3>Passed</h3>
-                <div class="value passed">2</div>
+                <div class="value passed">3</div>
             </div>
             <div class="summary-card">
                 <h3>Failed</h3>
-                <div class="value failed">1</div>
+                <div class="value failed">0</div>
             </div>
             <div class="summary-card">
                 <h3>Duration</h3>
-                <div class="value duration">53248ms</div>
+                <div class="value duration">25337ms</div>
             </div>
         </div>
         
         <div class="results">
             <h2>Test Results</h2>
             
-                <div class="result-item result-failure">
+                <div class="result-item result-success">
                     <div class="result-header">
-                        <span class="result-name">❌ Unit Tests</span>
-                        <span class="result-duration">30400ms</span>
+                        <span class="result-name">✅ Unit Tests</span>
+                        <span class="result-duration">13064ms</span>
                     </div>
                     
-                    <div class="error-output">stderr | src/shared/tests/unit/ccxt-data-source.test.ts
-Failed to add source coinbase: Error: [vitest] No "coinbase" export is defined on the "ccxt" mock. Did you forget to return it from "vi.mock"?
-If you need to partially mock a module, you can use "importOriginal" helper inside:
-
-    at VitestMocker.createError (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/vitest@3.2.4_@types+debug@4.1.12_@types+node@24.0.4_@vitest+ui@3.2.4_jiti@2.4.2_jsdom@2_f813d808220fbe9fbe14c149debf6d27/node_modules/vitest/dist/chunks/execute.B7h3T_Hc.js:284:17)
-    at Object.get (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/vitest@3.2.4_@types+debug@4.1.12_@types+node@24.0.4_@vitest+ui@3.2.4_jiti@2.4.2_jsdom@2_f813d808220fbe9fbe14c149debf6d27/node_modules/vitest/dist/chunks/execute.B7h3T_Hc.js:330:16)
-    at new CCXTDataSource (/Users/irfandi/Coding/2025/celebrum-ai/src/shared/src/infrastructure/ccxt-data-source.ts:30:28)
-    at CCXTDataSourceManager.addSource (/Users/irfandi/Coding/2025/celebrum-ai/src/shared/src/infrastructure/ccxt-data-source.ts:302:22)
-    at CCXTDataSourceManager.initializeDefaultSources (/Users/irfandi/Coding/2025/celebrum-ai/src/shared/src/infrastructure/ccxt-data-source.ts:275:14)
-    at new CCXTDataSourceManager (/Users/irfandi/Coding/2025/celebrum-ai/src/shared/src/infrastructure/ccxt-data-source.ts:268:10)
-    at /Users/irfandi/Coding/2025/celebrum-ai/src/shared/src/infrastructure/ccxt-data-source.ts:548:38
-    at VitestExecutor.runModule (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/vite-node@3.2.4_@types+node@24.0.4_jiti@2.4.2_lightningcss@1.30.1_tsx@4.20.3_yaml@2.8.0/node_modules/vite-node/dist/client.mjs:397:4)
-    at VitestExecutor.directRequest (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/vite-node@3.2.4_@types+node@24.0.4_jiti@2.4.2_lightningcss@1.30.1_tsx@4.20.3_yaml@2.8.0/node_modules/vite-node/dist/client.mjs:375:3)
-    at VitestExecutor.cachedRequest (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/vite-node@3.2.4_@types+node@24.0.4_jiti@2.4.2_lightningcss@1.30.1_tsx@4.20.3_yaml@2.8.0/node_modules/vite-node/dist/client.mjs:189:11) {
-  codeFrame: 'vi.mock(import("ccxt"), async (importOriginal) => {\n' +
-    '  const actual = await importOriginal()\n' +
-    '  return {\n' +
-    '    ...actual,\n' +
-    '    // your mocked methods\n' +
-    '  }\n' +
-    '})'
-}
-Failed to add source kraken: Error: [vitest] No "kraken" export is defined on the "ccxt" mock. Did you forget to return it from "vi.mock"?
-If you need to partially mock a module, you can use "importOriginal" helper inside:
-
-    at VitestMocker.createError (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/vitest@3.2.4_@types+debug@4.1.12_@types+node@24.0.4_@vitest+ui@3.2.4_jiti@2.4.2_jsdom@2_f813d808220fbe9fbe14c149debf6d27/node_modules/vitest/dist/chunks/execute.B7h3T_Hc.js:284:17)
-    at Object.get (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/vitest@3.2.4_@types+debug@4.1.12_@types+node@24.0.4_@vitest+ui@3.2.4_jiti@2.4.2_jsdom@2_f813d808220fbe9fbe14c149debf6d27/node_modules/vitest/dist/chunks/execute.B7h3T_Hc.js:330:16)
-    at new CCXTDataSource (/Users/irfandi/Coding/2025/celebrum-ai/src/shared/src/infrastructure/ccxt-data-source.ts:30:28)
-    at CCXTDataSourceManager.addSource (/Users/irfandi/Coding/2025/celebrum-ai/src/shared/src/infrastructure/ccxt-data-source.ts:302:22)
-    at CCXTDataSourceManager.initializeDefaultSources (/Users/irfandi/Coding/2025/celebrum-ai/src/shared/src/infrastructure/ccxt-data-source.ts:275:14)
-    at new CCXTDataSourceManager (/Users/irfandi/Coding/2025/celebrum-ai/src/shared/src/infrastructure/ccxt-data-source.ts:268:10)
-    at /Users/irfandi/Coding/2025/celebrum-ai/src/shared/src/infrastructure/ccxt-data-source.ts:548:38
-    at VitestExecutor.runModule (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/vite-node@3.2.4_@types+node@24.0.4_jiti@2.4.2_lightningcss@1.30.1_tsx@4.20.3_yaml@2.8.0/node_modules/vite-node/dist/client.mjs:397:4)
-    at VitestExecutor.directRequest (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/vite-node@3.2.4_@types+node@24.0.4_jiti@2.4.2_lightningcss@1.30.1_tsx@4.20.3_yaml@2.8.0/node_modules/vite-node/dist/client.mjs:375:3)
-    at VitestExecutor.cachedRequest (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/vite-node@3.2.4_@types+node@24.0.4_jiti@2.4.2_lightningcss@1.30.1_tsx@4.20.3_yaml@2.8.0/node_modules/vite-node/dist/client.mjs:189:11) {
-  codeFrame: 'vi.mock(import("ccxt"), async (importOriginal) => {\n' +
-    '  const actual = await importOriginal()\n' +
-    '  return {\n' +
-    '    ...actual,\n' +
-    '    // your mocked methods\n' +
-    '  }\n' +
-    '})'
-}
-Failed to add source bitfinex: Error: [vitest] No "bitfinex" export is defined on the "ccxt" mock. Did you forget to return it from "vi.mock"?
-If you need to partially mock a module, you can use "importOriginal" helper inside:
-
-    at VitestMocker.createError (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/vitest@3.2.4_@types+debug@4.1.12_@types+node@24.0.4_@vitest+ui@3.2.4_jiti@2.4.2_jsdom@2_f813d808220fbe9fbe14c149debf6d27/node_modules/vitest/dist/chunks/execute.B7h3T_Hc.js:284:17)
-    at Object.get (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/vitest@3.2.4_@types+debug@4.1.12_@types+node@24.0.4_@vitest+ui@3.2.4_jiti@2.4.2_jsdom@2_f813d808220fbe9fbe14c149debf6d27/node_modules/vitest/dist/chunks/execute.B7h3T_Hc.js:330:16)
-    at new CCXTDataSource (/Users/irfandi/Coding/2025/celebrum-ai/src/shared/src/infrastructure/ccxt-data-source.ts:30:28)
-    at CCXTDataSourceManager.addSource (/Users/irfandi/Coding/2025/celebrum-ai/src/shared/src/infrastructure/ccxt-data-source.ts:302:22)
-    at CCXTDataSourceManager.initializeDefaultSources (/Users/irfandi/Coding/2025/celebrum-ai/src/shared/src/infrastructure/ccxt-data-source.ts:287:14)
-    at new CCXTDataSourceManager (/Users/irfandi/Coding/2025/celebrum-ai/src/shared/src/infrastructure/ccxt-data-source.ts:268:10)
-    at /Users/irfandi/Coding/2025/celebrum-ai/src/shared/src/infrastructure/ccxt-data-source.ts:548:38
-    at VitestExecutor.runModule (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/vite-node@3.2.4_@types+node@24.0.4_jiti@2.4.2_lightningcss@1.30.1_tsx@4.20.3_yaml@2.8.0/node_modules/vite-node/dist/client.mjs:397:4)
-    at VitestExecutor.directRequest (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/vite-node@3.2.4_@types+node@24.0.4_jiti@2.4.2_lightningcss@1.30.1_tsx@4.20.3_yaml@2.8.0/node_modules/vite-node/dist/client.mjs:375:3)
-    at VitestExecutor.cachedRequest (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/vite-node@3.2.4_@types+node@24.0.4_jiti@2.4.2_lightningcss@1.30.1_tsx@4.20.3_yaml@2.8.0/node_modules/vite-node/dist/client.mjs:189:11) {
-  codeFrame: 'vi.mock(import("ccxt"), async (importOriginal) => {\n' +
-    '  const actual = await importOriginal()\n' +
-    '  return {\n' +
-    '    ...actual,\n' +
-    '    // your mocked methods\n' +
-    '  }\n' +
-    '})'
-}
-Failed to add source huobi: Error: [vitest] No "huobi" export is defined on the "ccxt" mock. Did you forget to return it from "vi.mock"?
-If you need to partially mock a module, you can use "importOriginal" helper inside:
-
-    at VitestMocker.createError (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/vitest@3.2.4_@types+debug@4.1.12_@types+node@24.0.4_@vitest+ui@3.2.4_jiti@2.4.2_jsdom@2_f813d808220fbe9fbe14c149debf6d27/node_modules/vitest/dist/chunks/execute.B7h3T_Hc.js:284:17)
-    at Object.get (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/vitest@3.2.4_@types+debug@4.1.12_@types+node@24.0.4_@vitest+ui@3.2.4_jiti@2.4.2_jsdom@2_f813d808220fbe9fbe14c149debf6d27/node_modules/vitest/dist/chunks/execute.B7h3T_Hc.js:330:16)
-    at new CCXTDataSource (/Users/irfandi/Coding/2025/celebrum-ai/src/shared/src/infrastructure/ccxt-data-source.ts:30:28)
-    at CCXTDataSourceManager.addSource (/Users/irfandi/Coding/2025/celebrum-ai/src/shared/src/infrastructure/ccxt-data-source.ts:302:22)
-    at CCXTDataSourceManager.initializeDefaultSources (/Users/irfandi/Coding/2025/celebrum-ai/src/shared/src/infrastructure/ccxt-data-source.ts:287:14)
-    at new CCXTDataSourceManager (/Users/irfandi/Coding/2025/celebrum-ai/src/shared/src/infrastructure/ccxt-data-source.ts:268:10)
-    at /Users/irfandi/Coding/2025/celebrum-ai/src/shared/src/infrastructure/ccxt-data-source.ts:548:38
-    at VitestExecutor.runModule (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/vite-node@3.2.4_@types+node@24.0.4_jiti@2.4.2_lightningcss@1.30.1_tsx@4.20.3_yaml@2.8.0/node_modules/vite-node/dist/client.mjs:397:4)
-    at VitestExecutor.directRequest (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/vite-node@3.2.4_@types+node@24.0.4_jiti@2.4.2_lightningcss@1.30.1_tsx@4.20.3_yaml@2.8.0/node_modules/vite-node/dist/client.mjs:375:3)
-    at VitestExecutor.cachedRequest (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/vite-node@3.2.4_@types+node@24.0.4_jiti@2.4.2_lightningcss@1.30.1_tsx@4.20.3_yaml@2.8.0/node_modules/vite-node/dist/client.mjs:189:11) {
-  codeFrame: 'vi.mock(import("ccxt"), async (importOriginal) => {\n' +
-    '  const actual = await importOriginal()\n' +
-    '  return {\n' +
-    '    ...actual,\n' +
-    '    // your mocked methods\n' +
-    '  }\n' +
-    '})'
-}
-Failed to add source okx: Error: [vitest] No "okx" export is defined on the "ccxt" mock. Did you forget to return it from "vi.mock"?
-If you need to partially mock a module, you can use "importOriginal" helper inside:
-
-    at VitestMocker.createError (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/vitest@3.2.4_@types+debug@4.1.12_@types+node@24.0.4_@vitest+ui@3.2.4_jiti@2.4.2_jsdom@2_f813d808220fbe9fbe14c149debf6d27/node_modules/vitest/dist/chunks/execute.B7h3T_Hc.js:284:17)
-    at Object.get (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/vitest@3.2.4_@types+debug@4.1.12_@types+node@24.0.4_@vitest+ui@3.2.4_jiti@2.4.2_jsdom@2_f813d808220fbe9fbe14c149debf6d27/node_modules/vitest/dist/chunks/execute.B7h3T_Hc.js:330:16)
-    at new CCXTDataSource (/Users/irfandi/Coding/2025/celebrum-ai/src/shared/src/infrastructure/ccxt-data-source.ts:30:28)
-    at CCXTDataSourceManager.addSource (/Users/irfandi/Coding/2025/celebrum-ai/src/shared/src/infrastructure/ccxt-data-source.ts:302:22)
-    at CCXTDataSourceManager.initializeDefaultSources (/Users/irfandi/Coding/2025/celebrum-ai/src/shared/src/infrastructure/ccxt-data-source.ts:287:14)
-    at new CCXTDataSourceManager (/Users/irfandi/Coding/2025/celebrum-ai/src/shared/src/infrastructure/ccxt-data-source.ts:268:10)
-    at /Users/irfandi/Coding/2025/celebrum-ai/src/shared/src/infrastructure/ccxt-data-source.ts:548:38
-    at VitestExecutor.runModule (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/vite-node@3.2.4_@types+node@24.0.4_jiti@2.4.2_lightningcss@1.30.1_tsx@4.20.3_yaml@2.8.0/node_modules/vite-node/dist/client.mjs:397:4)
-    at VitestExecutor.directRequest (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/vite-node@3.2.4_@types+node@24.0.4_jiti@2.4.2_lightningcss@1.30.1_tsx@4.20.3_yaml@2.8.0/node_modules/vite-node/dist/client.mjs:375:3)
-    at VitestExecutor.cachedRequest (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/vite-node@3.2.4_@types+node@24.0.4_jiti@2.4.2_lightningcss@1.30.1_tsx@4.20.3_yaml@2.8.0/node_modules/vite-node/dist/client.mjs:189:11) {
-  codeFrame: 'vi.mock(import("ccxt"), async (importOriginal) => {\n' +
-    '  const actual = await importOriginal()\n' +
-    '  return {\n' +
-    '    ...actual,\n' +
-    '    // your mocked methods\n' +
-    '  }\n' +
-    '})'
-}
-Failed to add source bybit: Error: [vitest] No "bybit" export is defined on the "ccxt" mock. Did you forget to return it from "vi.mock"?
-If you need to partially mock a module, you can use "importOriginal" helper inside:
-
-    at VitestMocker.createError (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/vitest@3.2.4_@types+debug@4.1.12_@types+node@24.0.4_@vitest+ui@3.2.4_jiti@2.4.2_jsdom@2_f813d808220fbe9fbe14c149debf6d27/node_modules/vitest/dist/chunks/execute.B7h3T_Hc.js:284:17)
-    at Object.get (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/vitest@3.2.4_@types+debug@4.1.12_@types+node@24.0.4_@vitest+ui@3.2.4_jiti@2.4.2_jsdom@2_f813d808220fbe9fbe14c149debf6d27/node_modules/vitest/dist/chunks/execute.B7h3T_Hc.js:330:16)
-    at new CCXTDataSource (/Users/irfandi/Coding/2025/celebrum-ai/src/shared/src/infrastructure/ccxt-data-source.ts:30:28)
-    at CCXTDataSourceManager.addSource (/Users/irfandi/Coding/2025/celebrum-ai/src/shared/src/infrastructure/ccxt-data-source.ts:302:22)
-    at CCXTDataSourceManager.initializeDefaultSources (/Users/irfandi/Coding/2025/celebrum-ai/src/shared/src/infrastructure/ccxt-data-source.ts:287:14)
-    at new CCXTDataSourceManager (/Users/irfandi/Coding/2025/celebrum-ai/src/shared/src/infrastructure/ccxt-data-source.ts:268:10)
-    at /Users/irfandi/Coding/2025/celebrum-ai/src/shared/src/infrastructure/ccxt-data-source.ts:548:38
-    at VitestExecutor.runModule (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/vite-node@3.2.4_@types+node@24.0.4_jiti@2.4.2_lightningcss@1.30.1_tsx@4.20.3_yaml@2.8.0/node_modules/vite-node/dist/client.mjs:397:4)
-    at VitestExecutor.directRequest (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/vite-node@3.2.4_@types+node@24.0.4_jiti@2.4.2_lightningcss@1.30.1_tsx@4.20.3_yaml@2.8.0/node_modules/vite-node/dist/client.mjs:375:3)
-    at VitestExecutor.cachedRequest (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/vite-node@3.2.4_@types+node@24.0.4_jiti@2.4.2_lightningcss@1.30.1_tsx@4.20.3_yaml@2.8.0/node_modules/vite-node/dist/client.mjs:189:11) {
-  codeFrame: 'vi.mock(import("ccxt"), async (importOriginal) => {\n' +
-    '  const actual = await importOriginal()\n' +
-    '  return {\n' +
-    '    ...actual,\n' +
-    '    // your mocked methods\n' +
-    '  }\n' +
-    '})'
-}
-
-</div>
+                    
                 </div>
             
                 <div class="result-item result-success">
                     <div class="result-header">
                         <span class="result-name">✅ Integration Tests</span>
-                        <span class="result-duration">15077ms</span>
+                        <span class="result-duration">7211ms</span>
                     </div>
                     
                     
@@ -208,7 +80,7 @@ If you need to partially mock a module, you can use "importOriginal" helper insi
                 <div class="result-item result-success">
                     <div class="result-header">
                         <span class="result-name">✅ End-to-End Tests</span>
-                        <span class="result-duration">7771ms</span>
+                        <span class="result-duration">5062ms</span>
                     </div>
                     
                     
