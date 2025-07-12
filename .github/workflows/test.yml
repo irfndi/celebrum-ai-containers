@@ -39,6 +39,10 @@ jobs:
         echo "npm_config_python=python3" >> $GITHUB_ENV
     - name: Install dependencies
       run: pnpm install --frozen-lockfile
+    - name: Rebuild native modules
+      run: pnpm rebuild --recursive
+    - name: Approve native builds
+      run: pnpm approve-builds --all
       
     - name: Type checking
       run: pnpm typecheck
@@ -106,6 +110,10 @@ jobs:
         echo "npm_config_python=python3" >> $GITHUB_ENV
     - name: Install dependencies
       run: pnpm install --frozen-lockfile
+    - name: Rebuild native modules
+      run: pnpm rebuild --recursive
+    - name: Approve native builds
+      run: pnpm approve-builds --all
       
     - name: Run ${{ matrix.test-type }} tests
       run: pnpm test:${{ matrix.test-type }}
@@ -132,6 +140,10 @@ jobs:
         
     - name: Install dependencies
       run: pnpm install --frozen-lockfile
+    - name: Rebuild native modules
+      run: pnpm rebuild --recursive
+    - name: Approve native builds
+      run: pnpm approve-builds --all
       
     - name: Run performance tests
       run: pnpm test:e2e --reporter=json --outputFile=performance-results.json
@@ -163,6 +175,10 @@ jobs:
         
     - name: Install dependencies
       run: pnpm install --frozen-lockfile
+    - name: Rebuild native modules
+      run: pnpm rebuild --recursive
+    - name: Approve native builds
+      run: pnpm approve-builds --all
       
     - name: Run security audit
       run: pnpm audit --audit-level moderate

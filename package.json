@@ -31,9 +31,9 @@
     "test:ci": "vitest --run --reporter=verbose",
     "test:watch": "vitest --watch",
     "test:coverage": "vitest run --coverage",
-    "test:unit": "vitest --run \"**/tests/unit/**/*.test.ts\"",
-    "test:integration": "vitest --run src/**/tests/integration/**/*.test.ts",
-    "test:e2e": "vitest --run src/**/tests/e2e/**/*.test.ts",
+    "test:unit": "vitest --run \"src/*/tests/unit/*.test.ts\" \"src/**/tests/unit/**/*.test.ts\" \"src/tests/unit.test.ts\"",
+    "test:integration": "vitest --run \"src/*/tests/integration/*.test.ts\" \"src/**/tests/integration/**/*.test.ts\"",
+    "test:e2e": "vitest --run \"src/*/tests/e2e/*.test.ts\" \"src/**/tests/e2e/**/*.test.ts\"",
     "test:telegram": "vitest --run src/telegram-bot/tests/**/*.test.ts",
     "test:web": "vitest --run src/web/tests/**/*.test.ts",
     "test:shared": "vitest --run src/shared/tests/**/*.test.ts",
@@ -96,7 +96,10 @@
   "pnpm": {
     "overrides": {
       "esbuild": "^0.25.0"
-    }
+    },
+    "ignoredBuiltDependencies": [
+      "better-sqlite3"
+    ]
   },
   "cloudflare": {
     "label": "Containers Starter",
