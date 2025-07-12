@@ -361,9 +361,9 @@ export class CCXTDataSourceManager {
       try {
         const ticker = await this.getTicker(symbol, preferredExchange);
         resultMap.set(symbol, ticker);
-      } catch (error) {
+      } catch (_error) {
         // If a symbol fails, skip it and continue to the next symbol
-        continue;
+        console.warn('getTicker failed for', symbol, _error);
       }
     }
     // Return results in the order of the input symbols, only for successful fetches, deduplicated
