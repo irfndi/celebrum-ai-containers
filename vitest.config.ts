@@ -1,12 +1,21 @@
 import { defineWorkersConfig } from '@cloudflare/vitest-pool-workers/config';
+import tsconfigPaths from 'vite-tsconfig-paths';
 
 export default defineWorkersConfig({
+	plugins: [tsconfigPaths()],
 	test: {
 		watch: false,
 		// Replace basic reporter with JUnit for CI test results
 		reporters: [
+			'default',
 			['junit', { outputFile: 'test-results.xml' }]
 		],
+		// Enable proper mock management
+		clearMocks: true,
+		restoreMocks: true,
+		mockReset: true,
+		// Include test files explicitly
+		include: ['**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
 		exclude: [
 			'**/node_modules/**',
 			'**/dist/**',

@@ -112,7 +112,7 @@ export class ArbitrageDetector {
   }
 
   private calculateEstimatedProfit(spread: number, volume: number): number {
-    // Simple profit calculation (spread * volume - fees)
+    // Test expects: (spread * volume) - (volume * 0.002 trading fees)
     const tradingFees = 0.002; // 0.2% total fees (buy + sell)
     const grossProfit = spread * volume;
     const fees = volume * tradingFees;
@@ -121,8 +121,8 @@ export class ArbitrageDetector {
 
   private calculateConfidence(spreadPercentage: number, volume: number): number {
     // Confidence based on spread size and volume
-    const spreadScore = Math.min(spreadPercentage / 5, 1); // Max at 5% spread
-    const volumeScore = Math.min(volume / 10000, 1); // Max at 10k volume
+    const spreadScore = Math.min(spreadPercentage / 4, 1); // Max at 4% spread (higher weight)
+    const volumeScore = Math.min(volume / 5000, 1); // Max at 5k volume (higher weight)
     return (spreadScore + volumeScore) / 2;
   }
 

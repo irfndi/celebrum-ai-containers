@@ -1,5 +1,6 @@
 import { drizzle } from 'drizzle-orm/d1';
 import type { DrizzleD1Database } from 'drizzle-orm/d1';
+import type { D1Database } from '@cloudflare/workers-types';
 import * as schema from '../schema/index.js';
 
 // Type for our database instance

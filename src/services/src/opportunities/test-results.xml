@@ -1,0 +1,963 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="29" failures="8" errors="0" time="0.662">
+    <testsuite name="tests/arbitrage-opportunity-manager.test.ts" timestamp="2025-07-09T14:33:23.369Z" hostname="Irfandis-MacBook-Pro.local" tests="12" failures="0" errors="0" skipped="0" time="0.302">
+        <testcase classname="tests/arbitrage-opportunity-manager.test.ts" name="ArbitrageOpportunityManager &gt; Real Market Data Integration &gt; should generate opportunities from real market data" time="0.02">
+            <system-out>
+DEBUG: getAvailableOpportunities called for user user123 with role pro
+
+DEBUG: User access validation result: {
+  success: true,
+  message: &apos;Opportunity access validated successfully&apos;,
+  timestamp: 1752071602496,
+  data: {
+    remainingDaily: 100,
+    remainingHourly: 25,
+    totalAccessed: 0,
+    successRate: 1
+  }
+}
+
+DEBUG: No cache found, generating new opportunities
+
+Filtering 5 opportunities for role: pro
+Opportunity opp_1752071602500_BTCUSDT_binance_coinbase: profit=0.2%, confidence=1
+Opportunity opp_1752071602500_ETHUSDT_binance_coinbase: profit=0.2%, confidence=1
+Opportunity opp_1752071602500_ADAUSDT_binance_coinbase: profit=0.2%, confidence=1
+Opportunity opp_1752071602500_DOTUSDT_binance_coinbase: profit=0.2%, confidence=1
+Opportunity opp_1752071602500_LINKUSDT_binance_coinbase: profit=0.2%, confidence=1
+After filtering: 5 opportunities remain
+
+            </system-out>
+            <system-err>
+DEBUG: generateOpportunities called for role: pro
+
+            </system-err>
+        </testcase>
+        <testcase classname="tests/arbitrage-opportunity-manager.test.ts" name="ArbitrageOpportunityManager &gt; Real Market Data Integration &gt; should handle API failures and fallback to mock data" time="0.047">
+            <system-out>
+DEBUG: getAvailableOpportunities called for user user123 with role pro
+
+DEBUG: User access validation result: {
+  success: true,
+  message: &apos;Opportunity access validated successfully&apos;,
+  timestamp: 1752071602514,
+  data: {
+    remainingDaily: 100,
+    remainingHourly: 25,
+    totalAccessed: 0,
+    successRate: 1
+  }
+}
+
+DEBUG: No cache found, generating new opportunities
+
+All API calls failed, triggering fallback mode
+Entering fallback mode - generating mock opportunities
+Generated 2 fallback opportunities for role: pro
+Pro role filter requires: confidence &gt;= 0.7 AND profit &gt;= 0.2
+Fallback opportunity: fallback_1752071602543_1, profit: 0.5%, confidence: 0.95
+  - Passes confidence filter (0.95 &gt;= 0.7): true
+  - Passes profit filter (0.5 &gt;= 0.2): true
+Fallback opportunity: fallback_1752071602543_2, profit: 0.6%, confidence: 0.9
+  - Passes confidence filter (0.9 &gt;= 0.7): true
+  - Passes profit filter (0.6 &gt;= 0.2): true
+Filtering 2 opportunities for role: pro
+Opportunity fallback_1752071602543_1: profit=0.5%, confidence=0.95
+Opportunity fallback_1752071602543_2: profit=0.6%, confidence=0.9
+After filtering: 2 opportunities remain
+
+validateAccessSpy calls: [ [ &apos;user123&apos;, &apos;view&apos; ] ]
+generateOpportunitiesSpy calls: [ [ &apos;pro&apos; ] ]
+opportunities returned: 2
+
+            </system-out>
+            <system-err>
+DEBUG: generateOpportunities called for role: pro
+
+Failed to fetch BTCUSDT from binance: Error: API Error
+    at Object.&lt;anonymous&gt; (/Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/tests/arbitrage-opportunity-manager.test.ts:156:31)
+    at Object.mockCall (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+spy@3.2.4/node_modules/@vitest/spy/dist/index.js:96:15)
+    at Object.spy [as getTicker] (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/tinyspy@4.0.3/node_modules/tinyspy/dist/index.js:47:103)
+    at ArbitrageOpportunityManager.generateOpportunities (/Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/src/arbitrage-opportunity-manager.ts:654:50)
+    at ArbitrageOpportunityManager.mockCall (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+spy@3.2.4/node_modules/@vitest/spy/dist/index.js:96:15)
+    at ArbitrageOpportunityManager.generateOpportunities (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/tinyspy@4.0.3/node_modules/tinyspy/dist/index.js:47:103)
+    at ArbitrageOpportunityManager.getAvailableOpportunities (/Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/src/arbitrage-opportunity-manager.ts:305:36)
+    at /Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/tests/arbitrage-opportunity-manager.test.ts:163:29
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20
+
+Failed to fetch BTCUSDT from coinbase: Error: API Error
+    at Object.&lt;anonymous&gt; (/Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/tests/arbitrage-opportunity-manager.test.ts:156:31)
+    at Object.mockCall (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+spy@3.2.4/node_modules/@vitest/spy/dist/index.js:96:15)
+    at Object.spy [as getTicker] (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/tinyspy@4.0.3/node_modules/tinyspy/dist/index.js:47:103)
+    at ArbitrageOpportunityManager.generateOpportunities (/Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/src/arbitrage-opportunity-manager.ts:654:50)
+
+Failed to fetch BTCUSDT from kraken: Error: API Error
+    at Object.&lt;anonymous&gt; (/Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/tests/arbitrage-opportunity-manager.test.ts:156:31)
+    at Object.mockCall (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+spy@3.2.4/node_modules/@vitest/spy/dist/index.js:96:15)
+    at Object.spy [as getTicker] (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/tinyspy@4.0.3/node_modules/tinyspy/dist/index.js:47:103)
+    at ArbitrageOpportunityManager.generateOpportunities (/Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/src/arbitrage-opportunity-manager.ts:654:50)
+
+Failed to fetch ETHUSDT from binance: Error: API Error
+    at Object.&lt;anonymous&gt; (/Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/tests/arbitrage-opportunity-manager.test.ts:156:31)
+    at Object.mockCall (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+spy@3.2.4/node_modules/@vitest/spy/dist/index.js:96:15)
+    at Object.spy [as getTicker] (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/tinyspy@4.0.3/node_modules/tinyspy/dist/index.js:47:103)
+    at ArbitrageOpportunityManager.generateOpportunities (/Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/src/arbitrage-opportunity-manager.ts:654:50)
+
+Failed to fetch ETHUSDT from coinbase: Error: API Error
+    at Object.&lt;anonymous&gt; (/Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/tests/arbitrage-opportunity-manager.test.ts:156:31)
+    at Object.mockCall (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+spy@3.2.4/node_modules/@vitest/spy/dist/index.js:96:15)
+    at Object.spy [as getTicker] (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/tinyspy@4.0.3/node_modules/tinyspy/dist/index.js:47:103)
+    at ArbitrageOpportunityManager.generateOpportunities (/Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/src/arbitrage-opportunity-manager.ts:654:50)
+
+Failed to fetch ETHUSDT from kraken: Error: API Error
+    at Object.&lt;anonymous&gt; (/Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/tests/arbitrage-opportunity-manager.test.ts:156:31)
+    at Object.mockCall (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+spy@3.2.4/node_modules/@vitest/spy/dist/index.js:96:15)
+    at Object.spy [as getTicker] (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/tinyspy@4.0.3/node_modules/tinyspy/dist/index.js:47:103)
+    at ArbitrageOpportunityManager.generateOpportunities (/Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/src/arbitrage-opportunity-manager.ts:654:50)
+
+Failed to fetch ADAUSDT from binance: Error: API Error
+    at Object.&lt;anonymous&gt; (/Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/tests/arbitrage-opportunity-manager.test.ts:156:31)
+    at Object.mockCall (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+spy@3.2.4/node_modules/@vitest/spy/dist/index.js:96:15)
+    at Object.spy [as getTicker] (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/tinyspy@4.0.3/node_modules/tinyspy/dist/index.js:47:103)
+    at ArbitrageOpportunityManager.generateOpportunities (/Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/src/arbitrage-opportunity-manager.ts:654:50)
+
+Failed to fetch ADAUSDT from coinbase: Error: API Error
+    at Object.&lt;anonymous&gt; (/Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/tests/arbitrage-opportunity-manager.test.ts:156:31)
+    at Object.mockCall (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+spy@3.2.4/node_modules/@vitest/spy/dist/index.js:96:15)
+    at Object.spy [as getTicker] (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/tinyspy@4.0.3/node_modules/tinyspy/dist/index.js:47:103)
+    at ArbitrageOpportunityManager.generateOpportunities (/Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/src/arbitrage-opportunity-manager.ts:654:50)
+
+Failed to fetch ADAUSDT from kraken: Error: API Error
+    at Object.&lt;anonymous&gt; (/Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/tests/arbitrage-opportunity-manager.test.ts:156:31)
+    at Object.mockCall (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+spy@3.2.4/node_modules/@vitest/spy/dist/index.js:96:15)
+    at Object.spy [as getTicker] (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/tinyspy@4.0.3/node_modules/tinyspy/dist/index.js:47:103)
+    at ArbitrageOpportunityManager.generateOpportunities (/Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/src/arbitrage-opportunity-manager.ts:654:50)
+
+Failed to fetch DOTUSDT from binance: Error: API Error
+    at Object.&lt;anonymous&gt; (/Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/tests/arbitrage-opportunity-manager.test.ts:156:31)
+    at Object.mockCall (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+spy@3.2.4/node_modules/@vitest/spy/dist/index.js:96:15)
+    at Object.spy [as getTicker] (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/tinyspy@4.0.3/node_modules/tinyspy/dist/index.js:47:103)
+    at ArbitrageOpportunityManager.generateOpportunities (/Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/src/arbitrage-opportunity-manager.ts:654:50)
+
+Failed to fetch DOTUSDT from coinbase: Error: API Error
+    at Object.&lt;anonymous&gt; (/Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/tests/arbitrage-opportunity-manager.test.ts:156:31)
+    at Object.mockCall (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+spy@3.2.4/node_modules/@vitest/spy/dist/index.js:96:15)
+    at Object.spy [as getTicker] (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/tinyspy@4.0.3/node_modules/tinyspy/dist/index.js:47:103)
+    at ArbitrageOpportunityManager.generateOpportunities (/Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/src/arbitrage-opportunity-manager.ts:654:50)
+
+Failed to fetch DOTUSDT from kraken: Error: API Error
+    at Object.&lt;anonymous&gt; (/Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/tests/arbitrage-opportunity-manager.test.ts:156:31)
+    at Object.mockCall (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+spy@3.2.4/node_modules/@vitest/spy/dist/index.js:96:15)
+    at Object.spy [as getTicker] (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/tinyspy@4.0.3/node_modules/tinyspy/dist/index.js:47:103)
+    at ArbitrageOpportunityManager.generateOpportunities (/Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/src/arbitrage-opportunity-manager.ts:654:50)
+
+Failed to fetch LINKUSDT from binance: Error: API Error
+    at Object.&lt;anonymous&gt; (/Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/tests/arbitrage-opportunity-manager.test.ts:156:31)
+    at Object.mockCall (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+spy@3.2.4/node_modules/@vitest/spy/dist/index.js:96:15)
+    at Object.spy [as getTicker] (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/tinyspy@4.0.3/node_modules/tinyspy/dist/index.js:47:103)
+    at ArbitrageOpportunityManager.generateOpportunities (/Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/src/arbitrage-opportunity-manager.ts:654:50)
+
+Failed to fetch LINKUSDT from coinbase: Error: API Error
+    at Object.&lt;anonymous&gt; (/Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/tests/arbitrage-opportunity-manager.test.ts:156:31)
+    at Object.mockCall (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+spy@3.2.4/node_modules/@vitest/spy/dist/index.js:96:15)
+    at Object.spy [as getTicker] (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/tinyspy@4.0.3/node_modules/tinyspy/dist/index.js:47:103)
+    at ArbitrageOpportunityManager.generateOpportunities (/Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/src/arbitrage-opportunity-manager.ts:654:50)
+
+Failed to fetch LINKUSDT from kraken: Error: API Error
+    at Object.&lt;anonymous&gt; (/Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/tests/arbitrage-opportunity-manager.test.ts:156:31)
+    at Object.mockCall (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+spy@3.2.4/node_modules/@vitest/spy/dist/index.js:96:15)
+    at Object.spy [as getTicker] (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/tinyspy@4.0.3/node_modules/tinyspy/dist/index.js:47:103)
+    at ArbitrageOpportunityManager.generateOpportunities (/Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/src/arbitrage-opportunity-manager.ts:654:50)
+Failed to generate real opportunities: Error: All market data API calls failed
+    at ArbitrageOpportunityManager.generateOpportunities (/Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/src/arbitrage-opportunity-manager.ts:716:15)
+FALLBACK MODE ACTIVATED - API CALLS FAILED
+
+            </system-err>
+        </testcase>
+        <testcase classname="tests/arbitrage-opportunity-manager.test.ts" name="ArbitrageOpportunityManager &gt; Real Market Data Integration &gt; should calculate profit margins correctly" time="0.011">
+            <system-out>
+DEBUG: getAvailableOpportunities called for user user123 with role ultra
+
+DEBUG: User access validation result: {
+  success: true,
+  message: &apos;Opportunity access validated successfully&apos;,
+  timestamp: 1752071602561,
+  data: {
+    remainingDaily: 1000,
+    remainingHourly: 100,
+    totalAccessed: 0,
+    successRate: 1
+  }
+}
+
+DEBUG: No cache found, generating new opportunities
+
+Filtering 15 opportunities for role: ultra
+Opportunity opp_1752071602562_BTCUSDT_binance_coinbase: profit=0.995%, confidence=0.99
+Opportunity opp_1752071602562_ETHUSDT_binance_coinbase: profit=0.995%, confidence=0.99
+Opportunity opp_1752071602562_ADAUSDT_binance_coinbase: profit=0.995%, confidence=0.99
+Opportunity opp_1752071602562_DOTUSDT_binance_coinbase: profit=0.995%, confidence=0.99
+Opportunity opp_1752071602562_LINKUSDT_binance_coinbase: profit=0.995%, confidence=0.99
+Opportunity opp_1752071602562_BTCUSDT_binance_kraken: profit=0.499%, confidence=1
+Opportunity opp_1752071602562_ETHUSDT_binance_kraken: profit=0.499%, confidence=1
+Opportunity opp_1752071602562_ADAUSDT_binance_kraken: profit=0.499%, confidence=1
+Opportunity opp_1752071602562_DOTUSDT_binance_kraken: profit=0.499%, confidence=1
+Opportunity opp_1752071602562_LINKUSDT_binance_kraken: profit=0.499%, confidence=1
+Opportunity opp_1752071602562_BTCUSDT_kraken_coinbase: profit=0.496%, confidence=1
+Opportunity opp_1752071602562_ETHUSDT_kraken_coinbase: profit=0.496%, confidence=1
+Opportunity opp_1752071602562_ADAUSDT_kraken_coinbase: profit=0.496%, confidence=1
+Opportunity opp_1752071602562_DOTUSDT_kraken_coinbase: profit=0.496%, confidence=1
+Opportunity opp_1752071602562_LINKUSDT_kraken_coinbase: profit=0.496%, confidence=1
+After filtering: 15 opportunities remain
+
+            </system-out>
+            <system-err>
+DEBUG: generateOpportunities called for role: ultra
+
+            </system-err>
+        </testcase>
+        <testcase classname="tests/arbitrage-opportunity-manager.test.ts" name="ArbitrageOpportunityManager &gt; Real Market Data Integration &gt; should calculate confidence scores based on volume and price stability" time="0.01">
+            <system-out>
+DEBUG: getAvailableOpportunities called for user user123 with role ultra
+
+DEBUG: User access validation result: {
+  success: true,
+  message: &apos;Opportunity access validated successfully&apos;,
+  timestamp: 1752071602573,
+  data: {
+    remainingDaily: 1000,
+    remainingHourly: 100,
+    totalAccessed: 0,
+    successRate: 1
+  }
+}
+
+DEBUG: No cache found, generating new opportunities
+
+Filtering 5 opportunities for role: ultra
+Opportunity opp_1752071602574_BTCUSDT_binance_coinbase: profit=0.11%, confidence=1
+Opportunity opp_1752071602574_ETHUSDT_binance_coinbase: profit=0.11%, confidence=1
+Opportunity opp_1752071602574_ADAUSDT_binance_coinbase: profit=0.11%, confidence=1
+Opportunity opp_1752071602574_DOTUSDT_binance_coinbase: profit=0.11%, confidence=1
+Opportunity opp_1752071602574_LINKUSDT_binance_coinbase: profit=0.11%, confidence=1
+After filtering: 5 opportunities remain
+
+            </system-out>
+            <system-err>
+DEBUG: generateOpportunities called for role: ultra
+
+            </system-err>
+        </testcase>
+        <testcase classname="tests/arbitrage-opportunity-manager.test.ts" name="ArbitrageOpportunityManager &gt; Real Market Data Integration &gt; should sort opportunities by profit percentage" time="0.014">
+            <system-out>
+DEBUG: getAvailableOpportunities called for user user123 with role ultra
+
+DEBUG: User access validation result: {
+  success: true,
+  message: &apos;Opportunity access validated successfully&apos;,
+  timestamp: 1752071602582,
+  data: {
+    remainingDaily: 1000,
+    remainingHourly: 100,
+    totalAccessed: 0,
+    successRate: 1
+  }
+}
+
+DEBUG: No cache found, generating new opportunities
+
+Filtering 15 opportunities for role: ultra
+Opportunity opp_1752071602582_BTCUSDT_binance_coinbase: profit=0.399%, confidence=1
+Opportunity opp_1752071602582_ETHUSDT_binance_coinbase: profit=0.399%, confidence=1
+Opportunity opp_1752071602582_ADAUSDT_binance_coinbase: profit=0.399%, confidence=1
+Opportunity opp_1752071602582_DOTUSDT_binance_coinbase: profit=0.399%, confidence=1
+Opportunity opp_1752071602582_LINKUSDT_binance_coinbase: profit=0.399%, confidence=1
+Opportunity opp_1752071602582_BTCUSDT_binance_kraken: profit=0.2%, confidence=1
+Opportunity opp_1752071602582_ETHUSDT_binance_kraken: profit=0.2%, confidence=1
+Opportunity opp_1752071602582_ADAUSDT_binance_kraken: profit=0.2%, confidence=1
+Opportunity opp_1752071602582_DOTUSDT_binance_kraken: profit=0.2%, confidence=1
+Opportunity opp_1752071602582_LINKUSDT_binance_kraken: profit=0.2%, confidence=1
+Opportunity opp_1752071602582_BTCUSDT_kraken_coinbase: profit=0.199%, confidence=1
+Opportunity opp_1752071602582_ETHUSDT_kraken_coinbase: profit=0.199%, confidence=1
+Opportunity opp_1752071602582_ADAUSDT_kraken_coinbase: profit=0.199%, confidence=1
+Opportunity opp_1752071602582_DOTUSDT_kraken_coinbase: profit=0.199%, confidence=1
+Opportunity opp_1752071602582_LINKUSDT_kraken_coinbase: profit=0.199%, confidence=1
+After filtering: 15 opportunities remain
+
+            </system-out>
+            <system-err>
+DEBUG: generateOpportunities called for role: ultra
+
+            </system-err>
+        </testcase>
+        <testcase classname="tests/arbitrage-opportunity-manager.test.ts" name="ArbitrageOpportunityManager &gt; Role-based Filtering &gt; should filter opportunities for free tier users" time="0.021">
+            <system-out>
+DEBUG: getAvailableOpportunities called for user user123 with role free
+
+DEBUG: User access validation result: {
+  success: true,
+  message: &apos;Opportunity access validated successfully&apos;,
+  timestamp: 1752071602610,
+  data: {
+    remainingDaily: 10,
+    remainingHourly: 5,
+    totalAccessed: 0,
+    successRate: 1
+  }
+}
+
+DEBUG: No cache found, generating new opportunities
+
+Filtering 0 opportunities for role: free
+After filtering: 0 opportunities remain
+
+            </system-out>
+            <system-err>
+DEBUG: generateOpportunities called for role: free
+
+            </system-err>
+        </testcase>
+        <testcase classname="tests/arbitrage-opportunity-manager.test.ts" name="ArbitrageOpportunityManager &gt; Role-based Filtering &gt; should provide more opportunities for pro users" time="0.026">
+            <system-out>
+DEBUG: getAvailableOpportunities called for user user123 with role pro
+
+DEBUG: User access validation result: {
+  success: true,
+  message: &apos;Opportunity access validated successfully&apos;,
+  timestamp: 1752071602634,
+  data: {
+    remainingDaily: 100,
+    remainingHourly: 25,
+    totalAccessed: 0,
+    successRate: 1
+  }
+}
+
+DEBUG: No cache found, generating new opportunities
+
+Filtering 5 opportunities for role: pro
+Opportunity opp_1752071602635_BTCUSDT_binance_coinbase: profit=0.2%, confidence=0.92
+Opportunity opp_1752071602635_ETHUSDT_binance_coinbase: profit=0.2%, confidence=0.92
+Opportunity opp_1752071602635_ADAUSDT_binance_coinbase: profit=0.2%, confidence=0.92
+Opportunity opp_1752071602635_DOTUSDT_binance_coinbase: profit=0.2%, confidence=0.92
+Opportunity opp_1752071602635_LINKUSDT_binance_coinbase: profit=0.2%, confidence=0.92
+After filtering: 5 opportunities remain
+
+            </system-out>
+            <system-err>
+DEBUG: generateOpportunities called for role: pro
+
+            </system-err>
+        </testcase>
+        <testcase classname="tests/arbitrage-opportunity-manager.test.ts" name="ArbitrageOpportunityManager &gt; Rate Limiting &gt; should respect daily limits" time="0.037">
+            <system-out>
+DEBUG: getAvailableOpportunities called for user user123 with role pro
+
+DEBUG: User access validation result: {
+  success: true,
+  message: &apos;Opportunity access validated successfully&apos;,
+  timestamp: 1752071602675,
+  data: {
+    remainingDaily: 100,
+    remainingHourly: 25,
+    totalAccessed: 100,
+    successRate: 1
+  }
+}
+
+DEBUG: No cache found, generating new opportunities
+
+Filtering 0 opportunities for role: pro
+After filtering: 0 opportunities remain
+
+            </system-out>
+            <system-err>
+DEBUG: generateOpportunities called for role: pro
+
+            </system-err>
+        </testcase>
+        <testcase classname="tests/arbitrage-opportunity-manager.test.ts" name="ArbitrageOpportunityManager &gt; Rate Limiting &gt; should reset counters after time period" time="0.012">
+            <system-out>
+DEBUG: getAvailableOpportunities called for user user123 with role pro
+
+DEBUG: User access validation result: {
+  success: true,
+  message: &apos;Opportunity access validated successfully&apos;,
+  timestamp: 1752071602712,
+  data: {
+    remainingDaily: 100,
+    remainingHourly: 25,
+    totalAccessed: 100,
+    successRate: 1
+  }
+}
+
+DEBUG: No cache found, generating new opportunities
+
+Filtering 5 opportunities for role: pro
+Opportunity opp_1752071602712_BTCUSDT_binance_coinbase: profit=0.2%, confidence=1
+Opportunity opp_1752071602712_ETHUSDT_binance_coinbase: profit=0.2%, confidence=1
+Opportunity opp_1752071602712_ADAUSDT_binance_coinbase: profit=0.2%, confidence=1
+Opportunity opp_1752071602713_DOTUSDT_binance_coinbase: profit=0.2%, confidence=1
+Opportunity opp_1752071602713_LINKUSDT_binance_coinbase: profit=0.2%, confidence=1
+After filtering: 5 opportunities remain
+
+            </system-out>
+            <system-err>
+DEBUG: generateOpportunities called for role: pro
+
+            </system-err>
+        </testcase>
+        <testcase classname="tests/arbitrage-opportunity-manager.test.ts" name="ArbitrageOpportunityManager &gt; Access Control &gt; should deny access to users without proper permissions" time="0.008">
+            <system-out>
+DEBUG: getAvailableOpportunities called for user user123 with role free
+
+DEBUG: User access validation result: {
+  success: false,
+  message: &apos;Opportunity limits not found&apos;,
+  timestamp: 1752071602731,
+  errors: [ &apos;User opportunity limits not initialized&apos; ]
+}
+DEBUG: Access denied, returning empty array
+
+            </system-out>
+        </testcase>
+        <testcase classname="tests/arbitrage-opportunity-manager.test.ts" name="ArbitrageOpportunityManager &gt; Caching &gt; should cache opportunities and serve from cache when available" time="0.006">
+            <system-out>
+DEBUG: getAvailableOpportunities called for user user123 with role pro
+
+DEBUG: User access validation result: {
+  success: true,
+  message: &apos;Opportunity access validated successfully&apos;,
+  timestamp: 1752071602746,
+  data: {
+    remainingDaily: 100,
+    remainingHourly: 25,
+    totalAccessed: 0,
+    successRate: 1
+  }
+}
+
+DEBUG: Found 1 cached opportunities
+
+            </system-out>
+        </testcase>
+        <testcase classname="tests/arbitrage-opportunity-manager.test.ts" name="ArbitrageOpportunityManager &gt; Caching &gt; should generate fresh opportunities when cache is expired" time="0.017">
+            <system-out>
+DEBUG: getAvailableOpportunities called for user user123 with role pro
+
+DEBUG: User access validation result: {
+  success: true,
+  message: &apos;Opportunity access validated successfully&apos;,
+  timestamp: 1752071602753,
+  data: {
+    remainingDaily: 100,
+    remainingHourly: 25,
+    totalAccessed: 0,
+    successRate: 1
+  }
+}
+
+DEBUG: No cache found, generating new opportunities
+
+Filtering 3 opportunities for role: pro
+Opportunity opp_1752071602755_BTCUSDT_binance_coinbase: profit=0.222%, confidence=1
+Opportunity opp_1752071602755_BTCUSDT_binance_kraken: profit=0.111%, confidence=0.98
+Opportunity opp_1752071602755_BTCUSDT_kraken_coinbase: profit=0.111%, confidence=1
+After filtering: 1 opportunities remain
+
+            </system-out>
+            <system-err>
+DEBUG: generateOpportunities called for role: pro
+
+            </system-err>
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/hedge-opportunity-manager.test.ts" timestamp="2025-07-09T14:33:23.509Z" hostname="Irfandis-MacBook-Pro.local" tests="17" failures="8" errors="0" skipped="0" time="0.36">
+        <testcase classname="tests/hedge-opportunity-manager.test.ts" name="HedgeOpportunityManager &gt; Hedge Opportunity Generation &gt; should generate hedge opportunities from market data with proper format" time="0.015">
+            <failure message="expected 0 to be greater than 0" type="AssertionError">
+AssertionError: expected 0 to be greater than 0
+ ❯ tests/hedge-opportunity-manager.test.ts:85:36
+            </failure>
+        </testcase>
+        <testcase classname="tests/hedge-opportunity-manager.test.ts" name="HedgeOpportunityManager &gt; Hedge Opportunity Generation &gt; should calculate expected APR correctly" time="0.002">
+            <failure message="expected 0 to be greater than 0" type="AssertionError">
+AssertionError: expected 0 to be greater than 0
+ ❯ tests/hedge-opportunity-manager.test.ts:135:36
+            </failure>
+        </testcase>
+        <testcase classname="tests/hedge-opportunity-manager.test.ts" name="HedgeOpportunityManager &gt; Hedge Opportunity Generation &gt; should assess risk levels correctly" time="0.003">
+            <failure message="expected 0 to be greater than 0" type="AssertionError">
+AssertionError: expected 0 to be greater than 0
+ ❯ tests/hedge-opportunity-manager.test.ts:159:36
+            </failure>
+        </testcase>
+        <testcase classname="tests/hedge-opportunity-manager.test.ts" name="HedgeOpportunityManager &gt; Hedge Opportunity Generation &gt; should sort opportunities by expected APR descending" time="0.003">
+            <failure message="expected 0 to be greater than 1" type="AssertionError">
+AssertionError: expected 0 to be greater than 1
+ ❯ tests/hedge-opportunity-manager.test.ts:188:36
+            </failure>
+        </testcase>
+        <testcase classname="tests/hedge-opportunity-manager.test.ts" name="HedgeOpportunityManager &gt; Tier-based Filtering &gt; should filter opportunities for free tier users" time="0.012">
+        </testcase>
+        <testcase classname="tests/hedge-opportunity-manager.test.ts" name="HedgeOpportunityManager &gt; Tier-based Filtering &gt; should provide more opportunities for pro tier users" time="0.008">
+        </testcase>
+        <testcase classname="tests/hedge-opportunity-manager.test.ts" name="HedgeOpportunityManager &gt; Tier-based Filtering &gt; should provide maximum opportunities for ultra tier users" time="0.012">
+        </testcase>
+        <testcase classname="tests/hedge-opportunity-manager.test.ts" name="HedgeOpportunityManager &gt; Caching &gt; should cache opportunities and serve from cache when available" time="0.01">
+            <failure message="expected [] to deeply equal [ { id: &apos;cached_hedge_1&apos;, …(15) } ]" type="AssertionError">
+AssertionError: expected [] to deeply equal [ { id: &apos;cached_hedge_1&apos;, …(15) } ]
+
+- Expected
++ Received
+
+- [
+-   {
+-     &quot;confidence_score&quot;: 0.85,
+-     &quot;difference&quot;: 100,
+-     &quot;execution_time&quot;: &quot;00:00:00&quot;,
+-     &quot;expected_apr&quot;: 365,
+-     &quot;expires_at&quot;: &quot;2025-07-09T14:38:22.610Z&quot;,
+-     &quot;generated_at&quot;: &quot;2025-07-09T14:33:22.610Z&quot;,
+-     &quot;id&quot;: &quot;cached_hedge_1&quot;,
+-     &quot;max_position_size&quot;: 1000,
+-     &quot;positions_opened&quot;: {
+-       &quot;long&quot;: {
+-         &quot;amount&quot;: 50,
+-         &quot;exchange&quot;: &quot;BINANCE&quot;,
+-         &quot;price&quot;: 45000,
+-       },
+-       &quot;short&quot;: {
+-         &quot;amount&quot;: 50,
+-         &quot;exchange&quot;: &quot;COINBASE&quot;,
+-         &quot;price&quot;: 45100,
+-       },
+-     },
+-     &quot;profit_percentage&quot;: 0.22,
+-     &quot;risk_level&quot;: &quot;low&quot;,
+-     &quot;status&quot;: &quot;pending&quot;,
+-     &quot;stop_loss&quot;: 44100,
+-     &quot;symbol&quot;: &quot;BTCUSDT&quot;,
+-     &quot;take_profit&quot;: 46020,
+-     &quot;type&quot;: &quot;hedge&quot;,
+-   },
+- ]
++ []
+
+ ❯ tests/hedge-opportunity-manager.test.ts:295:29
+            </failure>
+        </testcase>
+        <testcase classname="tests/hedge-opportunity-manager.test.ts" name="HedgeOpportunityManager &gt; Caching &gt; should generate fresh opportunities when cache is expired" time="0.007">
+            <failure message="expected 0 to be greater than 0" type="AssertionError">
+AssertionError: expected 0 to be greater than 0
+ ❯ tests/hedge-opportunity-manager.test.ts:318:36
+            </failure>
+        </testcase>
+        <testcase classname="tests/hedge-opportunity-manager.test.ts" name="HedgeOpportunityManager &gt; Hedge Execution &gt; should execute hedge opportunity successfully" time="0.036">
+        </testcase>
+        <testcase classname="tests/hedge-opportunity-manager.test.ts" name="HedgeOpportunityManager &gt; Hedge Execution &gt; should handle execution failure gracefully" time="0.01">
+        </testcase>
+        <testcase classname="tests/hedge-opportunity-manager.test.ts" name="HedgeOpportunityManager &gt; Hedge Execution &gt; should validate position size limits" time="0.01">
+        </testcase>
+        <testcase classname="tests/hedge-opportunity-manager.test.ts" name="HedgeOpportunityManager &gt; Hedge Execution &gt; should handle expired opportunities" time="0.008">
+            <system-out>
+Updating opportunity test_hedge_expired status to failed
+
+            </system-out>
+        </testcase>
+        <testcase classname="tests/hedge-opportunity-manager.test.ts" name="HedgeOpportunityManager &gt; Fallback Opportunities &gt; should generate fallback opportunities when API fails" time="0.006">
+            <system-err>
+Failed to fetch BTCUSDT from binance: Error: API Error
+    at /Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/tests/hedge-opportunity-manager.test.ts:485:62
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20
+    at new Promise (&lt;anonymous&gt;)
+    at runWithTimeout (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10)
+    at runTest (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1574:12)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+
+Failed to fetch BTCUSDT from coinbase: Error: API Error
+    at /Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/tests/hedge-opportunity-manager.test.ts:485:62
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20
+    at new Promise (&lt;anonymous&gt;)
+    at runWithTimeout (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10)
+    at runTest (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1574:12)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+
+Failed to fetch BTCUSDT from kraken: Error: API Error
+    at /Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/tests/hedge-opportunity-manager.test.ts:485:62
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20
+    at new Promise (&lt;anonymous&gt;)
+    at runWithTimeout (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10)
+    at runTest (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1574:12)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+
+Failed to fetch ETHUSDT from binance: Error: API Error
+    at /Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/tests/hedge-opportunity-manager.test.ts:485:62
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20
+    at new Promise (&lt;anonymous&gt;)
+    at runWithTimeout (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10)
+    at runTest (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1574:12)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+
+Failed to fetch ETHUSDT from coinbase: Error: API Error
+    at /Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/tests/hedge-opportunity-manager.test.ts:485:62
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20
+    at new Promise (&lt;anonymous&gt;)
+    at runWithTimeout (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10)
+    at runTest (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1574:12)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+
+Failed to fetch ETHUSDT from kraken: Error: API Error
+    at /Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/tests/hedge-opportunity-manager.test.ts:485:62
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20
+    at new Promise (&lt;anonymous&gt;)
+    at runWithTimeout (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10)
+    at runTest (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1574:12)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+
+Failed to fetch ADAUSDT from binance: Error: API Error
+    at /Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/tests/hedge-opportunity-manager.test.ts:485:62
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20
+    at new Promise (&lt;anonymous&gt;)
+    at runWithTimeout (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10)
+    at runTest (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1574:12)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+
+Failed to fetch ADAUSDT from coinbase: Error: API Error
+    at /Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/tests/hedge-opportunity-manager.test.ts:485:62
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20
+    at new Promise (&lt;anonymous&gt;)
+    at runWithTimeout (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10)
+    at runTest (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1574:12)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+
+Failed to fetch ADAUSDT from kraken: Error: API Error
+    at /Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/tests/hedge-opportunity-manager.test.ts:485:62
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20
+    at new Promise (&lt;anonymous&gt;)
+    at runWithTimeout (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10)
+    at runTest (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1574:12)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+
+Failed to fetch DOTUSDT from binance: Error: API Error
+    at /Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/tests/hedge-opportunity-manager.test.ts:485:62
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20
+    at new Promise (&lt;anonymous&gt;)
+    at runWithTimeout (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10)
+    at runTest (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1574:12)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+
+Failed to fetch DOTUSDT from coinbase: Error: API Error
+    at /Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/tests/hedge-opportunity-manager.test.ts:485:62
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20
+    at new Promise (&lt;anonymous&gt;)
+    at runWithTimeout (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10)
+    at runTest (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1574:12)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+
+Failed to fetch DOTUSDT from kraken: Error: API Error
+    at /Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/tests/hedge-opportunity-manager.test.ts:485:62
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20
+    at new Promise (&lt;anonymous&gt;)
+    at runWithTimeout (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10)
+    at runTest (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1574:12)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+
+Failed to fetch LINKUSDT from binance: Error: API Error
+    at /Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/tests/hedge-opportunity-manager.test.ts:485:62
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20
+    at new Promise (&lt;anonymous&gt;)
+    at runWithTimeout (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10)
+    at runTest (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1574:12)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+
+Failed to fetch LINKUSDT from coinbase: Error: API Error
+    at /Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/tests/hedge-opportunity-manager.test.ts:485:62
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20
+    at new Promise (&lt;anonymous&gt;)
+    at runWithTimeout (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10)
+    at runTest (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1574:12)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+
+Failed to fetch LINKUSDT from kraken: Error: API Error
+    at /Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/tests/hedge-opportunity-manager.test.ts:485:62
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20
+    at new Promise (&lt;anonymous&gt;)
+    at runWithTimeout (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10)
+    at runTest (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1574:12)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+
+            </system-err>
+            <failure message="expected 0 to be greater than 0" type="AssertionError">
+AssertionError: expected 0 to be greater than 0
+ ❯ tests/hedge-opportunity-manager.test.ts:490:36
+            </failure>
+        </testcase>
+        <testcase classname="tests/hedge-opportunity-manager.test.ts" name="HedgeOpportunityManager &gt; Fallback Opportunities &gt; should match the image format in fallback opportunities" time="0.009">
+            <system-err>
+Failed to fetch BTCUSDT from binance: Error: API Error
+    at /Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/tests/hedge-opportunity-manager.test.ts:498:62
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20
+    at new Promise (&lt;anonymous&gt;)
+    at runWithTimeout (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10)
+    at runTest (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1574:12)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+
+Failed to fetch BTCUSDT from coinbase: Error: API Error
+    at /Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/tests/hedge-opportunity-manager.test.ts:498:62
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20
+    at new Promise (&lt;anonymous&gt;)
+    at runWithTimeout (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10)
+    at runTest (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1574:12)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+
+Failed to fetch BTCUSDT from kraken: Error: API Error
+    at /Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/tests/hedge-opportunity-manager.test.ts:498:62
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20
+    at new Promise (&lt;anonymous&gt;)
+    at runWithTimeout (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10)
+    at runTest (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1574:12)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+
+Failed to fetch ETHUSDT from binance: Error: API Error
+    at /Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/tests/hedge-opportunity-manager.test.ts:498:62
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20
+    at new Promise (&lt;anonymous&gt;)
+    at runWithTimeout (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10)
+    at runTest (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1574:12)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+
+Failed to fetch ETHUSDT from coinbase: Error: API Error
+    at /Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/tests/hedge-opportunity-manager.test.ts:498:62
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20
+    at new Promise (&lt;anonymous&gt;)
+    at runWithTimeout (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10)
+    at runTest (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1574:12)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+
+Failed to fetch ETHUSDT from kraken: Error: API Error
+    at /Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/tests/hedge-opportunity-manager.test.ts:498:62
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20
+    at new Promise (&lt;anonymous&gt;)
+    at runWithTimeout (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10)
+    at runTest (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1574:12)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+
+Failed to fetch ADAUSDT from binance: Error: API Error
+    at /Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/tests/hedge-opportunity-manager.test.ts:498:62
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20
+    at new Promise (&lt;anonymous&gt;)
+    at runWithTimeout (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10)
+    at runTest (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1574:12)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+
+Failed to fetch ADAUSDT from coinbase: Error: API Error
+    at /Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/tests/hedge-opportunity-manager.test.ts:498:62
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20
+    at new Promise (&lt;anonymous&gt;)
+    at runWithTimeout (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10)
+    at runTest (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1574:12)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+
+Failed to fetch ADAUSDT from kraken: Error: API Error
+    at /Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/tests/hedge-opportunity-manager.test.ts:498:62
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20
+    at new Promise (&lt;anonymous&gt;)
+    at runWithTimeout (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10)
+    at runTest (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1574:12)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+
+Failed to fetch DOTUSDT from binance: Error: API Error
+    at /Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/tests/hedge-opportunity-manager.test.ts:498:62
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20
+    at new Promise (&lt;anonymous&gt;)
+    at runWithTimeout (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10)
+    at runTest (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1574:12)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+
+Failed to fetch DOTUSDT from coinbase: Error: API Error
+    at /Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/tests/hedge-opportunity-manager.test.ts:498:62
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20
+    at new Promise (&lt;anonymous&gt;)
+    at runWithTimeout (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10)
+    at runTest (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1574:12)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+
+Failed to fetch DOTUSDT from kraken: Error: API Error
+    at /Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/tests/hedge-opportunity-manager.test.ts:498:62
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20
+    at new Promise (&lt;anonymous&gt;)
+    at runWithTimeout (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10)
+    at runTest (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1574:12)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+
+Failed to fetch LINKUSDT from binance: Error: API Error
+    at /Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/tests/hedge-opportunity-manager.test.ts:498:62
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20
+    at new Promise (&lt;anonymous&gt;)
+    at runWithTimeout (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10)
+    at runTest (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1574:12)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+
+Failed to fetch LINKUSDT from coinbase: Error: API Error
+    at /Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/tests/hedge-opportunity-manager.test.ts:498:62
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20
+    at new Promise (&lt;anonymous&gt;)
+    at runWithTimeout (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10)
+    at runTest (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1574:12)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+
+Failed to fetch LINKUSDT from kraken: Error: API Error
+    at /Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/tests/hedge-opportunity-manager.test.ts:498:62
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20
+    at new Promise (&lt;anonymous&gt;)
+    at runWithTimeout (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10)
+    at runTest (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1574:12)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+
+            </system-err>
+            <failure message="expected 0 to be greater than 0" type="AssertionError">
+AssertionError: expected 0 to be greater than 0
+ ❯ tests/hedge-opportunity-manager.test.ts:502:36
+            </failure>
+        </testcase>
+        <testcase classname="tests/hedge-opportunity-manager.test.ts" name="HedgeOpportunityManager &gt; Error Handling &gt; should handle missing opportunities gracefully" time="0.022">
+        </testcase>
+        <testcase classname="tests/hedge-opportunity-manager.test.ts" name="HedgeOpportunityManager &gt; Error Handling &gt; should handle execution errors gracefully" time="0.011">
+            <system-err>
+Error executing hedge opportunity: Error: Network error
+    at /Users/irfandi/Coding/2025/celebrum-ai/src/services/src/opportunities/tests/hedge-opportunity-manager.test.ts:560:74
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26
+    at Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20
+    at new Promise (&lt;anonymous&gt;)
+    at runWithTimeout (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10)
+    at runTest (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1574:12)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runSuite (Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+
+            </system-err>
+        </testcase>
+    </testsuite>
+</testsuites>

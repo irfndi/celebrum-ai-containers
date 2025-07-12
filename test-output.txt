@@ -1,0 +1,10 @@
+
+ RUN  v3.2.4 /Users/irfandi/Coding/2025/celebrum-ai
+
+No test files found, exiting with code 1
+
+filter: test-minimal.ts
+include: **/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}
+exclude:  **/node_modules/**, **/dist/**, **/.temporary-code/**, **/dist-test/**
+
+JUNIT report written to /Users/irfandi/Coding/2025/celebrum-ai/test-results.xml

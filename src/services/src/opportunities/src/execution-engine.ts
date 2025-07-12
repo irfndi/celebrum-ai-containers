@@ -242,6 +242,6 @@ export class ExecutionEngine {
 
   enableDryRun(): void {
     this.config.dryRun = true;
-    console.log('Dry run mode enabled. No real trades will be executed.');
+    // Dry run mode enabled - no real trades will be executed
   }
 }

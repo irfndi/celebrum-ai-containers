@@ -5,7 +5,6 @@
 // @celebrum-ai/shared - Shared Types
 import { z } from 'zod';
 import type { D1Database, KVNamespace, DurableObjectNamespace } from '@cloudflare/workers-types';
-import type { Container } from '@cloudflare/containers';
 
 // API types
 export * from './api';
@@ -49,7 +48,7 @@ export interface Env {
   FEATURE_REGISTRATION_INVITATION_REQUIRED?: string;
   
   // Container
-  CELEBRUM_CONTAINERS: DurableObjectNamespace<Container>;
+  CELEBRUM_CONTAINERS: DurableObjectNamespace;
   CELEBRUM_STORAGE: DurableObjectNamespace;
   API_SERVICE_URL?: string;
   WEB_SERVICE_URL?: string;

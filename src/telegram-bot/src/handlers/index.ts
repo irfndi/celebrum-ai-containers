@@ -381,11 +381,31 @@ export function initializeHandlers(): void {
         }
       }
 
+      // Construct inline keyboard based on PRD requirements: dual opportunity types, profile/settings, help, plus admin controls
+      const keyboardButtons: Array<Array<{ text: string; callback_data: string }>> = [
+        // Dual opportunity types as per PRD: arbitrage (2-position) and technical (1-position)
+        [{ text: 'Arbitrage Opportunities', callback_data: 'opportunities arbitrage' }],
+        [{ text: 'Technical Analysis Opportunities', callback_data: 'opportunities technical' }],
+        // General user options
+        [{ text: 'Profile', callback_data: 'profile' }],
+        [{ text: 'Settings', callback_data: 'settings' }],
+        [{ text: 'Help', callback_data: 'help' }]
+      ];
+      // RBAC: include admin-specific commands if superadmin
+      if (user?.role === 'superadmin') {
+        keyboardButtons.push([
+          { text: 'Invite Stats', callback_data: 'invitestats' }
+        ]);
+        keyboardButtons.push([
+          { text: 'Create Invites', callback_data: 'createinvites' }
+        ]);
+      }
       return {
         method: 'sendMessage',
         chat_id: chatId,
         text: welcomeMessage,
-        parse_mode: 'HTML'
+        parse_mode: 'HTML',
+        reply_markup: { inline_keyboard: keyboardButtons }
       };
     }
   });

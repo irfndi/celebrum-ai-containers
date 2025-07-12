@@ -1,0 +1,20 @@
+{
+  "name": "@celebrum-ai/opportunities-tests",
+  "version": "1.0.0",
+  "description": "Tests for arbitrage opportunities service",
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "@celebrum-ai/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^1.0.0",
+    "@vitest/coverage-v8": "^1.0.0"
+  }
+}

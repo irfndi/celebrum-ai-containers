@@ -1,11 +1,16 @@
 import { Hono } from "hono";
-import { DurableObject } from "cloudflare:workers";
+import type { DurableObjectNamespace, DurableObjectState, Request as CloudflareRequest } from '@cloudflare/workers-types';
 import type { Env } from "@celebrum-ai/shared";
 import { handleTelegramUpdate } from "./telegram-bot/src";
 
+// Define DurableObject base class for compatibility
+class DurableObject {
+  constructor(protected ctx: DurableObjectState, protected env: Env) {}
+}
+
 // Types for Cloudflare Workers
 interface ExportedHandler {
-  fetch(request: Request, env: unknown, ctx: unknown): Promise<Response>;
+  fetch(request: CloudflareRequest, env: unknown, ctx: unknown): Promise<Response>;
 }
 
 export class CelebrumAIStorage extends DurableObject {
@@ -13,7 +18,7 @@ export class CelebrumAIStorage extends DurableObject {
     super(ctx, env);
   }
 
-  async fetch(_request: Request): Promise<Response> {
+  async fetch(_request: CloudflareRequest): Promise<Response> {
     return new Response("CelebrumAIStorage is running", { status: 200 });
   }
 }
@@ -176,8 +181,16 @@ if (!isTestEnvironment) {
   app.get("/api/storage/:id", async (c) => {
     const id = c.req.param("id");
     const storageId = c.env.CELEBRUM_STORAGE.idFromName(`/storage/${id}`);
-    const storage = (c.env.CELEBRUM_STORAGE as unknown as DurableObjectNamespace).get(storageId);
-    return storage.fetch(c.req.raw);
+    const storage = (c.env.CELEBRUM_STORAGE as DurableObjectNamespace).get(storageId);
+    // Use the raw request with proper type assertion for Cloudflare Workers
+    const response = await storage.fetch(c.req.raw as unknown as CloudflareRequest);
+    // Convert Cloudflare Workers Response to standard Response for Hono compatibility
+    const responseBody = await response.arrayBuffer();
+    return new Response(responseBody, {
+      status: response.status,
+      statusText: response.statusText,
+      headers: response.headers as unknown as HeadersInit,
+    });
   });
 
   // Route requests to a specific container instance using the container ID
@@ -191,9 +204,17 @@ if (!isTestEnvironment) {
   app.all("*", async (c) => {
     if (astroHandler) {
       try {
-        return await astroHandler.fetch(c.req.raw, c.env, {
+        // Use the raw request with proper type assertion for Cloudflare Workers
+        const response = await astroHandler.fetch(c.req.raw as unknown as CloudflareRequest, c.env, {
           waitUntil: () => {},
           passThroughOnException: () => {},
+        });
+        // Convert Cloudflare Workers Response to standard Response for Hono compatibility
+        const responseBody = await response.arrayBuffer();
+        return new Response(responseBody, {
+          status: response.status,
+          statusText: response.statusText,
+          headers: response.headers as unknown as HeadersInit,
         });
       } catch (error) {
         console.error("Astro SSR error:", error);

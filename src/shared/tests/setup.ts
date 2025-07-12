@@ -46,7 +46,22 @@
 })();
 
 import { vi, beforeEach, afterEach, beforeAll, afterAll } from 'vitest';
-import { env as workerEnv } from 'cloudflare:test';
+
+// Mock worker environment for tests
+const workerEnv = {
+  ALCHEMY_MANAGED: 'true',
+  CONTAINER_VERSION: 'test',
+  DEPLOYMENT_STRATEGY: 'test',
+  STAGE: 'test',
+  CELEBRUM_KV: {
+    get: vi.fn(),
+    put: vi.fn(),
+    delete: vi.fn(),
+    list: vi.fn()
+  },
+  CELEBRUM_CONTAINERS: {},
+  CELEBRUM_DB: {}
+};
 
 // The Cloudflare Workers Vitest integration handles Miniflare setup automatically
 // No need for manual Miniflare configuration when using @cloudflare/vitest-pool-workers
