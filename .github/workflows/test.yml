@@ -38,7 +38,7 @@ jobs:
         echo "npm_config_build_from_source=true" >> $GITHUB_ENV
         echo "npm_config_python=python3" >> $GITHUB_ENV
     - name: Install dependencies
-      run: pnpm install --frozen-lockfile --workspace-root
+      run: pnpm install --frozen-lockfile
     - name: Reinstall better-sqlite3 from source
       run: npm_config_build_from_source=true npm_config_python=python3 npm install better-sqlite3 --no-save --build-from-source
       
@@ -107,7 +107,7 @@ jobs:
         echo "npm_config_build_from_source=true" >> $GITHUB_ENV
         echo "npm_config_python=python3" >> $GITHUB_ENV
     - name: Install dependencies
-      run: pnpm install --frozen-lockfile --workspace-root
+      run: pnpm install --frozen-lockfile
     - name: Reinstall better-sqlite3 from source
       run: npm_config_build_from_source=true npm_config_python=python3 npm install better-sqlite3 --no-save --build-from-source
       
@@ -135,7 +135,7 @@ jobs:
         cache: 'pnpm'
         
     - name: Install dependencies
-      run: pnpm install --frozen-lockfile --workspace-root
+      run: pnpm install --frozen-lockfile
     - name: Reinstall better-sqlite3 from source
       run: npm_config_build_from_source=true npm_config_python=python3 npm install better-sqlite3 --no-save --build-from-source
       
@@ -168,7 +168,7 @@ jobs:
         cache: 'pnpm'
         
     - name: Install dependencies
-      run: pnpm install --frozen-lockfile --workspace-root
+      run: pnpm install --frozen-lockfile
     - name: Reinstall better-sqlite3 from source
       run: npm_config_build_from_source=true npm_config_python=python3 npm install better-sqlite3 --no-save --build-from-source
       
