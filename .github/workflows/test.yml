@@ -37,12 +37,23 @@ jobs:
       run: |
         echo "npm_config_build_from_source=true" >> $GITHUB_ENV
         echo "npm_config_python=python3" >> $GITHUB_ENV
+    - name: Clean node_modules and pnpm store
+      run: |
+        rm -rf node_modules
+        pnpm store prune
     - name: Install dependencies
       run: pnpm install --frozen-lockfile
     - name: Rebuild native modules
       run: pnpm rebuild --recursive
+    - name: Rebuild better-sqlite3 directly
+      run: pnpm rebuild better-sqlite3
     - name: Debug better-sqlite3 build
       run: ls -alR node_modules/.pnpm/better-sqlite3@*/node_modules/better-sqlite3/
+    - name: Show Node version and arch
+      run: node -p "process.version + ' ' + process.arch + ' ' + process.platform"
+    - name: ldd on better_sqlite3.node
+      run: |
+        find node_modules -name better_sqlite3.node -exec ldd {} \; || echo "better_sqlite3.node not found"
     - name: Approve native builds
       run: pnpm approve-builds
       
@@ -110,12 +121,23 @@ jobs:
       run: |
         echo "npm_config_build_from_source=true" >> $GITHUB_ENV
         echo "npm_config_python=python3" >> $GITHUB_ENV
+    - name: Clean node_modules and pnpm store
+      run: |
+        rm -rf node_modules
+        pnpm store prune
     - name: Install dependencies
       run: pnpm install --frozen-lockfile
     - name: Rebuild native modules
       run: pnpm rebuild --recursive
+    - name: Rebuild better-sqlite3 directly
+      run: pnpm rebuild better-sqlite3
     - name: Debug better-sqlite3 build
       run: ls -alR node_modules/.pnpm/better-sqlite3@*/node_modules/better-sqlite3/
+    - name: Show Node version and arch
+      run: node -p "process.version + ' ' + process.arch + ' ' + process.platform"
+    - name: ldd on better_sqlite3.node
+      run: |
+        find node_modules -name better_sqlite3.node -exec ldd {} \; || echo "better_sqlite3.node not found"
     - name: Approve native builds
       run: pnpm approve-builds
       
@@ -142,12 +164,29 @@ jobs:
         node-version: 22.x
         cache: 'pnpm'
         
+    - name: Install system packages for native modules
+      run: sudo apt-get update && sudo apt-get install -y libsqlite3-dev build-essential python3 python-is-python3
+    - name: Set build flags for native modules
+      run: |
+        echo "npm_config_build_from_source=true" >> $GITHUB_ENV
+        echo "npm_config_python=python3" >> $GITHUB_ENV
+    - name: Clean node_modules and pnpm store
+      run: |
+        rm -rf node_modules
+        pnpm store prune
     - name: Install dependencies
       run: pnpm install --frozen-lockfile
     - name: Rebuild native modules
       run: pnpm rebuild --recursive
+    - name: Rebuild better-sqlite3 directly
+      run: pnpm rebuild better-sqlite3
     - name: Debug better-sqlite3 build
       run: ls -alR node_modules/.pnpm/better-sqlite3@*/node_modules/better-sqlite3/
+    - name: Show Node version and arch
+      run: node -p "process.version + ' ' + process.arch + ' ' + process.platform"
+    - name: ldd on better_sqlite3.node
+      run: |
+        find node_modules -name better_sqlite3.node -exec ldd {} \; || echo "better_sqlite3.node not found"
     - name: Approve native builds
       run: pnpm approve-builds
       
@@ -179,12 +218,29 @@ jobs:
         node-version: 22.x
         cache: 'pnpm'
         
+    - name: Install system packages for native modules
+      run: sudo apt-get update && sudo apt-get install -y libsqlite3-dev build-essential python3 python-is-python3
+    - name: Set build flags for native modules
+      run: |
+        echo "npm_config_build_from_source=true" >> $GITHUB_ENV
+        echo "npm_config_python=python3" >> $GITHUB_ENV
+    - name: Clean node_modules and pnpm store
+      run: |
+        rm -rf node_modules
+        pnpm store prune
     - name: Install dependencies
       run: pnpm install --frozen-lockfile
     - name: Rebuild native modules
       run: pnpm rebuild --recursive
+    - name: Rebuild better-sqlite3 directly
+      run: pnpm rebuild better-sqlite3
     - name: Debug better-sqlite3 build
       run: ls -alR node_modules/.pnpm/better-sqlite3@*/node_modules/better-sqlite3/
+    - name: Show Node version and arch
+      run: node -p "process.version + ' ' + process.arch + ' ' + process.platform"
+    - name: ldd on better_sqlite3.node
+      run: |
+        find node_modules -name better_sqlite3.node -exec ldd {} \; || echo "better_sqlite3.node not found"
     - name: Approve native builds
       run: pnpm approve-builds
       
