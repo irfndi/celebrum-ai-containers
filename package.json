@@ -80,6 +80,7 @@
     "better-sqlite3": "^12.2.0",
     "drizzle-kit": "^0.31.4",
     "drizzle-orm": "^0.44.2",
+    "fast-glob": "^3.3.3",
     "jsdom": "^26.1.0",
     "miniflare": "^4.20250705.0",
     "oxlint": "^1.6.0",

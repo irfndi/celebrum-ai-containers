@@ -2,6 +2,106 @@
  * Enhanced mock database with compound condition support
  */
 
+import { vi } from 'vitest';
+
+/**
+ * Sets up a robust, production-grade mock for the 'ccxt' module.
+ * Covers all major exchanges and unified methods, simulates both success and error cases.
+ * Call this at the top of any test file that uses ccxt.
+ */
+export function setupRobustCCXTMock() {
+  vi.mock('ccxt', () => {
+    const createMockExchange = (id: string, name: string) => ({
+      id,
+      name,
+      urls: {
+        api: {
+          public: `https://api.${id}.com`
+        }
+      },
+      rateLimit: 1200,
+      has: {
+        fetchTicker: true,
+        fetchOrderBook: true,
+        fetchTrades: true,
+        fetchOHLCV: true,
+        fetchStatus: true,
+        close: true
+      },
+      markets: {
+        'BTC/USDT': {
+          id: 'BTCUSDT',
+          symbol: 'BTC/USDT',
+          base: 'BTC',
+          quote: 'USDT',
+          active: true
+        }
+      },
+      loadMarkets: vi.fn().mockResolvedValue({}),
+      fetchTicker: vi.fn().mockImplementation((symbol: string) => {
+        if (symbol === 'MISSING') throw new Error('Symbol not found');
+        return Promise.resolve({
+          symbol,
+          last: 45000,
+          bid: 44999,
+          ask: 45001,
+          baseVolume: 1000,
+          quoteVolume: 45000000,
+          timestamp: Date.now(),
+          high: 46000,
+          low: 44000
+        });
+      }),
+      fetchOrderBook: vi.fn().mockImplementation((symbol: string) => {
+        if (symbol === 'MISSING') throw new Error('Symbol not found');
+        return Promise.resolve({
+          symbol,
+          bids: [[44999, 1.5], [44998, 2.0]],
+          asks: [[45001, 1.2], [45002, 1.8]],
+          timestamp: Date.now()
+        });
+      }),
+      fetchTrades: vi.fn().mockImplementation((symbol: string) => {
+        if (symbol === 'MISSING') throw new Error('Symbol not found');
+        return Promise.resolve([
+          {
+            id: '1',
+            timestamp: Date.now(),
+            symbol,
+            side: 'buy',
+            amount: 1.0,
+            price: 45000
+          }
+        ]);
+      }),
+      fetchOHLCV: vi.fn().mockResolvedValue([
+        [Date.now(), 44000, 46000, 43900, 45000, 1000]
+      ]),
+      fetchStatus: vi.fn().mockResolvedValue({ status: 'ok', updated: Date.now() }),
+      close: vi.fn().mockResolvedValue(undefined)
+    });
+
+    const createMockExchangeClass = (id: string, name: string) => {
+      return class {
+        constructor(config?: any) {
+          return createMockExchange(id, name);
+        }
+      };
+    };
+
+    return {
+      binance: createMockExchangeClass('binance', 'Binance'),
+      coinbase: createMockExchangeClass('coinbase', 'Coinbase'),
+      kraken: createMockExchangeClass('kraken', 'Kraken'),
+      bitfinex: createMockExchangeClass('bitfinex', 'Bitfinex'),
+      huobi: createMockExchangeClass('huobi', 'Huobi'),
+      okx: createMockExchangeClass('okx', 'OKX'),
+      bybit: createMockExchangeClass('bybit', 'Bybit'),
+      exchanges: ['binance', 'coinbase', 'kraken', 'bitfinex', 'huobi', 'okx', 'bybit']
+    };
+  });
+}
+
 export class EnhancedProductionDrizzleMock {
   private mockDataStore: Record<string, any[]> = {};
   private nextId = 1;

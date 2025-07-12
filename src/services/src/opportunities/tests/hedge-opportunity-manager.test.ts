@@ -1,6 +1,9 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { OpportunityManager } from '../src/opportunity-manager';
 import type { HedgeOpportunity, HedgeExecutionResult } from '../src/opportunity-manager';
+import { setupRobustCCXTMock } from '../../../shared/tests/utils/enhanced-mock';
+
+setupRobustCCXTMock();
 
 // Mock the shared data source manager
 vi.mock('@celebrum-ai/shared/infrastructure/data-sources', () => {
@@ -73,29 +76,6 @@ vi.mock('node:fetch', () => ({
 }));
 
 global.fetch = vi.fn();
-
-// Mock CCXT library to prevent real exchange connections
-vi.mock('ccxt', () => {
-  const mockExchange = {
-    fetchTicker: vi.fn(),
-    fetchTickers: vi.fn(),
-    fetchOrderBook: vi.fn(),
-    loadMarkets: vi.fn(),
-    close: vi.fn(),
-    has: {
-      fetchTicker: true,
-      fetchTickers: true,
-      fetchOrderBook: true
-    }
-  };
-  
-  return {
-    binance: vi.fn(() => mockExchange),
-    coinbase: vi.fn(() => mockExchange),
-    kraken: vi.fn(() => mockExchange),
-    exchanges: ['binance', 'coinbase', 'kraken']
-  };
-});
 
 // Mock environment with KV
 const mockEnv = {

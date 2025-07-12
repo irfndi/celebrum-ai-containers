@@ -1,58 +1,8 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import type { MarketDataPoint } from '@celebrum-ai/shared/types/market';
+import { setupRobustCCXTMock } from '../../../shared/tests/utils/enhanced-mock';
 
-// Mock fetch globally to prevent real HTTP requests
-const mockFetch = vi.fn();
-global.fetch = mockFetch;
-
-// Mock CCXT library first
-vi.mock('ccxt', () => {
-  const createMockExchange = (id: string, name: string) => ({
-    id,
-    name,
-    urls: {
-      api: {
-        public: `https://api.${id}.com`
-      }
-    },
-    rateLimit: 1200,
-    has: {
-      fetchTicker: true,
-      fetchOrderBook: true,
-      fetchTrades: true,
-      fetchOHLCV: true,
-      fetchStatus: true,
-      close: true
-    },
-    markets: {},
-    loadMarkets: vi.fn().mockResolvedValue({}),
-    fetchTicker: vi.fn(),
-    fetchOrderBook: vi.fn(),
-    fetchTrades: vi.fn(),
-    fetchOHLCV: vi.fn(),
-    fetchStatus: vi.fn().mockResolvedValue({ status: 'ok', updated: Date.now() }),
-    close: vi.fn().mockResolvedValue(undefined)
-  });
-
-  const createMockExchangeClass = (id: string, name: string) => {
-    return class {
-      constructor(config?: any) {
-        return createMockExchange(id, name);
-      }
-    };
-  };
-
-  return {
-    binance: createMockExchangeClass('binance', 'Binance'),
-    coinbase: createMockExchangeClass('coinbase', 'Coinbase'),
-    kraken: createMockExchangeClass('kraken', 'Kraken'),
-    bitfinex: createMockExchangeClass('bitfinex', 'Bitfinex'),
-    huobi: createMockExchangeClass('huobi', 'Huobi'),
-    okx: createMockExchangeClass('okx', 'OKX'),
-    bybit: createMockExchangeClass('bybit', 'Bybit'),
-    exchanges: ['binance', 'coinbase', 'kraken', 'bitfinex', 'huobi', 'okx', 'bybit']
-  };
-});
+setupRobustCCXTMock();
 
 // Mock the CCXT data source manager
 vi.mock('@celebrum-ai/shared/infrastructure/ccxt-data-source', () => ({
