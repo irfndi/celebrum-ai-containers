@@ -1,67 +1,67 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuites name="vitest tests" tests="64" failures="0" errors="0" time="1.195">
-    <testsuite name="src/api-service/tests/e2e/api-endpoints.test.ts" timestamp="2025-07-12T01:47:10.532Z" hostname="Irfandis-MacBook-Pro.local" tests="27" failures="0" errors="0" skipped="0" time="0.414">
-        <testcase classname="src/api-service/tests/e2e/api-endpoints.test.ts" name="API Service E2E Tests &gt; Authentication Endpoints &gt; POST /auth/login &gt; should authenticate user with valid Telegram data" time="0.017">
+<testsuites name="vitest tests" tests="64" failures="0" errors="0" time="1.883">
+    <testsuite name="src/api-service/tests/e2e/api-endpoints.test.ts" timestamp="2025-07-12T01:52:07.709Z" hostname="Irfandis-MacBook-Pro.local" tests="27" failures="0" errors="0" skipped="0" time="0.643">
+        <testcase classname="src/api-service/tests/e2e/api-endpoints.test.ts" name="API Service E2E Tests &gt; Authentication Endpoints &gt; POST /auth/login &gt; should authenticate user with valid Telegram data" time="0.019">
             <system-out>
 Fresh mock database created and initialized for new test
 
             </system-out>
         </testcase>
-        <testcase classname="src/api-service/tests/e2e/api-endpoints.test.ts" name="API Service E2E Tests &gt; Authentication Endpoints &gt; POST /auth/login &gt; should reject invalid Telegram hash" time="0.01">
+        <testcase classname="src/api-service/tests/e2e/api-endpoints.test.ts" name="API Service E2E Tests &gt; Authentication Endpoints &gt; POST /auth/login &gt; should reject invalid Telegram hash" time="0.028">
             <system-out>
 Fresh mock database created and initialized for new test
 
             </system-out>
         </testcase>
-        <testcase classname="src/api-service/tests/e2e/api-endpoints.test.ts" name="API Service E2E Tests &gt; Authentication Endpoints &gt; POST /auth/login &gt; should handle rate limiting" time="0.013">
+        <testcase classname="src/api-service/tests/e2e/api-endpoints.test.ts" name="API Service E2E Tests &gt; Authentication Endpoints &gt; POST /auth/login &gt; should handle rate limiting" time="0.025">
             <system-out>
 Fresh mock database created and initialized for new test
 
             </system-out>
         </testcase>
-        <testcase classname="src/api-service/tests/e2e/api-endpoints.test.ts" name="API Service E2E Tests &gt; Authentication Endpoints &gt; POST /auth/refresh &gt; should refresh valid token" time="0.007">
+        <testcase classname="src/api-service/tests/e2e/api-endpoints.test.ts" name="API Service E2E Tests &gt; Authentication Endpoints &gt; POST /auth/refresh &gt; should refresh valid token" time="0.041">
             <system-out>
 Fresh mock database created and initialized for new test
 
             </system-out>
         </testcase>
-        <testcase classname="src/api-service/tests/e2e/api-endpoints.test.ts" name="API Service E2E Tests &gt; Authentication Endpoints &gt; POST /auth/refresh &gt; should reject expired token" time="0.009">
+        <testcase classname="src/api-service/tests/e2e/api-endpoints.test.ts" name="API Service E2E Tests &gt; Authentication Endpoints &gt; POST /auth/refresh &gt; should reject expired token" time="0.014">
             <system-out>
 Fresh mock database created and initialized for new test
 
             </system-out>
         </testcase>
-        <testcase classname="src/api-service/tests/e2e/api-endpoints.test.ts" name="API Service E2E Tests &gt; User Management Endpoints &gt; GET /users/profile &gt; should return user profile" time="0.008">
+        <testcase classname="src/api-service/tests/e2e/api-endpoints.test.ts" name="API Service E2E Tests &gt; User Management Endpoints &gt; GET /users/profile &gt; should return user profile" time="0.012">
             <system-out>
 Fresh mock database created and initialized for new test
 
             </system-out>
         </testcase>
-        <testcase classname="src/api-service/tests/e2e/api-endpoints.test.ts" name="API Service E2E Tests &gt; User Management Endpoints &gt; GET /users/profile &gt; should handle user not found" time="0.009">
+        <testcase classname="src/api-service/tests/e2e/api-endpoints.test.ts" name="API Service E2E Tests &gt; User Management Endpoints &gt; GET /users/profile &gt; should handle user not found" time="0.013">
             <system-out>
 Fresh mock database created and initialized for new test
 
             </system-out>
         </testcase>
-        <testcase classname="src/api-service/tests/e2e/api-endpoints.test.ts" name="API Service E2E Tests &gt; User Management Endpoints &gt; PUT /users/profile &gt; should update user profile" time="0.007">
+        <testcase classname="src/api-service/tests/e2e/api-endpoints.test.ts" name="API Service E2E Tests &gt; User Management Endpoints &gt; PUT /users/profile &gt; should update user profile" time="0.012">
             <system-out>
 Fresh mock database created and initialized for new test
 
             </system-out>
         </testcase>
-        <testcase classname="src/api-service/tests/e2e/api-endpoints.test.ts" name="API Service E2E Tests &gt; User Management Endpoints &gt; PUT /users/profile &gt; should validate email format" time="0.008">
+        <testcase classname="src/api-service/tests/e2e/api-endpoints.test.ts" name="API Service E2E Tests &gt; User Management Endpoints &gt; PUT /users/profile &gt; should validate email format" time="0.012">
             <system-out>
 Fresh mock database created and initialized for new test
 
             </system-out>
         </testcase>
-        <testcase classname="src/api-service/tests/e2e/api-endpoints.test.ts" name="API Service E2E Tests &gt; Trading Endpoints &gt; GET /trading/positions &gt; should return user positions" time="0.01">
+        <testcase classname="src/api-service/tests/e2e/api-endpoints.test.ts" name="API Service E2E Tests &gt; Trading Endpoints &gt; GET /trading/positions &gt; should return user positions" time="0.013">
             <system-out>
 Fresh mock database created and initialized for new test
 
             </system-out>
         </testcase>
-        <testcase classname="src/api-service/tests/e2e/api-endpoints.test.ts" name="API Service E2E Tests &gt; Trading Endpoints &gt; GET /trading/positions &gt; should handle empty positions" time="0.006">
+        <testcase classname="src/api-service/tests/e2e/api-endpoints.test.ts" name="API Service E2E Tests &gt; Trading Endpoints &gt; GET /trading/positions &gt; should handle empty positions" time="0.008">
             <system-out>
 Fresh mock database created and initialized for new test
 
@@ -73,13 +73,13 @@ Fresh mock database created and initialized for new test
 
             </system-out>
         </testcase>
-        <testcase classname="src/api-service/tests/e2e/api-endpoints.test.ts" name="API Service E2E Tests &gt; Trading Endpoints &gt; POST /trading/positions &gt; should handle insufficient balance" time="0.005">
+        <testcase classname="src/api-service/tests/e2e/api-endpoints.test.ts" name="API Service E2E Tests &gt; Trading Endpoints &gt; POST /trading/positions &gt; should handle insufficient balance" time="0.01">
             <system-out>
 Fresh mock database created and initialized for new test
 
             </system-out>
         </testcase>
-        <testcase classname="src/api-service/tests/e2e/api-endpoints.test.ts" name="API Service E2E Tests &gt; Trading Endpoints &gt; POST /trading/positions &gt; should handle expired opportunity" time="0.006">
+        <testcase classname="src/api-service/tests/e2e/api-endpoints.test.ts" name="API Service E2E Tests &gt; Trading Endpoints &gt; POST /trading/positions &gt; should handle expired opportunity" time="0.005">
             <system-out>
 Fresh mock database created and initialized for new test
 
@@ -91,7 +91,7 @@ Fresh mock database created and initialized for new test
 
             </system-out>
         </testcase>
-        <testcase classname="src/api-service/tests/e2e/api-endpoints.test.ts" name="API Service E2E Tests &gt; Trading Endpoints &gt; DELETE /trading/positions/:id &gt; should handle position not found" time="0.006">
+        <testcase classname="src/api-service/tests/e2e/api-endpoints.test.ts" name="API Service E2E Tests &gt; Trading Endpoints &gt; DELETE /trading/positions/:id &gt; should handle position not found" time="0.012">
             <system-out>
 Fresh mock database created and initialized for new test
 
@@ -103,105 +103,105 @@ Fresh mock database created and initialized for new test
 
             </system-out>
         </testcase>
-        <testcase classname="src/api-service/tests/e2e/api-endpoints.test.ts" name="API Service E2E Tests &gt; Market Data Endpoints &gt; GET /market/opportunities &gt; should return active opportunities" time="0.006">
+        <testcase classname="src/api-service/tests/e2e/api-endpoints.test.ts" name="API Service E2E Tests &gt; Market Data Endpoints &gt; GET /market/opportunities &gt; should return active opportunities" time="0.012">
             <system-out>
 Fresh mock database created and initialized for new test
 
             </system-out>
         </testcase>
-        <testcase classname="src/api-service/tests/e2e/api-endpoints.test.ts" name="API Service E2E Tests &gt; Market Data Endpoints &gt; GET /market/opportunities &gt; should filter opportunities by risk tolerance" time="0.01">
+        <testcase classname="src/api-service/tests/e2e/api-endpoints.test.ts" name="API Service E2E Tests &gt; Market Data Endpoints &gt; GET /market/opportunities &gt; should filter opportunities by risk tolerance" time="0.007">
             <system-out>
 Fresh mock database created and initialized for new test
 
             </system-out>
         </testcase>
-        <testcase classname="src/api-service/tests/e2e/api-endpoints.test.ts" name="API Service E2E Tests &gt; Market Data Endpoints &gt; GET /market/prices/:symbol &gt; should return current price data" time="0.011">
+        <testcase classname="src/api-service/tests/e2e/api-endpoints.test.ts" name="API Service E2E Tests &gt; Market Data Endpoints &gt; GET /market/prices/:symbol &gt; should return current price data" time="0.017">
             <system-out>
 Fresh mock database created and initialized for new test
 
             </system-out>
         </testcase>
-        <testcase classname="src/api-service/tests/e2e/api-endpoints.test.ts" name="API Service E2E Tests &gt; Market Data Endpoints &gt; GET /market/prices/:symbol &gt; should handle invalid symbol" time="0.007">
+        <testcase classname="src/api-service/tests/e2e/api-endpoints.test.ts" name="API Service E2E Tests &gt; Market Data Endpoints &gt; GET /market/prices/:symbol &gt; should handle invalid symbol" time="0.014">
             <system-out>
 Fresh mock database created and initialized for new test
 
             </system-out>
         </testcase>
-        <testcase classname="src/api-service/tests/e2e/api-endpoints.test.ts" name="API Service E2E Tests &gt; Error Handling and Edge Cases &gt; should handle database connection errors" time="0.006">
+        <testcase classname="src/api-service/tests/e2e/api-endpoints.test.ts" name="API Service E2E Tests &gt; Error Handling and Edge Cases &gt; should handle database connection errors" time="0.01">
             <system-out>
 Fresh mock database created and initialized for new test
 
             </system-out>
         </testcase>
-        <testcase classname="src/api-service/tests/e2e/api-endpoints.test.ts" name="API Service E2E Tests &gt; Error Handling and Edge Cases &gt; should handle external API failures" time="0.01">
+        <testcase classname="src/api-service/tests/e2e/api-endpoints.test.ts" name="API Service E2E Tests &gt; Error Handling and Edge Cases &gt; should handle external API failures" time="0.014">
             <system-out>
 Fresh mock database created and initialized for new test
 
             </system-out>
         </testcase>
-        <testcase classname="src/api-service/tests/e2e/api-endpoints.test.ts" name="API Service E2E Tests &gt; Error Handling and Edge Cases &gt; should handle malformed requests" time="0.007">
+        <testcase classname="src/api-service/tests/e2e/api-endpoints.test.ts" name="API Service E2E Tests &gt; Error Handling and Edge Cases &gt; should handle malformed requests" time="0.015">
             <system-out>
 Fresh mock database created and initialized for new test
 
             </system-out>
         </testcase>
-        <testcase classname="src/api-service/tests/e2e/api-endpoints.test.ts" name="API Service E2E Tests &gt; Error Handling and Edge Cases &gt; should handle missing authorization header" time="0.008">
+        <testcase classname="src/api-service/tests/e2e/api-endpoints.test.ts" name="API Service E2E Tests &gt; Error Handling and Edge Cases &gt; should handle missing authorization header" time="0.011">
             <system-out>
 Fresh mock database created and initialized for new test
 
             </system-out>
         </testcase>
-        <testcase classname="src/api-service/tests/e2e/api-endpoints.test.ts" name="API Service E2E Tests &gt; Performance and Scalability &gt; should handle concurrent requests" time="0.104">
+        <testcase classname="src/api-service/tests/e2e/api-endpoints.test.ts" name="API Service E2E Tests &gt; Performance and Scalability &gt; should handle concurrent requests" time="0.107">
             <system-out>
 Fresh mock database created and initialized for new test
 
             </system-out>
         </testcase>
-        <testcase classname="src/api-service/tests/e2e/api-endpoints.test.ts" name="API Service E2E Tests &gt; Performance and Scalability &gt; should implement request caching" time="0.006">
+        <testcase classname="src/api-service/tests/e2e/api-endpoints.test.ts" name="API Service E2E Tests &gt; Performance and Scalability &gt; should implement request caching" time="0.007">
             <system-out>
 Fresh mock database created and initialized for new test
 
             </system-out>
         </testcase>
     </testsuite>
-    <testsuite name="src/shared/tests/e2e/database-scenarios.test.ts" timestamp="2025-07-12T01:47:10.538Z" hostname="Irfandis-MacBook-Pro.local" tests="12" failures="0" errors="0" skipped="0" time="0.185">
-        <testcase classname="src/shared/tests/e2e/database-scenarios.test.ts" name="Database E2E Scenarios &gt; User Registration Flow &gt; should handle complete new user registration with invitation" time="0.012">
+    <testsuite name="src/shared/tests/e2e/database-scenarios.test.ts" timestamp="2025-07-12T01:52:07.715Z" hostname="Irfandis-MacBook-Pro.local" tests="12" failures="0" errors="0" skipped="0" time="0.452">
+        <testcase classname="src/shared/tests/e2e/database-scenarios.test.ts" name="Database E2E Scenarios &gt; User Registration Flow &gt; should handle complete new user registration with invitation" time="0.034">
         </testcase>
-        <testcase classname="src/shared/tests/e2e/database-scenarios.test.ts" name="Database E2E Scenarios &gt; User Registration Flow &gt; should handle existing user login" time="0.024">
+        <testcase classname="src/shared/tests/e2e/database-scenarios.test.ts" name="Database E2E Scenarios &gt; User Registration Flow &gt; should handle existing user login" time="0.052">
         </testcase>
-        <testcase classname="src/shared/tests/e2e/database-scenarios.test.ts" name="Database E2E Scenarios &gt; User Registration Flow &gt; should reject invalid invitation codes" time="0.012">
+        <testcase classname="src/shared/tests/e2e/database-scenarios.test.ts" name="Database E2E Scenarios &gt; User Registration Flow &gt; should reject invalid invitation codes" time="0.024">
         </testcase>
-        <testcase classname="src/shared/tests/e2e/database-scenarios.test.ts" name="Database E2E Scenarios &gt; Session Management &gt; should handle session retrieval with KV caching" time="0.01">
+        <testcase classname="src/shared/tests/e2e/database-scenarios.test.ts" name="Database E2E Scenarios &gt; Session Management &gt; should handle session retrieval with KV caching" time="0.04">
         </testcase>
-        <testcase classname="src/shared/tests/e2e/database-scenarios.test.ts" name="Database E2E Scenarios &gt; Session Management &gt; should handle session expiration" time="0.012">
+        <testcase classname="src/shared/tests/e2e/database-scenarios.test.ts" name="Database E2E Scenarios &gt; Session Management &gt; should handle session expiration" time="0.023">
         </testcase>
-        <testcase classname="src/shared/tests/e2e/database-scenarios.test.ts" name="Database E2E Scenarios &gt; Trading Signals &gt; should create and cache trading signals" time="0.008">
+        <testcase classname="src/shared/tests/e2e/database-scenarios.test.ts" name="Database E2E Scenarios &gt; Trading Signals &gt; should create and cache trading signals" time="0.016">
         </testcase>
-        <testcase classname="src/shared/tests/e2e/database-scenarios.test.ts" name="Database E2E Scenarios &gt; Trading Signals &gt; should maintain only latest 10 signals in cache" time="0.008">
+        <testcase classname="src/shared/tests/e2e/database-scenarios.test.ts" name="Database E2E Scenarios &gt; Trading Signals &gt; should maintain only latest 10 signals in cache" time="0.01">
         </testcase>
-        <testcase classname="src/shared/tests/e2e/database-scenarios.test.ts" name="Database E2E Scenarios &gt; System Statistics &gt; should calculate comprehensive system stats" time="0.009">
+        <testcase classname="src/shared/tests/e2e/database-scenarios.test.ts" name="Database E2E Scenarios &gt; System Statistics &gt; should calculate comprehensive system stats" time="0.012">
         </testcase>
-        <testcase classname="src/shared/tests/e2e/database-scenarios.test.ts" name="Database E2E Scenarios &gt; Performance and Scalability &gt; should handle concurrent user registrations" time="0.007">
+        <testcase classname="src/shared/tests/e2e/database-scenarios.test.ts" name="Database E2E Scenarios &gt; Performance and Scalability &gt; should handle concurrent user registrations" time="0.013">
         </testcase>
-        <testcase classname="src/shared/tests/e2e/database-scenarios.test.ts" name="Database E2E Scenarios &gt; Performance and Scalability &gt; should handle large dataset operations" time="0.007">
+        <testcase classname="src/shared/tests/e2e/database-scenarios.test.ts" name="Database E2E Scenarios &gt; Performance and Scalability &gt; should handle large dataset operations" time="0.012">
         </testcase>
-        <testcase classname="src/shared/tests/e2e/database-scenarios.test.ts" name="Database E2E Scenarios &gt; Error Handling and Recovery &gt; should handle database connection failures gracefully" time="0.006">
+        <testcase classname="src/shared/tests/e2e/database-scenarios.test.ts" name="Database E2E Scenarios &gt; Error Handling and Recovery &gt; should handle database connection failures gracefully" time="0.009">
         </testcase>
-        <testcase classname="src/shared/tests/e2e/database-scenarios.test.ts" name="Database E2E Scenarios &gt; Error Handling and Recovery &gt; should handle KV storage failures gracefully" time="0.007">
+        <testcase classname="src/shared/tests/e2e/database-scenarios.test.ts" name="Database E2E Scenarios &gt; Error Handling and Recovery &gt; should handle KV storage failures gracefully" time="0.015">
             <system-err>
 KV caching failed: KV storage failed
 
             </system-err>
         </testcase>
     </testsuite>
-    <testsuite name="src/telegram-bot/tests/e2e/bot-workflow.test.ts" timestamp="2025-07-12T01:47:10.539Z" hostname="Irfandis-MacBook-Pro.local" tests="13" failures="0" errors="0" skipped="0" time="0.412">
-        <testcase classname="src/telegram-bot/tests/e2e/bot-workflow.test.ts" name="Telegram Bot E2E Workflows &gt; New User Onboarding Flow &gt; should complete full onboarding process" time="0.012">
+    <testsuite name="src/telegram-bot/tests/e2e/bot-workflow.test.ts" timestamp="2025-07-12T01:52:07.716Z" hostname="Irfandis-MacBook-Pro.local" tests="13" failures="0" errors="0" skipped="0" time="0.434">
+        <testcase classname="src/telegram-bot/tests/e2e/bot-workflow.test.ts" name="Telegram Bot E2E Workflows &gt; New User Onboarding Flow &gt; should complete full onboarding process" time="0.016">
             <system-out>
 Fresh mock database created and initialized for new test
 
 === PROCESS TELEGRAM UPDATE START ===
 Update object: {
-  &quot;update_id&quot;: 1752284830097,
+  &quot;update_id&quot;: 1752285127244,
   &quot;message&quot;: {
     &quot;message_id&quot;: 1,
     &quot;from&quot;: {
@@ -215,7 +215,7 @@ Update object: {
       &quot;id&quot;: 123456789,
       &quot;type&quot;: &quot;private&quot;
     },
-    &quot;date&quot;: 1752284830,
+    &quot;date&quot;: 1752285127,
     &quot;text&quot;: &quot;/start&quot;
   }
 }
@@ -229,7 +229,7 @@ Processing update with message: {
     username: &apos;testuser&apos;
   },
   chat: { id: 123456789, type: &apos;private&apos; },
-  date: 1752284830,
+  date: 1752285127,
   text: &apos;/start&apos;
 }
 Message text: /start
@@ -264,13 +264,13 @@ Handler response: {
 
             </system-out>
         </testcase>
-        <testcase classname="src/telegram-bot/tests/e2e/bot-workflow.test.ts" name="Telegram Bot E2E Workflows &gt; New User Onboarding Flow &gt; should handle onboarding callback interactions" time="0.005">
+        <testcase classname="src/telegram-bot/tests/e2e/bot-workflow.test.ts" name="Telegram Bot E2E Workflows &gt; New User Onboarding Flow &gt; should handle onboarding callback interactions" time="0.007">
             <system-out>
 Fresh mock database created and initialized for new test
 
 === PROCESS TELEGRAM UPDATE START ===
 Update object: {
-  &quot;update_id&quot;: 1752284830107,
+  &quot;update_id&quot;: 1752285127258,
   &quot;callback_query&quot;: {
     &quot;id&quot;: &quot;callback_1&quot;,
     &quot;from&quot;: {
@@ -285,7 +285,7 @@ Update object: {
         &quot;id&quot;: 123456789,
         &quot;type&quot;: &quot;private&quot;
       },
-      &quot;date&quot;: 1752284830,
+      &quot;date&quot;: 1752285127,
       &quot;text&quot;: &quot;Welcome to CelebrumAI!&quot;
     },
     &quot;data&quot;: &quot;onboarding_start&quot;
@@ -295,13 +295,13 @@ Processing callback query
 
             </system-out>
         </testcase>
-        <testcase classname="src/telegram-bot/tests/e2e/bot-workflow.test.ts" name="Telegram Bot E2E Workflows &gt; New User Onboarding Flow &gt; should complete risk preference selection" time="0.004">
+        <testcase classname="src/telegram-bot/tests/e2e/bot-workflow.test.ts" name="Telegram Bot E2E Workflows &gt; New User Onboarding Flow &gt; should complete risk preference selection" time="0.005">
             <system-out>
 Fresh mock database created and initialized for new test
 
 === PROCESS TELEGRAM UPDATE START ===
 Update object: {
-  &quot;update_id&quot;: 1752284830111,
+  &quot;update_id&quot;: 1752285127264,
   &quot;callback_query&quot;: {
     &quot;id&quot;: &quot;callback_2&quot;,
     &quot;from&quot;: {
@@ -316,7 +316,7 @@ Update object: {
         &quot;id&quot;: 123456789,
         &quot;type&quot;: &quot;private&quot;
       },
-      &quot;date&quot;: 1752284830,
+      &quot;date&quot;: 1752285127,
       &quot;text&quot;: &quot;Previous message&quot;
     },
     &quot;data&quot;: &quot;risk_moderate&quot;
@@ -326,13 +326,13 @@ Processing callback query
 
             </system-out>
         </testcase>
-        <testcase classname="src/telegram-bot/tests/e2e/bot-workflow.test.ts" name="Telegram Bot E2E Workflows &gt; Trading Opportunities Workflow &gt; should display available trading opportunities" time="0.033">
+        <testcase classname="src/telegram-bot/tests/e2e/bot-workflow.test.ts" name="Telegram Bot E2E Workflows &gt; Trading Opportunities Workflow &gt; should display available trading opportunities" time="0.043">
             <system-out>
 Fresh mock database created and initialized for new test
 
 === PROCESS TELEGRAM UPDATE START ===
 Update object: {
-  &quot;update_id&quot;: 1752284830121,
+  &quot;update_id&quot;: 1752285127274,
   &quot;message&quot;: {
     &quot;message_id&quot;: 3,
     &quot;from&quot;: {
@@ -345,7 +345,7 @@ Update object: {
       &quot;id&quot;: 123456789,
       &quot;type&quot;: &quot;private&quot;
     },
-    &quot;date&quot;: 1752284830,
+    &quot;date&quot;: 1752285127,
     &quot;text&quot;: &quot;/opportunities&quot;
   }
 }
@@ -358,7 +358,7 @@ Processing update with message: {
     username: &apos;testuser&apos;
   },
   chat: { id: 123456789, type: &apos;private&apos; },
-  date: 1752284830,
+  date: 1752285127,
   text: &apos;/opportunities&apos;
 }
 Message text: /opportunities
@@ -381,7 +381,7 @@ Handler response: {
     &apos;🥈 ETH/USDT: 3.8% profit\n&apos; +
     &apos;🥉 ADA/USDT: 2.1% profit\n&apos; +
     &apos;\n&apos; +
-    &apos;🔄 &lt;i&gt;Updated: 8:47:10 AM&lt;/i&gt;\n&apos; +
+    &apos;🔄 &lt;i&gt;Updated: 8:52:07 AM&lt;/i&gt;\n&apos; +
     &apos;\n&apos; +
     &apos;💡 Use /opportunities high for high-profit only&apos;,
   parse_mode: &apos;HTML&apos;
@@ -390,13 +390,13 @@ Handler response: {
 
             </system-out>
         </testcase>
-        <testcase classname="src/telegram-bot/tests/e2e/bot-workflow.test.ts" name="Telegram Bot E2E Workflows &gt; Trading Opportunities Workflow &gt; should handle opportunity selection and position creation" time="0.005">
+        <testcase classname="src/telegram-bot/tests/e2e/bot-workflow.test.ts" name="Telegram Bot E2E Workflows &gt; Trading Opportunities Workflow &gt; should handle opportunity selection and position creation" time="0.009">
             <system-out>
 Fresh mock database created and initialized for new test
 
 === PROCESS TELEGRAM UPDATE START ===
 Update object: {
-  &quot;update_id&quot;: 1752284830155,
+  &quot;update_id&quot;: 1752285127319,
   &quot;callback_query&quot;: {
     &quot;id&quot;: &quot;callback_3&quot;,
     &quot;from&quot;: {
@@ -411,7 +411,7 @@ Update object: {
         &quot;id&quot;: 123456789,
         &quot;type&quot;: &quot;private&quot;
       },
-      &quot;date&quot;: 1752284830,
+      &quot;date&quot;: 1752285127,
       &quot;text&quot;: &quot;Previous message&quot;
     },
     &quot;data&quot;: &quot;opportunity_1&quot;
@@ -421,13 +421,13 @@ Processing callback query
 
             </system-out>
         </testcase>
-        <testcase classname="src/telegram-bot/tests/e2e/bot-workflow.test.ts" name="Telegram Bot E2E Workflows &gt; Trading Opportunities Workflow &gt; should execute trade and create position" time="0.004">
+        <testcase classname="src/telegram-bot/tests/e2e/bot-workflow.test.ts" name="Telegram Bot E2E Workflows &gt; Trading Opportunities Workflow &gt; should execute trade and create position" time="0.008">
             <system-out>
 Fresh mock database created and initialized for new test
 
 === PROCESS TELEGRAM UPDATE START ===
 Update object: {
-  &quot;update_id&quot;: 1752284830158,
+  &quot;update_id&quot;: 1752285127328,
   &quot;callback_query&quot;: {
     &quot;id&quot;: &quot;callback_4&quot;,
     &quot;from&quot;: {
@@ -442,7 +442,7 @@ Update object: {
         &quot;id&quot;: 123456789,
         &quot;type&quot;: &quot;private&quot;
       },
-      &quot;date&quot;: 1752284830,
+      &quot;date&quot;: 1752285127,
       &quot;text&quot;: &quot;Previous message&quot;
     },
     &quot;data&quot;: &quot;invest_250&quot;
@@ -458,7 +458,7 @@ Fresh mock database created and initialized for new test
 
 === PROCESS TELEGRAM UPDATE START ===
 Update object: {
-  &quot;update_id&quot;: 1752284830166,
+  &quot;update_id&quot;: 1752285127342,
   &quot;message&quot;: {
     &quot;message_id&quot;: 5,
     &quot;from&quot;: {
@@ -471,7 +471,7 @@ Update object: {
       &quot;id&quot;: 123456789,
       &quot;type&quot;: &quot;private&quot;
     },
-    &quot;date&quot;: 1752284830,
+    &quot;date&quot;: 1752285127,
     &quot;text&quot;: &quot;/portfolio&quot;
   }
 }
@@ -484,7 +484,7 @@ Processing update with message: {
     username: &apos;testuser&apos;
   },
   chat: { id: 123456789, type: &apos;private&apos; },
-  date: 1752284830,
+  date: 1752285127,
   text: &apos;/portfolio&apos;
 }
 Message text: /portfolio
@@ -503,13 +503,13 @@ Handler response: {
 
             </system-out>
         </testcase>
-        <testcase classname="src/telegram-bot/tests/e2e/bot-workflow.test.ts" name="Telegram Bot E2E Workflows &gt; Portfolio Management Workflow &gt; should handle position closure" time="0.005">
+        <testcase classname="src/telegram-bot/tests/e2e/bot-workflow.test.ts" name="Telegram Bot E2E Workflows &gt; Portfolio Management Workflow &gt; should handle position closure" time="0.008">
             <system-out>
 Fresh mock database created and initialized for new test
 
 === PROCESS TELEGRAM UPDATE START ===
 Update object: {
-  &quot;update_id&quot;: 1752284830172,
+  &quot;update_id&quot;: 1752285127349,
   &quot;callback_query&quot;: {
     &quot;id&quot;: &quot;callback_5&quot;,
     &quot;from&quot;: {
@@ -524,7 +524,7 @@ Update object: {
         &quot;id&quot;: 123456789,
         &quot;type&quot;: &quot;private&quot;
       },
-      &quot;date&quot;: 1752284830,
+      &quot;date&quot;: 1752285127,
       &quot;text&quot;: &quot;Previous message&quot;
     },
     &quot;data&quot;: &quot;close_position_1&quot;
@@ -534,13 +534,13 @@ Processing callback query
 
             </system-out>
         </testcase>
-        <testcase classname="src/telegram-bot/tests/e2e/bot-workflow.test.ts" name="Telegram Bot E2E Workflows &gt; Error Handling and Edge Cases &gt; should handle opportunities command" time="0.004">
+        <testcase classname="src/telegram-bot/tests/e2e/bot-workflow.test.ts" name="Telegram Bot E2E Workflows &gt; Error Handling and Edge Cases &gt; should handle opportunities command" time="0.006">
             <system-out>
 Fresh mock database created and initialized for new test
 
 === PROCESS TELEGRAM UPDATE START ===
 Update object: {
-  &quot;update_id&quot;: 1752284830179,
+  &quot;update_id&quot;: 1752285127360,
   &quot;message&quot;: {
     &quot;message_id&quot;: 7,
     &quot;from&quot;: {
@@ -553,7 +553,7 @@ Update object: {
       &quot;id&quot;: 123456789,
       &quot;type&quot;: &quot;private&quot;
     },
-    &quot;date&quot;: 1752284830,
+    &quot;date&quot;: 1752285127,
     &quot;text&quot;: &quot;/opportunities&quot;
   }
 }
@@ -566,7 +566,7 @@ Processing update with message: {
     username: &apos;testuser&apos;
   },
   chat: { id: 123456789, type: &apos;private&apos; },
-  date: 1752284830,
+  date: 1752285127,
   text: &apos;/opportunities&apos;
 }
 Message text: /opportunities
@@ -589,7 +589,7 @@ Handler response: {
     &apos;🥈 ETH/USDT: 3.8% profit\n&apos; +
     &apos;🥉 ADA/USDT: 2.1% profit\n&apos; +
     &apos;\n&apos; +
-    &apos;🔄 &lt;i&gt;Updated: 8:47:10 AM&lt;/i&gt;\n&apos; +
+    &apos;🔄 &lt;i&gt;Updated: 8:52:07 AM&lt;/i&gt;\n&apos; +
     &apos;\n&apos; +
     &apos;💡 Use /opportunities high for high-profit only&apos;,
   parse_mode: &apos;HTML&apos;
@@ -598,13 +598,13 @@ Handler response: {
 
             </system-out>
         </testcase>
-        <testcase classname="src/telegram-bot/tests/e2e/bot-workflow.test.ts" name="Telegram Bot E2E Workflows &gt; Error Handling and Edge Cases &gt; should handle insufficient balance scenarios" time="0.006">
+        <testcase classname="src/telegram-bot/tests/e2e/bot-workflow.test.ts" name="Telegram Bot E2E Workflows &gt; Error Handling and Edge Cases &gt; should handle insufficient balance scenarios" time="0.003">
             <system-out>
 Fresh mock database created and initialized for new test
 
 === PROCESS TELEGRAM UPDATE START ===
 Update object: {
-  &quot;update_id&quot;: 1752284830184,
+  &quot;update_id&quot;: 1752285127365,
   &quot;callback_query&quot;: {
     &quot;id&quot;: &quot;callback_6&quot;,
     &quot;from&quot;: {
@@ -619,7 +619,7 @@ Update object: {
         &quot;id&quot;: 123456789,
         &quot;type&quot;: &quot;private&quot;
       },
-      &quot;date&quot;: 1752284830,
+      &quot;date&quot;: 1752285127,
       &quot;text&quot;: &quot;Previous message&quot;
     },
     &quot;data&quot;: &quot;invest_500&quot;
@@ -635,7 +635,7 @@ Fresh mock database created and initialized for new test
 
 === PROCESS TELEGRAM UPDATE START ===
 Update object: {
-  &quot;update_id&quot;: 1752284830190,
+  &quot;update_id&quot;: 1752285127370,
   &quot;callback_query&quot;: {
     &quot;id&quot;: &quot;callback_7&quot;,
     &quot;from&quot;: {
@@ -650,7 +650,7 @@ Update object: {
         &quot;id&quot;: 123456789,
         &quot;type&quot;: &quot;private&quot;
       },
-      &quot;date&quot;: 1752284830,
+      &quot;date&quot;: 1752285127,
       &quot;text&quot;: &quot;Previous message&quot;
     },
     &quot;data&quot;: &quot;opportunity_999&quot;
@@ -660,33 +660,33 @@ Processing callback query
 
             </system-out>
         </testcase>
-        <testcase classname="src/telegram-bot/tests/e2e/bot-workflow.test.ts" name="Telegram Bot E2E Workflows &gt; Performance and Reliability &gt; should handle high message volume" time="0.102">
+        <testcase classname="src/telegram-bot/tests/e2e/bot-workflow.test.ts" name="Telegram Bot E2E Workflows &gt; Performance and Reliability &gt; should handle high message volume" time="0.091">
             <system-out>
 Fresh mock database created and initialized for new test
 
             </system-out>
         </testcase>
-        <testcase classname="src/telegram-bot/tests/e2e/bot-workflow.test.ts" name="Telegram Bot E2E Workflows &gt; Performance and Reliability &gt; should implement rate limiting" time="0.196">
+        <testcase classname="src/telegram-bot/tests/e2e/bot-workflow.test.ts" name="Telegram Bot E2E Workflows &gt; Performance and Reliability &gt; should implement rate limiting" time="0.195">
             <system-out>
 Fresh mock database created and initialized for new test
 
             </system-out>
         </testcase>
     </testsuite>
-    <testsuite name="src/web/tests/e2e/landing-page.test.ts" timestamp="2025-07-12T01:47:10.541Z" hostname="Irfandis-MacBook-Pro.local" tests="5" failures="0" errors="0" skipped="0" time="0.107">
-        <testcase classname="src/web/tests/e2e/landing-page.test.ts" name="Landing Page Entry Point &gt; should have correct API routes structure" time="0.012">
+    <testsuite name="src/web/tests/e2e/landing-page.test.ts" timestamp="2025-07-12T01:52:07.719Z" hostname="Irfandis-MacBook-Pro.local" tests="5" failures="0" errors="0" skipped="0" time="0.239">
+        <testcase classname="src/web/tests/e2e/landing-page.test.ts" name="Landing Page Entry Point &gt; should have correct API routes structure" time="0.033">
         </testcase>
-        <testcase classname="src/web/tests/e2e/landing-page.test.ts" name="Landing Page Entry Point &gt; should verify API health endpoint" time="0.023">
+        <testcase classname="src/web/tests/e2e/landing-page.test.ts" name="Landing Page Entry Point &gt; should verify API health endpoint" time="0.04">
         </testcase>
-        <testcase classname="src/web/tests/e2e/landing-page.test.ts" name="Landing Page Entry Point &gt; should verify API status endpoint" time="0.013">
+        <testcase classname="src/web/tests/e2e/landing-page.test.ts" name="Landing Page Entry Point &gt; should verify API status endpoint" time="0.038">
         </testcase>
-        <testcase classname="src/web/tests/e2e/landing-page.test.ts" name="Landing Page Entry Point &gt; should handle API errors gracefully" time="0.012">
+        <testcase classname="src/web/tests/e2e/landing-page.test.ts" name="Landing Page Entry Point &gt; should handle API errors gracefully" time="0.016">
         </testcase>
-        <testcase classname="src/web/tests/e2e/landing-page.test.ts" name="Landing Page Entry Point &gt; should verify Telegram webhook endpoint" time="0.011">
+        <testcase classname="src/web/tests/e2e/landing-page.test.ts" name="Landing Page Entry Point &gt; should verify Telegram webhook endpoint" time="0.03">
         </testcase>
     </testsuite>
-    <testsuite name="src/web/tests/e2e/user-flow.test.ts" timestamp="2025-07-12T01:47:10.541Z" hostname="Irfandis-MacBook-Pro.local" tests="7" failures="0" errors="0" skipped="0" time="0.077">
-        <testcase classname="src/web/tests/e2e/user-flow.test.ts" name="Complete User Flow E2E Tests &gt; Landing Page Access &gt; should load landing page successfully" time="0.017">
+    <testsuite name="src/web/tests/e2e/user-flow.test.ts" timestamp="2025-07-12T01:52:07.719Z" hostname="Irfandis-MacBook-Pro.local" tests="7" failures="0" errors="0" skipped="0" time="0.115">
+        <testcase classname="src/web/tests/e2e/user-flow.test.ts" name="Complete User Flow E2E Tests &gt; Landing Page Access &gt; should load landing page successfully" time="0.025">
             <system-out>
 Fresh mock database created and initialized for new test
 
@@ -699,7 +699,7 @@ mockCreateDb calls so far: 0
 
             </system-out>
         </testcase>
-        <testcase classname="src/web/tests/e2e/user-flow.test.ts" name="Complete User Flow E2E Tests &gt; Landing Page Access &gt; should have working API health check" time="0.006">
+        <testcase classname="src/web/tests/e2e/user-flow.test.ts" name="Complete User Flow E2E Tests &gt; Landing Page Access &gt; should have working API health check" time="0.007">
             <system-out>
 Fresh mock database created and initialized for new test
 
@@ -712,7 +712,7 @@ mockCreateDb calls so far: 0
 
             </system-out>
         </testcase>
-        <testcase classname="src/web/tests/e2e/user-flow.test.ts" name="Complete User Flow E2E Tests &gt; Landing Page Access &gt; should have working API status check" time="0.007">
+        <testcase classname="src/web/tests/e2e/user-flow.test.ts" name="Complete User Flow E2E Tests &gt; Landing Page Access &gt; should have working API status check" time="0.005">
             <system-out>
 Fresh mock database created and initialized for new test
 
@@ -725,7 +725,7 @@ mockCreateDb calls so far: 0
 
             </system-out>
         </testcase>
-        <testcase classname="src/web/tests/e2e/user-flow.test.ts" name="Complete User Flow E2E Tests &gt; Telegram Bot Interaction Flow &gt; should handle new user /start command without invitation" time="0.007">
+        <testcase classname="src/web/tests/e2e/user-flow.test.ts" name="Complete User Flow E2E Tests &gt; Telegram Bot Interaction Flow &gt; should handle new user /start command without invitation" time="0.009">
             <system-out>
 Fresh mock database created and initialized for new test
 
@@ -738,10 +738,10 @@ mockCreateDb calls so far: 0
 
 === PROCESS TELEGRAM UPDATE START ===
 Update object: {
-  &quot;update_id&quot;: 183860454,
+  &quot;update_id&quot;: 69192724,
   &quot;message&quot;: {
-    &quot;message_id&quot;: 317070069,
-    &quot;date&quot;: 1752284830,
+    &quot;message_id&quot;: 637962192,
+    &quot;date&quot;: 1752285127,
     &quot;text&quot;: &quot;/start&quot;,
     &quot;from&quot;: {
       &quot;id&quot;: 54321,
@@ -761,8 +761,8 @@ Update object: {
   }
 }
 Processing update with message: {
-  message_id: 317070069,
-  date: 1752284830,
+  message_id: 637962192,
+  date: 1752285127,
   text: &apos;/start&apos;,
   from: {
     id: 54321,
@@ -817,7 +817,7 @@ Handler response: {
 
             </system-out>
         </testcase>
-        <testcase classname="src/web/tests/e2e/user-flow.test.ts" name="Complete User Flow E2E Tests &gt; Telegram Bot Interaction Flow &gt; should handle new user registration with valid invitation" time="0.01">
+        <testcase classname="src/web/tests/e2e/user-flow.test.ts" name="Complete User Flow E2E Tests &gt; Telegram Bot Interaction Flow &gt; should handle new user registration with valid invitation" time="0.013">
             <system-out>
 Fresh mock database created and initialized for new test
 
@@ -840,19 +840,19 @@ Inserted invitation: {
   &quot;id&quot;: 1,
   &quot;code&quot;: &quot;BETA2025&quot;,
   &quot;createdBy&quot;: &quot;admin&quot;,
-  &quot;createdAt&quot;: &quot;2025-07-12T01:47:10.137Z&quot;,
-  &quot;expiresAt&quot;: &quot;2025-07-13T01:47:10.137Z&quot;,
+  &quot;createdAt&quot;: &quot;2025-07-12T01:52:07.290Z&quot;,
+  &quot;expiresAt&quot;: &quot;2025-07-13T01:52:07.290Z&quot;,
   &quot;maxUses&quot;: 1,
   &quot;currentUses&quot;: 0,
   &quot;isActive&quot;: true,
-  &quot;updatedAt&quot;: &quot;2025-07-12T01:47:10.137Z&quot;
+  &quot;updatedAt&quot;: &quot;2025-07-12T01:52:07.290Z&quot;
 }
 createDb mock configured: true
 Sending telegram update: {
-  &quot;update_id&quot;: 147842678,
+  &quot;update_id&quot;: 374553426,
   &quot;message&quot;: {
-    &quot;message_id&quot;: 42361873,
-    &quot;date&quot;: 1752284830,
+    &quot;message_id&quot;: 113969600,
+    &quot;date&quot;: 1752285127,
     &quot;text&quot;: &quot;/start BETA2025&quot;,
     &quot;from&quot;: {
       &quot;id&quot;: 54322,
@@ -874,10 +874,10 @@ Sending telegram update: {
 
 === PROCESS TELEGRAM UPDATE START ===
 Update object: {
-  &quot;update_id&quot;: 147842678,
+  &quot;update_id&quot;: 374553426,
   &quot;message&quot;: {
-    &quot;message_id&quot;: 42361873,
-    &quot;date&quot;: 1752284830,
+    &quot;message_id&quot;: 113969600,
+    &quot;date&quot;: 1752285127,
     &quot;text&quot;: &quot;/start BETA2025&quot;,
     &quot;from&quot;: {
       &quot;id&quot;: 54322,
@@ -897,8 +897,8 @@ Update object: {
   }
 }
 Processing update with message: {
-  message_id: 42361873,
-  date: 1752284830,
+  message_id: 113969600,
+  date: 1752285127,
   text: &apos;/start BETA2025&apos;,
   from: {
     id: 54322,
@@ -946,12 +946,12 @@ User found: null
   id: 1,
   code: &apos;BETA2025&apos;,
   createdBy: &apos;admin&apos;,
-  createdAt: 2025-07-12T01:47:10.137Z,
-  expiresAt: 2025-07-13T01:47:10.137Z,
+  createdAt: 2025-07-12T01:52:07.290Z,
+  expiresAt: 2025-07-13T01:52:07.290Z,
   maxUses: 1,
   currentUses: 0,
   isActive: true,
-  updatedAt: &apos;2025-07-12T01:47:10.137Z&apos;
+  updatedAt: &apos;2025-07-12T01:52:07.290Z&apos;
 }
 [MOCK DB DEBUG] Processing chunk 0: [ &apos;&apos; ]
 [MOCK DB DEBUG] Processing chunk 1: code
@@ -977,12 +977,12 @@ User found: null
   id: 1,
   code: &apos;BETA2025&apos;,
   createdBy: &apos;admin&apos;,
-  createdAt: 2025-07-12T01:47:10.137Z,
-  expiresAt: 2025-07-13T01:47:10.137Z,
+  createdAt: 2025-07-12T01:52:07.290Z,
+  expiresAt: 2025-07-13T01:52:07.290Z,
   maxUses: 1,
   currentUses: 0,
   isActive: true,
-  updatedAt: &apos;2025-07-12T01:47:10.137Z&apos;
+  updatedAt: &apos;2025-07-12T01:52:07.290Z&apos;
 }
 [MOCK DB DEBUG] Processing chunk 0: [ &apos;&apos; ]
 [MOCK DB DEBUG] Processing chunk 1: code
@@ -1008,12 +1008,12 @@ User found: null
   id: 1,
   code: &apos;BETA2025&apos;,
   createdBy: &apos;admin&apos;,
-  createdAt: 2025-07-12T01:47:10.137Z,
-  expiresAt: 2025-07-13T01:47:10.137Z,
+  createdAt: 2025-07-12T01:52:07.290Z,
+  expiresAt: 2025-07-13T01:52:07.290Z,
   maxUses: 1,
   currentUses: 0,
   isActive: true,
-  updatedAt: &apos;2025-07-12T01:47:10.137Z&apos;
+  updatedAt: &apos;2025-07-12T01:52:07.290Z&apos;
 }
 [MOCK DB DEBUG] Processing chunk 0: [ &apos;&apos; ]
 [MOCK DB DEBUG] Processing chunk 1: code
@@ -1049,7 +1049,7 @@ Handler response: {
     &apos;\n&apos; +
     &quot;&lt;i&gt;Ready to maximize your trading potential? Let&apos;s go! 🎯&lt;/i&gt;\n&quot; +
     &apos;\n&apos; +
-    &apos;(Session ID: a0fd39df-67bf-4b5c-aff3-d7ca706cfbb1)&apos;,
+    &apos;(Session ID: c71c8506-8f9c-4f1f-8b72-60215960d4cd)&apos;,
   parse_mode: &apos;HTML&apos;,
   reply_markup: { inline_keyboard: [ [Array], [Array], [Array], [Array], [Array] ] }
 }
@@ -1058,11 +1058,11 @@ Handler response: {
 createDb mock calls after webhook: 0
 createDb mock return values: []
 
-Raw response text: {&quot;method&quot;:&quot;sendMessage&quot;,&quot;chat_id&quot;:54322,&quot;text&quot;:&quot;🚀 &lt;b&gt;Welcome to Celebrum Trading Platform, Betauser!&lt;/b&gt;\n\nYour account has been created. I&apos;m your AI-powered trading assistant. Here&apos;s what I can help you with:\n\n📊 &lt;b&gt;Market Analysis&lt;/b&gt;\n• Real-time arbitrage opportunities\n• Price tracking across exchanges\n• Market insights and trends\n\n🛠️ &lt;b&gt;Trading Tools&lt;/b&gt;\n• Portfolio management\n• Risk assessment\n• Trade execution assistance\n\nType /help to see all available commands or /opportunities to get started!\n\n&lt;i&gt;Ready to maximize your trading potential? Let&apos;s go! 🎯&lt;/i&gt;\n\n(Session ID: a0fd39df-67bf-4b5c-aff3-d7ca706cfbb1)&quot;,&quot;parse_mode&quot;:&quot;HTML&quot;,&quot;reply_markup&quot;:{&quot;inline_keyboard&quot;:[[{&quot;text&quot;:&quot;Arbitrage Opportunities&quot;,&quot;callback_data&quot;:&quot;opportunities arbitrage&quot;}],[{&quot;text&quot;:&quot;Technical Analysis Opportunities&quot;,&quot;callback_data&quot;:&quot;opportunities technical&quot;}],[{&quot;text&quot;:&quot;Profile&quot;,&quot;callback_data&quot;:&quot;profile&quot;}],[{&quot;text&quot;:&quot;Settings&quot;,&quot;callback_data&quot;:&quot;settings&quot;}],[{&quot;text&quot;:&quot;Help&quot;,&quot;callback_data&quot;:&quot;help&quot;}]]}}
+Raw response text: {&quot;method&quot;:&quot;sendMessage&quot;,&quot;chat_id&quot;:54322,&quot;text&quot;:&quot;🚀 &lt;b&gt;Welcome to Celebrum Trading Platform, Betauser!&lt;/b&gt;\n\nYour account has been created. I&apos;m your AI-powered trading assistant. Here&apos;s what I can help you with:\n\n📊 &lt;b&gt;Market Analysis&lt;/b&gt;\n• Real-time arbitrage opportunities\n• Price tracking across exchanges\n• Market insights and trends\n\n🛠️ &lt;b&gt;Trading Tools&lt;/b&gt;\n• Portfolio management\n• Risk assessment\n• Trade execution assistance\n\nType /help to see all available commands or /opportunities to get started!\n\n&lt;i&gt;Ready to maximize your trading potential? Let&apos;s go! 🎯&lt;/i&gt;\n\n(Session ID: c71c8506-8f9c-4f1f-8b72-60215960d4cd)&quot;,&quot;parse_mode&quot;:&quot;HTML&quot;,&quot;reply_markup&quot;:{&quot;inline_keyboard&quot;:[[{&quot;text&quot;:&quot;Arbitrage Opportunities&quot;,&quot;callback_data&quot;:&quot;opportunities arbitrage&quot;}],[{&quot;text&quot;:&quot;Technical Analysis Opportunities&quot;,&quot;callback_data&quot;:&quot;opportunities technical&quot;}],[{&quot;text&quot;:&quot;Profile&quot;,&quot;callback_data&quot;:&quot;profile&quot;}],[{&quot;text&quot;:&quot;Settings&quot;,&quot;callback_data&quot;:&quot;settings&quot;}],[{&quot;text&quot;:&quot;Help&quot;,&quot;callback_data&quot;:&quot;help&quot;}]]}}
 Parsed bot response: {
   &quot;method&quot;: &quot;sendMessage&quot;,
   &quot;chat_id&quot;: 54322,
-  &quot;text&quot;: &quot;🚀 &lt;b&gt;Welcome to Celebrum Trading Platform, Betauser!&lt;/b&gt;\n\nYour account has been created. I&apos;m your AI-powered trading assistant. Here&apos;s what I can help you with:\n\n📊 &lt;b&gt;Market Analysis&lt;/b&gt;\n• Real-time arbitrage opportunities\n• Price tracking across exchanges\n• Market insights and trends\n\n🛠️ &lt;b&gt;Trading Tools&lt;/b&gt;\n• Portfolio management\n• Risk assessment\n• Trade execution assistance\n\nType /help to see all available commands or /opportunities to get started!\n\n&lt;i&gt;Ready to maximize your trading potential? Let&apos;s go! 🎯&lt;/i&gt;\n\n(Session ID: a0fd39df-67bf-4b5c-aff3-d7ca706cfbb1)&quot;,
+  &quot;text&quot;: &quot;🚀 &lt;b&gt;Welcome to Celebrum Trading Platform, Betauser!&lt;/b&gt;\n\nYour account has been created. I&apos;m your AI-powered trading assistant. Here&apos;s what I can help you with:\n\n📊 &lt;b&gt;Market Analysis&lt;/b&gt;\n• Real-time arbitrage opportunities\n• Price tracking across exchanges\n• Market insights and trends\n\n🛠️ &lt;b&gt;Trading Tools&lt;/b&gt;\n• Portfolio management\n• Risk assessment\n• Trade execution assistance\n\nType /help to see all available commands or /opportunities to get started!\n\n&lt;i&gt;Ready to maximize your trading potential? Let&apos;s go! 🎯&lt;/i&gt;\n\n(Session ID: c71c8506-8f9c-4f1f-8b72-60215960d4cd)&quot;,
   &quot;parse_mode&quot;: &quot;HTML&quot;,
   &quot;reply_markup&quot;: {
     &quot;inline_keyboard&quot;: [
@@ -1106,7 +1106,7 @@ Parsed bot response: {
 
             </system-out>
         </testcase>
-        <testcase classname="src/web/tests/e2e/user-flow.test.ts" name="Complete User Flow E2E Tests &gt; Telegram Bot Interaction Flow &gt; should handle existing user /start command" time="0.009">
+        <testcase classname="src/web/tests/e2e/user-flow.test.ts" name="Complete User Flow E2E Tests &gt; Telegram Bot Interaction Flow &gt; should handle existing user /start command" time="0.019">
             <system-out>
 Fresh mock database created and initialized for new test
 
@@ -1123,10 +1123,10 @@ User inserted into DB
 
 Feature flag configured for existing user bypass
 Telegram update created: {
-  &quot;update_id&quot;: 315980439,
+  &quot;update_id&quot;: 968718,
   &quot;message&quot;: {
-    &quot;message_id&quot;: 597446264,
-    &quot;date&quot;: 1752284830,
+    &quot;message_id&quot;: 598891649,
+    &quot;date&quot;: 1752285127,
     &quot;text&quot;: &quot;/start&quot;,
     &quot;from&quot;: {
       &quot;id&quot;: 12345,
@@ -1148,10 +1148,10 @@ Telegram update created: {
 
 === PROCESS TELEGRAM UPDATE START ===
 Update object: {
-  &quot;update_id&quot;: 315980439,
+  &quot;update_id&quot;: 968718,
   &quot;message&quot;: {
-    &quot;message_id&quot;: 597446264,
-    &quot;date&quot;: 1752284830,
+    &quot;message_id&quot;: 598891649,
+    &quot;date&quot;: 1752285127,
     &quot;text&quot;: &quot;/start&quot;,
     &quot;from&quot;: {
       &quot;id&quot;: 12345,
@@ -1171,8 +1171,8 @@ Update object: {
   }
 }
 Processing update with message: {
-  message_id: 597446264,
-  date: 1752284830,
+  message_id: 598891649,
+  date: 1752285127,
   text: &apos;/start&apos;,
   from: {
     id: 12345,
@@ -1213,8 +1213,8 @@ Looking for user with telegramId: 12345
   email: &apos;existinguser@test.com&apos;,
   languageCode: &apos;en&apos;,
   role: &apos;user&apos;,
-  createdAt: &apos;2025-07-12T01:47:10.145Z&apos;,
-  updatedAt: &apos;2025-07-12T01:47:10.145Z&apos;
+  createdAt: &apos;2025-07-12T01:52:07.309Z&apos;,
+  updatedAt: &apos;2025-07-12T01:52:07.309Z&apos;
 }
 [MOCK DB DEBUG] Processing chunk 0: [ &apos;&apos; ]
 [MOCK DB DEBUG] Processing chunk 1: telegram_id
@@ -1238,8 +1238,8 @@ User found: {
   email: &apos;existinguser@test.com&apos;,
   languageCode: &apos;en&apos;,
   role: &apos;user&apos;,
-  createdAt: &apos;2025-07-12T01:47:10.145Z&apos;,
-  updatedAt: &apos;2025-07-12T01:47:10.145Z&apos;
+  createdAt: &apos;2025-07-12T01:52:07.309Z&apos;,
+  updatedAt: &apos;2025-07-12T01:52:07.309Z&apos;
 }
 [DEBUG] FeatureFlagManager: Reading from KV store key: rbac:global_flag:registration.invitation_required
 
@@ -1268,8 +1268,8 @@ Updating user data from Telegram...
   email: &apos;existinguser@test.com&apos;,
   languageCode: &apos;en&apos;,
   role: &apos;user&apos;,
-  createdAt: &apos;2025-07-12T01:47:10.145Z&apos;,
-  updatedAt: &apos;2025-07-12T01:47:10.145Z&apos;
+  createdAt: &apos;2025-07-12T01:52:07.309Z&apos;,
+  updatedAt: &apos;2025-07-12T01:52:07.309Z&apos;
 }
 [MOCK DB DEBUG] Processing chunk 0: [ &apos;&apos; ]
 [MOCK DB DEBUG] Processing chunk 1: telegram_id
@@ -1300,8 +1300,8 @@ Updating user data from Telegram...
   email: &apos;existinguser@test.com&apos;,
   languageCode: &apos;en&apos;,
   role: &apos;user&apos;,
-  createdAt: &apos;2025-07-12T01:47:10.145Z&apos;,
-  updatedAt: &apos;2025-07-12T01:47:10.145Z&apos;
+  createdAt: &apos;2025-07-12T01:52:07.309Z&apos;,
+  updatedAt: &apos;2025-07-12T01:52:07.309Z&apos;
 }
 [MOCK DB DEBUG] Processing chunk 0: [ &apos;&apos; ]
 [MOCK DB DEBUG] Processing chunk 1: id
@@ -1334,9 +1334,9 @@ Refetching updated user data...
   email: &apos;existinguser@test.com&apos;,
   languageCode: &apos;en&apos;,
   role: &apos;user&apos;,
-  createdAt: &apos;2025-07-12T01:47:10.145Z&apos;,
-  updatedAt: &apos;2025-07-12T01:47:10.146Z&apos;,
-  lastActiveAt: 2025-07-12T01:47:10.146Z
+  createdAt: &apos;2025-07-12T01:52:07.309Z&apos;,
+  updatedAt: &apos;2025-07-12T01:52:07.311Z&apos;,
+  lastActiveAt: 2025-07-12T01:52:07.311Z
 }
 [MOCK DB DEBUG] Processing chunk 0: [ &apos;&apos; ]
 [MOCK DB DEBUG] Processing chunk 1: telegram_id
@@ -1357,7 +1357,7 @@ Deleting existing sessions...
 Existing sessions deleted
 Creating new session...
 
-New session created: 3619ad20-47c0-4fba-9020-9e56b1729395
+New session created: ae554edf-edbc-4bef-9d72-cf02fd034ae2
 
 Handler response: {
   method: &apos;sendMessage&apos;,
@@ -1366,7 +1366,7 @@ Handler response: {
     &apos;\n&apos; +
     &apos;Your trading journey continues. What would you like to do today?\n&apos; +
     &apos;\n&apos; +
-    &apos;(Session ID: 3619ad20-47c0-4fba-9020-9e56b1729395)&apos;,
+    &apos;(Session ID: ae554edf-edbc-4bef-9d72-cf02fd034ae2)&apos;,
   parse_mode: &apos;HTML&apos;,
   reply_markup: { inline_keyboard: [ [Array], [Array], [Array], [Array], [Array] ] }
 }
@@ -1375,11 +1375,11 @@ Handler response: {
 Response status: 200
 Response ok: true
 
-Raw response text: {&quot;method&quot;:&quot;sendMessage&quot;,&quot;chat_id&quot;:12345,&quot;text&quot;:&quot;👋 &lt;b&gt;Welcome back, Existinguser!&lt;/b&gt;\n\nYour trading journey continues. What would you like to do today?\n\n(Session ID: 3619ad20-47c0-4fba-9020-9e56b1729395)&quot;,&quot;parse_mode&quot;:&quot;HTML&quot;,&quot;reply_markup&quot;:{&quot;inline_keyboard&quot;:[[{&quot;text&quot;:&quot;Arbitrage Opportunities&quot;,&quot;callback_data&quot;:&quot;opportunities arbitrage&quot;}],[{&quot;text&quot;:&quot;Technical Analysis Opportunities&quot;,&quot;callback_data&quot;:&quot;opportunities technical&quot;}],[{&quot;text&quot;:&quot;Profile&quot;,&quot;callback_data&quot;:&quot;profile&quot;}],[{&quot;text&quot;:&quot;Settings&quot;,&quot;callback_data&quot;:&quot;settings&quot;}],[{&quot;text&quot;:&quot;Help&quot;,&quot;callback_data&quot;:&quot;help&quot;}]]}}
+Raw response text: {&quot;method&quot;:&quot;sendMessage&quot;,&quot;chat_id&quot;:12345,&quot;text&quot;:&quot;👋 &lt;b&gt;Welcome back, Existinguser!&lt;/b&gt;\n\nYour trading journey continues. What would you like to do today?\n\n(Session ID: ae554edf-edbc-4bef-9d72-cf02fd034ae2)&quot;,&quot;parse_mode&quot;:&quot;HTML&quot;,&quot;reply_markup&quot;:{&quot;inline_keyboard&quot;:[[{&quot;text&quot;:&quot;Arbitrage Opportunities&quot;,&quot;callback_data&quot;:&quot;opportunities arbitrage&quot;}],[{&quot;text&quot;:&quot;Technical Analysis Opportunities&quot;,&quot;callback_data&quot;:&quot;opportunities technical&quot;}],[{&quot;text&quot;:&quot;Profile&quot;,&quot;callback_data&quot;:&quot;profile&quot;}],[{&quot;text&quot;:&quot;Settings&quot;,&quot;callback_data&quot;:&quot;settings&quot;}],[{&quot;text&quot;:&quot;Help&quot;,&quot;callback_data&quot;:&quot;help&quot;}]]}}
 Parsed bot response: {
   &quot;method&quot;: &quot;sendMessage&quot;,
   &quot;chat_id&quot;: 12345,
-  &quot;text&quot;: &quot;👋 &lt;b&gt;Welcome back, Existinguser!&lt;/b&gt;\n\nYour trading journey continues. What would you like to do today?\n\n(Session ID: 3619ad20-47c0-4fba-9020-9e56b1729395)&quot;,
+  &quot;text&quot;: &quot;👋 &lt;b&gt;Welcome back, Existinguser!&lt;/b&gt;\n\nYour trading journey continues. What would you like to do today?\n\n(Session ID: ae554edf-edbc-4bef-9d72-cf02fd034ae2)&quot;,
   &quot;parse_mode&quot;: &quot;HTML&quot;,
   &quot;reply_markup&quot;: {
     &quot;inline_keyboard&quot;: [
@@ -1420,7 +1420,7 @@ Parsed bot response: {
 
             </system-out>
         </testcase>
-        <testcase classname="src/web/tests/e2e/user-flow.test.ts" name="Complete User Flow E2E Tests &gt; Telegram Bot Interaction Flow &gt; should handle /help command for all user roles" time="0.009">
+        <testcase classname="src/web/tests/e2e/user-flow.test.ts" name="Complete User Flow E2E Tests &gt; Telegram Bot Interaction Flow &gt; should handle /help command for all user roles" time="0.013">
             <system-out>
 Fresh mock database created and initialized for new test
 
@@ -1446,16 +1446,16 @@ Inserted regular user: {
   &quot;email&quot;: &quot;reguser@test.com&quot;,
   &quot;role&quot;: &quot;user&quot;,
   &quot;languageCode&quot;: &quot;en&quot;,
-  &quot;createdAt&quot;: &quot;2025-07-12T01:47:10.156Z&quot;,
-  &quot;updatedAt&quot;: &quot;2025-07-12T01:47:10.156Z&quot;
+  &quot;createdAt&quot;: &quot;2025-07-12T01:52:07.325Z&quot;,
+  &quot;updatedAt&quot;: &quot;2025-07-12T01:52:07.325Z&quot;
 }
 
 === PROCESS TELEGRAM UPDATE START ===
 Update object: {
-  &quot;update_id&quot;: 574715148,
+  &quot;update_id&quot;: 2344941,
   &quot;message&quot;: {
-    &quot;message_id&quot;: 922032654,
-    &quot;date&quot;: 1752284830,
+    &quot;message_id&quot;: 335316986,
+    &quot;date&quot;: 1752285127,
     &quot;text&quot;: &quot;/help&quot;,
     &quot;from&quot;: {
       &quot;id&quot;: 111,
@@ -1475,8 +1475,8 @@ Update object: {
   }
 }
 Processing update with message: {
-  message_id: 922032654,
-  date: 1752284830,
+  message_id: 335316986,
+  date: 1752285127,
   text: &apos;/help&apos;,
   from: {
     id: 111,
@@ -1518,8 +1518,8 @@ Help command - from object: {&quot;id&quot;:111,&quot;is_bot&quot;:false,&quot;f
   email: &apos;reguser@test.com&apos;,
   role: &apos;user&apos;,
   languageCode: &apos;en&apos;,
-  createdAt: &apos;2025-07-12T01:47:10.156Z&apos;,
-  updatedAt: &apos;2025-07-12T01:47:10.156Z&apos;
+  createdAt: &apos;2025-07-12T01:52:07.325Z&apos;,
+  updatedAt: &apos;2025-07-12T01:52:07.325Z&apos;
 }
 [MOCK DB DEBUG] Processing chunk 0: [ &apos;&apos; ]
 [MOCK DB DEBUG] Processing chunk 1: telegram_id
@@ -1534,7 +1534,7 @@ Help command - from object: {&quot;id&quot;:111,&quot;is_bot&quot;:false,&quot;f
 [MOCK DB DEBUG]   Actual: 111 (string)
 [MOCK DB DEBUG] Final comparison result: true
 
-Help command - user found: {&quot;id&quot;:1,&quot;telegramId&quot;:&quot;111&quot;,&quot;firstName&quot;:&quot;Reg&quot;,&quot;lastName&quot;:&quot;User&quot;,&quot;username&quot;:&quot;reguser&quot;,&quot;email&quot;:&quot;reguser@test.com&quot;,&quot;role&quot;:&quot;user&quot;,&quot;languageCode&quot;:&quot;en&quot;,&quot;createdAt&quot;:&quot;2025-07-12T01:47:10.156Z&quot;,&quot;updatedAt&quot;:&quot;2025-07-12T01:47:10.156Z&quot;}
+Help command - user found: {&quot;id&quot;:1,&quot;telegramId&quot;:&quot;111&quot;,&quot;firstName&quot;:&quot;Reg&quot;,&quot;lastName&quot;:&quot;User&quot;,&quot;username&quot;:&quot;reguser&quot;,&quot;email&quot;:&quot;reguser@test.com&quot;,&quot;role&quot;:&quot;user&quot;,&quot;languageCode&quot;:&quot;en&quot;,&quot;createdAt&quot;:&quot;2025-07-12T01:52:07.325Z&quot;,&quot;updatedAt&quot;:&quot;2025-07-12T01:52:07.325Z&quot;}
 Help command - user role: user
 Help command - isSuperAdmin: false
 === HELP COMMAND DEBUG END ===
@@ -1576,8 +1576,8 @@ Inserted admin user: {
   &quot;email&quot;: &quot;reguser@test.com&quot;,
   &quot;role&quot;: &quot;user&quot;,
   &quot;languageCode&quot;: &quot;en&quot;,
-  &quot;createdAt&quot;: &quot;2025-07-12T01:47:10.156Z&quot;,
-  &quot;updatedAt&quot;: &quot;2025-07-12T01:47:10.156Z&quot;
+  &quot;createdAt&quot;: &quot;2025-07-12T01:52:07.325Z&quot;,
+  &quot;updatedAt&quot;: &quot;2025-07-12T01:52:07.325Z&quot;
 }
 
 All users in DB before admin help call: [
@@ -1590,8 +1590,8 @@ All users in DB before admin help call: [
     &quot;email&quot;: &quot;reguser@test.com&quot;,
     &quot;role&quot;: &quot;user&quot;,
     &quot;languageCode&quot;: &quot;en&quot;,
-    &quot;createdAt&quot;: &quot;2025-07-12T01:47:10.156Z&quot;,
-    &quot;updatedAt&quot;: &quot;2025-07-12T01:47:10.156Z&quot;
+    &quot;createdAt&quot;: &quot;2025-07-12T01:52:07.325Z&quot;,
+    &quot;updatedAt&quot;: &quot;2025-07-12T01:52:07.325Z&quot;
   },
   {
     &quot;id&quot;: 2,
@@ -1602,16 +1602,16 @@ All users in DB before admin help call: [
     &quot;email&quot;: &quot;adminuser@test.com&quot;,
     &quot;role&quot;: &quot;superadmin&quot;,
     &quot;languageCode&quot;: &quot;en&quot;,
-    &quot;createdAt&quot;: &quot;2025-07-12T01:47:10.157Z&quot;,
-    &quot;updatedAt&quot;: &quot;2025-07-12T01:47:10.157Z&quot;
+    &quot;createdAt&quot;: &quot;2025-07-12T01:52:07.326Z&quot;,
+    &quot;updatedAt&quot;: &quot;2025-07-12T01:52:07.326Z&quot;
   }
 ]
 === ADMIN HELP TEST DEBUG ===
 Admin user update: {
-  &quot;update_id&quot;: 616832123,
+  &quot;update_id&quot;: 24740257,
   &quot;message&quot;: {
-    &quot;message_id&quot;: 793336955,
-    &quot;date&quot;: 1752284830,
+    &quot;message_id&quot;: 921506013,
+    &quot;date&quot;: 1752285127,
     &quot;text&quot;: &quot;/help&quot;,
     &quot;from&quot;: {
       &quot;id&quot;: 222,
@@ -1647,16 +1647,16 @@ Direct DB query result for admin user: {
   &quot;email&quot;: &quot;reguser@test.com&quot;,
   &quot;role&quot;: &quot;user&quot;,
   &quot;languageCode&quot;: &quot;en&quot;,
-  &quot;createdAt&quot;: &quot;2025-07-12T01:47:10.156Z&quot;,
-  &quot;updatedAt&quot;: &quot;2025-07-12T01:47:10.156Z&quot;
+  &quot;createdAt&quot;: &quot;2025-07-12T01:52:07.325Z&quot;,
+  &quot;updatedAt&quot;: &quot;2025-07-12T01:52:07.325Z&quot;
 }
 
 === PROCESS TELEGRAM UPDATE START ===
 Update object: {
-  &quot;update_id&quot;: 616832123,
+  &quot;update_id&quot;: 24740257,
   &quot;message&quot;: {
-    &quot;message_id&quot;: 793336955,
-    &quot;date&quot;: 1752284830,
+    &quot;message_id&quot;: 921506013,
+    &quot;date&quot;: 1752285127,
     &quot;text&quot;: &quot;/help&quot;,
     &quot;from&quot;: {
       &quot;id&quot;: 222,
@@ -1676,8 +1676,8 @@ Update object: {
   }
 }
 Processing update with message: {
-  message_id: 793336955,
-  date: 1752284830,
+  message_id: 921506013,
+  date: 1752285127,
   text: &apos;/help&apos;,
   from: {
     id: 222,
@@ -1719,8 +1719,8 @@ Help command - from object: {&quot;id&quot;:222,&quot;is_bot&quot;:false,&quot;f
   email: &apos;reguser@test.com&apos;,
   role: &apos;user&apos;,
   languageCode: &apos;en&apos;,
-  createdAt: &apos;2025-07-12T01:47:10.156Z&apos;,
-  updatedAt: &apos;2025-07-12T01:47:10.156Z&apos;
+  createdAt: &apos;2025-07-12T01:52:07.325Z&apos;,
+  updatedAt: &apos;2025-07-12T01:52:07.325Z&apos;
 }
 [MOCK DB DEBUG] Processing chunk 0: [ &apos;&apos; ]
 [MOCK DB DEBUG] Processing chunk 1: telegram_id
@@ -1750,8 +1750,8 @@ Help command - from object: {&quot;id&quot;:222,&quot;is_bot&quot;:false,&quot;f
   email: &apos;adminuser@test.com&apos;,
   role: &apos;superadmin&apos;,
   languageCode: &apos;en&apos;,
-  createdAt: &apos;2025-07-12T01:47:10.157Z&apos;,
-  updatedAt: &apos;2025-07-12T01:47:10.157Z&apos;
+  createdAt: &apos;2025-07-12T01:52:07.326Z&apos;,
+  updatedAt: &apos;2025-07-12T01:52:07.326Z&apos;
 }
 [MOCK DB DEBUG] Processing chunk 0: [ &apos;&apos; ]
 [MOCK DB DEBUG] Processing chunk 1: telegram_id
@@ -1766,7 +1766,7 @@ Help command - from object: {&quot;id&quot;:222,&quot;is_bot&quot;:false,&quot;f
 [MOCK DB DEBUG]   Actual: 222 (string)
 [MOCK DB DEBUG] Final comparison result: true
 
-Help command - user found: {&quot;id&quot;:2,&quot;telegramId&quot;:&quot;222&quot;,&quot;firstName&quot;:&quot;Admin&quot;,&quot;lastName&quot;:&quot;User&quot;,&quot;username&quot;:&quot;adminuser&quot;,&quot;email&quot;:&quot;adminuser@test.com&quot;,&quot;role&quot;:&quot;superadmin&quot;,&quot;languageCode&quot;:&quot;en&quot;,&quot;createdAt&quot;:&quot;2025-07-12T01:47:10.157Z&quot;,&quot;updatedAt&quot;:&quot;2025-07-12T01:47:10.157Z&quot;}
+Help command - user found: {&quot;id&quot;:2,&quot;telegramId&quot;:&quot;222&quot;,&quot;firstName&quot;:&quot;Admin&quot;,&quot;lastName&quot;:&quot;User&quot;,&quot;username&quot;:&quot;adminuser&quot;,&quot;email&quot;:&quot;adminuser@test.com&quot;,&quot;role&quot;:&quot;superadmin&quot;,&quot;languageCode&quot;:&quot;en&quot;,&quot;createdAt&quot;:&quot;2025-07-12T01:52:07.326Z&quot;,&quot;updatedAt&quot;:&quot;2025-07-12T01:52:07.326Z&quot;}
 Help command - user role: superadmin
 Help command - isSuperAdmin: true
 === HELP COMMAND DEBUG END ===

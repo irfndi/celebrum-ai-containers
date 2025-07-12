@@ -4,6 +4,9 @@ import type { UserRoleType, SubscriptionTierType } from '@celebrum-ai/shared/typ
 import type { ArbitrageOpportunity } from '@celebrum-ai/shared/types/arbitrage';
 import { setupRobustCCXTMock } from '../../../../shared/tests/utils/enhanced-mock';
 
+const mockFetch = vi.fn();
+global.fetch = mockFetch;
+
 setupRobustCCXTMock();
 
 // Mock the data source manager

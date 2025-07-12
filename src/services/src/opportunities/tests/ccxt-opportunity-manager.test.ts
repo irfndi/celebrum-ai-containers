@@ -2,6 +2,9 @@ import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import type { MarketDataPoint } from '@celebrum-ai/shared/types/market';
 import { setupRobustCCXTMock } from '../../../../shared/tests/utils/enhanced-mock';
 
+const mockFetch = vi.fn();
+global.fetch = mockFetch;
+
 setupRobustCCXTMock();
 
 // Mock the CCXT data source manager
