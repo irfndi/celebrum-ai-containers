@@ -1,1324 +1,1045 @@
-/**
- * Test utilities and helpers for Celebrum AI
- */
-
-import { vi, beforeEach, afterEach } from 'vitest';
+// Production-ready test helper utilities for Cloudflare Workers with Drizzle ORM
+import { vi } from 'vitest';
 import type { D1Database, KVNamespace } from '@cloudflare/workers-types';
-import { drizzle, DrizzleD1Database } from 'drizzle-orm/d1';
-import * as schema from '../../../db/src/schema';
-import { users, invitationCodes } from '../../../db/src/schema';
-import * as fixtures from '../fixtures';
-import type { User, UserProfile, UserSubscription, OrderBook, Trade, Candle, Order, BacktestResult, Portfolio } from '../../src/types';
-import { sql } from 'drizzle-orm';
-import * as fs from 'node:fs/promises';
-import * as path from 'node:path';
+import type { Env, ExtendedKVNamespace } from '../../src/types';
+import { createDb } from '../../../db/src/utils/connection';
+import { Miniflare } from 'miniflare';
 
-export type TestContext = {
-  db: DrizzleD1Database<typeof schema>;
-  kv: KVNamespace;
-  dispose: () => Promise<void>;
-};
-
-// Create a proper mock D1Database implementation
-function createMockD1Database(): D1Database {
-  const mockResults = new Map();
-  
-  const mockDb = {
-    exec: vi.fn().mockResolvedValue([]),
-    prepare: vi.fn().mockReturnValue({
-      bind: vi.fn().mockReturnThis(),
-      first: vi.fn().mockResolvedValue(undefined),
-      all: vi.fn().mockResolvedValue({ results: [], success: true }),
-      run: vi.fn().mockResolvedValue({ success: true, meta: {} }),
-    }),
-    batch: vi.fn().mockResolvedValue([]),
-    dump: vi.fn().mockResolvedValue(new ArrayBuffer(0)),
-    run: vi.fn().mockResolvedValue({ success: true, meta: {} }),
-  } as unknown as D1Database;
-
-  return mockDb;
+// Define proper types for our mock data store
+interface MockDataStore {
+  [key: string]: any[];
+  users: any[];
+  user_username_history: any[];
+  positions: any[];
+  opportunities: any[];
+  trading_strategies: any[];
+  invitation_codes: any[];
+  invitation_usage: any[];
 }
 
-function createMockKVNamespace(): KVNamespace {
-  const storage = new Map();
+// Production-ready mock KV namespace that simulates Cloudflare KV behavior
+export function createMockKV(): ExtendedKVNamespace {
+  const store = new Map<string, string>();
   
   return {
-    get: vi.fn().mockImplementation((key: string) => Promise.resolve(storage.get(key) || null)),
-    put: vi.fn().mockImplementation((key: string, value: string) => {
-      storage.set(key, value);
-      return Promise.resolve();
-    }),
-    delete: vi.fn().mockImplementation((key: string) => {
-      storage.delete(key);
-      return Promise.resolve();
-    }),
-    list: vi.fn().mockResolvedValue({ keys: [], list_complete: true, cursor: '' }),
-    getWithMetadata: vi.fn().mockResolvedValue({ value: null, metadata: null }),
-  } as unknown as KVNamespace;
-}
-
-// Mock platform proxy implementation
-const mockGetPlatformProxy = vi.fn().mockImplementation(async () => {
-  try {
-    const mockEnv = createMockEnv();
-    const mockKv = createMockKVNamespace();
-    const mockD1 = createMockD1Database();
-    
-    const platform = {
-      env: {
-        ...mockEnv,
-        CELEBRUM_KV: mockKv,
-        CELEBRUM_DB: mockD1,
-        CELEBRUM_STORAGE: {} as any,
-      },
-      cf: {},
-      ctx: { 
-        waitUntil: vi.fn(), 
-        passThroughOnException: vi.fn() 
-      },
-      caches: { default: {} },
-      dispose: vi.fn()
-    };
-    
-    // Ensure env exists
-    if (!platform.env) {
-      throw new Error('Failed to create mock environment');
-    }
-    
-    return platform;
-  } catch (error) {
-    console.error('Error in mockGetPlatformProxy:', error);
-    // Return a fallback platform object
-    return {
-      env: createMockEnv(),
-      cf: {},
-      ctx: { waitUntil: vi.fn(), passThroughOnException: vi.fn() },
-      caches: { default: {} },
-      dispose: vi.fn()
-    };
-  }
-});
-
-/**
- * Get a test database and KV namespace
- */
-export async function getTestDb(): Promise<TestContext> {
-  // Create a fresh mock database instance for each test
-  const mockDb = createMockDatabase();
-  
-  // Initialize the mock database with empty tables
-  mockDb.resetData();
-  
-  // Always call init() method to ensure proper initialization
-  await mockDb.init();
-  
-  console.log('Fresh mock database created and initialized for new test');
-  
-  // Create KV namespace
-  const kv = createMockKVNamespace();
-  
-  // Return the test context with proper mock database
-  return {
-    db: mockDb as any,
-    kv,
-    dispose: async () => {
-      console.log('Test database disposed');
-    }
-  };
-}
-
-// Helper function for migrations - no-op for mock
-export const applyMigrations = async (db: D1Database) => {
-  console.log('Mock migrations applied (no-op)');
-  return {
-    success: true,
-    meta: {
-      duration: 0,
-    },
-  };
-};
-
-// Helper function for cleanup - no-op for mock
-export const cleanupDb = async (db: DrizzleD1Database<typeof schema>) => {
-  console.log('Mock database cleanup (no-op)');
-  return {
-    success: true,
-    meta: {
-      duration: 0,
-    },
-  };
-};
-
-// Mock request/response utilities
-export const createMockContext = () => ({
-  waitUntil: vi.fn(),
-  passThroughOnException: vi.fn(),
-});
-
-export const createMockRequest = (url: string, options: RequestInit = {}): Request => {
-  return new Request(url, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      ...((options.headers as Record<string, string>) || {}),
-    },
-    ...options,
-  });
-};
-
-export const createMockEnv = () => {
-  const mockEnv: Record<string, any> = {
-    // Database mock
-    DB: createMockD1Database(),
-    
-    // KV mock
-    KV: createMockKVNamespace(),
-    
-    // Environment variables
-    TELEGRAM_BOT_TOKEN: 'mock-bot-token',
-    TELEGRAM_WEBHOOK_SECRET: 'mock-webhook-secret',
-    JWT_SECRET: 'mock-jwt-secret',
-    OPENAI_API_KEY: 'mock-openai-key',
-    
-    // Bindings
-    CLOUDFLARE_API_TOKEN: 'mock-cloudflare-token',
-    CLOUDFLARE_ACCOUNT_ID: 'mock-account-id',
-    CLOUDFLARE_ZONE_ID: 'mock-zone-id',
-    
-    // Feature flags
-    FEATURE_FLAGS: JSON.stringify({
-      enableNewUI: true,
-      enableBetaFeatures: false,
-      maintenanceMode: false,
-    }),
-    
-    // Mock additional environment variables as needed
-    ENVIRONMENT: 'test',
-    LOG_LEVEL: 'debug',
-  };
-  
-  return mockEnv;
-};
-
-// Production-ready Drizzle mock implementation
-class ProductionDrizzleMock {
-  private mockDataStore: Record<string, any[]> = {};
-  private nextId = 1;
-  private currentTable = '';
-  private lastInsertedRecord: any = null;
-
-  constructor() {
-    this.init();
-  }
-
-  async init() {
-    this.resetData();
-  }
-
-  get mockData() {
-    return this.mockDataStore;
-  }
-
-  resetData() {
-    this.mockDataStore = {
-      users: [],
-      userProfiles: [],
-      userSubscriptions: [],
-      orders: [],
-      positions: [],
-      portfolios: [],
-      backtestResults: [],
-      invitationCodes: [],
-      invitationUsage: [],
-      opportunities: [],
-      userUsernameHistory: [],
-    };
-    this.nextId = 1;
-    this.currentTable = '';
-    this.lastInsertedRecord = null;
-  }
-
-  private detectTableName(table: any): string {
-    if (!table) return 'unknown';
-    
-    // Handle Drizzle table objects
-    if (table[Symbol.for('drizzle:Name')]) {
-      return table[Symbol.for('drizzle:Name')];
-    }
-    
-    // Handle table objects with _ property
-    if (table._ && table._.name) {
-      return table._.name;
-    }
-    
-    // Handle string table names
-    if (typeof table === 'string') {
-      return table;
-    }
-    
-    // Fallback: try to extract from constructor name or other properties
-    if (table.constructor && table.constructor.name) {
-      return table.constructor.name.toLowerCase();
-    }
-    
-    return 'unknown';
-  }
-
-  private generateId(): number {
-    return this.nextId++;
-  }
-
-  private getTableData(tableName: string): any[] {
-    if (!this.mockDataStore[tableName]) {
-      this.mockDataStore[tableName] = [];
-    }
-    return this.mockDataStore[tableName];
-  }
-
-  private mapColumnNameToProperty(columnName: string): string {
-    // Map snake_case column names to camelCase property names
-    const columnMappings: Record<string, string> = {
-      'telegram_id': 'telegramId',
-      'first_name': 'firstName',
-      'last_name': 'lastName',
-      'account_balance': 'accountBalance',
-      'total_pnl': 'totalPnl',
-      'weekly_pnl': 'weeklyPnl',
-      'last_active_at': 'lastActiveAt',
-      'created_at': 'createdAt',
-      'updated_at': 'updatedAt',
-      'user_id': 'userId',
-      'risk_tolerance': 'riskTolerance',
-      'invitation_code': 'invitationCode',
-      'used_at': 'usedAt',
-      'expires_at': 'expiresAt',
-      'changed_at': 'changedAt',
-      'created_by': 'createdBy',
-      'max_uses': 'maxUses',
-      'current_uses': 'currentUses',
-      'is_active': 'isActive',
-      'invitation_id': 'invitationId',
-      'beta_expires_at': 'betaExpiresAt'
-    };
-    
-    return columnMappings[columnName] || columnName;
-  }
-
-  private applyWhereFilter(data: any[], whereCondition: any): any[] {
-    if (!whereCondition) return data;
-    
-    return data.filter(record => {
-      return this.evaluateCondition(record, whereCondition);
-    });
-  }
-
-  private evaluateCondition(record: any, condition: any): boolean {
-    if (!condition) return true;
-    
-    console.log('[MOCK DB DEBUG] Evaluating condition with queryChunks - type:', typeof condition);
-    // Avoid circular reference error by not stringifying the entire condition object
-    console.log('[MOCK DB DEBUG] Condition has queryChunks:', !!condition.queryChunks, 'length:', condition.queryChunks?.length);
-    
-    // Handle compound conditions (and, or)
-    if (condition && typeof condition === 'object' && condition.queryChunks) {
-      // Check if this is a compound condition by looking for logical operators
-      const hasLogicalOperator = condition.queryChunks.some((chunk: any) => 
-        chunk === 'and' || chunk === 'or' || 
-        (typeof chunk === 'string' && (chunk.includes('AND') || chunk.includes('OR')))
-      );
+    get: vi.fn().mockImplementation(async (key: string, options?: { type?: 'text' | 'json' | 'arrayBuffer' | 'stream' }) => {
+      const value = store.get(key);
+      if (!value) return null;
       
-      // Also check if we have multiple nested conditions (typical for and/or operations)
-      const hasNestedConditions = condition.queryChunks.some((chunk: any) => 
-        chunk && typeof chunk === 'object' && chunk.queryChunks && Array.isArray(chunk.queryChunks)
-      );
-      
-      console.log('[MOCK DB DEBUG] Found condition with queryChunks:', condition.queryChunks.length);
-      console.log('[MOCK DB DEBUG] Has logical operator:', hasLogicalOperator);
-      console.log('[MOCK DB DEBUG] Has nested conditions:', hasNestedConditions);
-      
-      if (hasLogicalOperator || hasNestedConditions) {
-        console.log('[MOCK DB DEBUG] Treating as compound condition');
-        return this.evaluateCompoundCondition(record, condition);
-      }
-    }
-    
-    // Handle single conditions
-    console.log('[MOCK DB DEBUG] Handling as single condition');
-    return this.evaluateSingleCondition(record, condition);
-  }
-
-  private evaluateCompoundCondition(record: any, condition: any): boolean {
-    if (!condition.queryChunks || !Array.isArray(condition.queryChunks)) {
-      return true;
-    }
-
-    console.log('[MOCK DB DEBUG] Evaluating compound condition with queryChunks:', condition.queryChunks.length);
-    
-    // For Drizzle and() conditions, the structure is typically:
-    // [condition1, operator, condition2]
-    // where operator is StringChunk with ' and ' and conditions are _SQL objects with eq() 
-    
-    let isAndOperation = false;
-    const conditions: any[] = [];
-    
-    for (let i = 0; i < condition.queryChunks.length; i++) {
-      const chunk = condition.queryChunks[i];
-      
-      console.log(`[MOCK DB DEBUG] Processing chunk ${i}:`, chunk, 'chunkStr:', chunk);
-      
-      // Check for StringChunk with AND/OR operator
-      if (chunk && typeof chunk === 'object' && chunk.value && Array.isArray(chunk.value)) {
-        const operatorStr = chunk.value[0];
-        if (typeof operatorStr === 'string') {
-          if (operatorStr.trim() === 'and') {
-            isAndOperation = true;
-            console.log('[MOCK DB DEBUG] Found AND operator in StringChunk');
-            continue;
-          }
-          if (operatorStr.trim() === 'or') {
-            isAndOperation = false;
-            console.log('[MOCK DB DEBUG] Found OR operator in StringChunk');
-            continue;
-          }
-          // Skip other string chunks like parentheses
-          if (operatorStr.trim() === ')' || operatorStr.trim() === '(') {
-            console.log('[MOCK DB DEBUG] Skipping parenthesis chunk:', operatorStr);
-            continue;
-          }
+      if (options?.type === 'json') {
+        try {
+          return JSON.parse(value);
+        } catch {
+          return null;
         }
       }
       
-      // If this chunk has queryChunks, it might be a nested condition or eq() condition
-      if (chunk && typeof chunk === 'object' && chunk.queryChunks && Array.isArray(chunk.queryChunks)) {
-        // Check if this looks like an eq() condition (has column and parameter chunks)
-        const hasColumn = chunk.queryChunks.some((subChunk: any) => 
-          subChunk && typeof subChunk === 'object' && subChunk.name && subChunk.dataType
-        );
-        const hasParam = chunk.queryChunks.some((subChunk: any) => 
-          subChunk && typeof subChunk === 'object' && subChunk.hasOwnProperty('brand') && subChunk.value !== undefined
-        );
-        
-        if (hasColumn && hasParam) {
-          conditions.push(chunk);
-          console.log(`[MOCK DB DEBUG] Found eq() condition ${conditions.length}`);
-        } else {
-          // This might be a nested compound condition, recursively process it
-          console.log(`[MOCK DB DEBUG] Found nested compound condition, recursively processing`);
-          const nestedResult = this.evaluateCompoundCondition(record, chunk);
-          // For now, treat nested compound conditions as individual conditions
-          // This is a simplification but should work for our test case
-          if (chunk.queryChunks.length > 1) {
-            // Extract individual eq() conditions from the nested structure
-            for (const nestedChunk of chunk.queryChunks) {
-              if (nestedChunk && typeof nestedChunk === 'object' && nestedChunk.queryChunks) {
-                const nestedHasColumn = nestedChunk.queryChunks.some((subChunk: any) => 
-                  subChunk && typeof subChunk === 'object' && subChunk.name && subChunk.dataType
-                );
-                const nestedHasParam = nestedChunk.queryChunks.some((subChunk: any) => 
-                  subChunk && typeof subChunk === 'object' && subChunk.hasOwnProperty('brand') && subChunk.value !== undefined
-                );
-                
-                if (nestedHasColumn && nestedHasParam) {
-                  conditions.push(nestedChunk);
-                  console.log(`[MOCK DB DEBUG] Found nested eq() condition ${conditions.length}`);
-                }
-              } else if (nestedChunk && typeof nestedChunk === 'object' && nestedChunk.value && Array.isArray(nestedChunk.value)) {
-                const operatorStr = nestedChunk.value[0];
-                if (typeof operatorStr === 'string' && operatorStr.trim() === 'and') {
-                  isAndOperation = true;
-                  console.log('[MOCK DB DEBUG] Found AND operator in nested structure');
-                }
-              }
+      return value;
+    }),
+    
+    put: vi.fn().mockImplementation(async (key: string, value: string | ArrayBuffer | ArrayBufferView | ReadableStream) => {
+      if (typeof value === 'object' && value !== null) {
+        store.set(key, JSON.stringify(value));
+      } else {
+        store.set(key, String(value));
+      }
+      return undefined;
+    }),
+    
+    delete: vi.fn().mockImplementation(async (key: string) => {
+      store.delete(key);
+      return undefined;
+    }),
+    
+    list: vi.fn().mockImplementation(async (options?: { prefix?: string; limit?: number; cursor?: string }) => {
+      const keys = Array.from(store.keys());
+      const filteredKeys = options?.prefix 
+        ? keys.filter(key => key.startsWith(options.prefix!))
+        : keys;
+      
+      const limitedKeys = options?.limit 
+        ? filteredKeys.slice(0, options.limit)
+        : filteredKeys;
+      
+      return {
+        keys: limitedKeys.map(name => ({ name })),
+        list_complete: true,
+        cursor: '',
+      };
+    }),
+    
+    getWithMetadata: vi.fn().mockImplementation(async (key: string, options?: any) => {
+      // Mock implementation - return null value and metadata
+      return {
+        value: null,
+        metadata: null,
+      };
+    }),
+    
+    clear: vi.fn().mockImplementation(async () => {
+      store.clear();
+    }),
+  } as ExtendedKVNamespace;
+}
+
+// Production-ready Drizzle database instance for testing
+export async function createTestDatabase() {
+  // Create an in-memory store for test data
+  const dataStore = new Map<string, Map<string, any>>();
+  
+  // Initialize tables
+  dataStore.set('users', new Map());
+  dataStore.set('positions', new Map());
+  dataStore.set('invitation_codes', new Map());
+  dataStore.set('sessions', new Map());
+  dataStore.set('invitationUsage', new Map());
+  
+  // Use a mock D1 database that works with Drizzle and stores data
+  const mockD1 = {
+    prepare: vi.fn().mockImplementation((sql: string) => {
+      return {
+        bind: vi.fn().mockReturnThis(),
+        first: vi.fn().mockImplementation(async () => {
+          // Simple mock - return first item from users table for SELECT queries
+          if (sql.includes('SELECT') && sql.includes('users')) {
+            const usersTable = dataStore.get('users');
+            if (usersTable && usersTable.size > 0) {
+              return Array.from(usersTable.values())[0];
             }
           }
-        }
-      }
-    }
-    
-    console.log('[MOCK DB DEBUG] Parsed', conditions.length, 'individual conditions for', isAndOperation ? 'AND' : 'OR', 'operation');
-    
-    // Evaluate all conditions
-    if (isAndOperation) {
-      // AND: all conditions must be true
-      for (const cond of conditions) {
-        const condResult = this.evaluateSingleCondition(record, cond);
-        console.log('[MOCK DB DEBUG] AND condition result:', condResult);
-        if (!condResult) {
-          console.log('[MOCK DB DEBUG] AND operation failed, returning false');
-          return false;
-        }
-      }
-      console.log('[MOCK DB DEBUG] All AND conditions passed, returning true');
-      return true;
-    } else {
-      // OR: at least one condition must be true
-      for (const cond of conditions) {
-        const condResult = this.evaluateSingleCondition(record, cond);
-        console.log('[MOCK DB DEBUG] OR condition result:', condResult);
-        if (condResult) {
-          console.log('[MOCK DB DEBUG] OR operation succeeded, returning true');
-          return true;
-        }
-      }
-      console.log('[MOCK DB DEBUG] All OR conditions failed, returning false');
-      return false;
-    }
-  }
-
-  private evaluateSingleCondition(record: any, condition: any): boolean {
-    if (!condition) return true;
-    
-    // Handle Drizzle SQL objects with queryChunks
-    if (condition && typeof condition === 'object' && condition.queryChunks) {
-      console.log('[MOCK DB DEBUG] Evaluating condition with queryChunks - type:', typeof condition);
-      console.log('[MOCK DB DEBUG] Record being evaluated:', record);
-      
-      // Parse queryChunks to extract the actual condition
-       // For Drizzle eq() conditions, we need to find the column and value
-        let columnName = null;
-        let value = null;
-        
-        for (let i = 0; i < condition.queryChunks.length; i++) {
-          const chunk = condition.queryChunks[i];
-          console.log(`[MOCK DB DEBUG] Processing chunk ${i}:`, chunk?.name || chunk?.value || 'unknown chunk');
-          
-          // Look for column chunk (has name, dataType, etc.)
-          if (chunk && typeof chunk === 'object' && chunk.name && chunk.dataType) {
-            columnName = chunk.name;
-            console.log('[MOCK DB DEBUG] Found column name:', columnName);
+          return null;
+        }),
+        all: vi.fn().mockImplementation(async () => {
+          // Return all items for SELECT queries
+          if (sql.includes('SELECT') && sql.includes('users')) {
+            const usersTable = dataStore.get('users');
+            return { results: usersTable ? Array.from(usersTable.values()) : [] };
           }
-          
-          // Look for parameter chunk (has brand, value, encoder) - this is the actual value
-          if (chunk && typeof chunk === 'object' && chunk.hasOwnProperty('brand') && chunk.value !== undefined) {
-            value = chunk.value;
-            console.log('[MOCK DB DEBUG] Found value:', value);
-          }
-        }
+          return { results: [] };
+        }),
+        run: vi.fn().mockImplementation(async () => {
+          // Mock successful operations
+          return { success: true, meta: { changes: 1, last_row_id: 1 } };
+        }),
+        raw: vi.fn().mockResolvedValue([]),
+      };
+    }),
+    exec: vi.fn().mockResolvedValue({ success: true }),
+    dump: vi.fn().mockResolvedValue(new ArrayBuffer(0)),
+    batch: vi.fn().mockResolvedValue([]),
+  };
+  
+  // Create a mock Drizzle database that can handle basic operations
+   let lastInsertedUser: any = null;
+   
+   // Helper function to detect table name from Drizzle table objects
+   const detectTableName = (table: any): string => {
+     if (!table) return 'unknown';
+     
+     // Check for Drizzle Symbol
+     if (table[Symbol.for('drizzle:Name')]) {
+       return table[Symbol.for('drizzle:Name')];
+     }
+     
+     // Check for table metadata (most common for Drizzle tables)
+     if (table._ && table._.name) {
+       return table._.name;
+     }
+     
+     // Check for table config
+     if (table._ && table._.config && table._.config.name) {
+       return table._.config.name;
+     }
+     
+     // Check for dbName property
+     if (table._ && table._.dbName) {
+       return table._.dbName;
+     }
+     
+     // For Drizzle SQLite tables, check the table name directly
+     if (table._.baseName) {
+       return table._.baseName;
+     }
+     
+     // Fallback to string representation
+     if (typeof table === 'string') {
+       return table;
+     }
+     
+     // Last resort: try to extract from toString or constructor
+     if (table.toString && typeof table.toString === 'function') {
+       const str = table.toString();
+       // Look for table name patterns in the string representation
+       const match = str.match(/table["']([^"']+)["']/) || str.match(/name["']([^"']+)["']/);
+       if (match) {
+         return match[1];
+       }
+     }
+     
+     return 'unknown';
+   };
+   
+   // Define getFilteredResults function globally within the mock
+   const getFilteredResults = (tableData: any[], whereCondition: any) => {
+     if (!whereCondition || !whereCondition.queryChunks || !Array.isArray(whereCondition.queryChunks)) {
+       return tableData;
+     }
+     
+     // Check if this is a compound condition
+     const hasLogicalOperator = whereCondition.queryChunks.some((chunk: any) => 
+       chunk === 'and' || chunk === 'or' || 
+       (typeof chunk === 'string' && (chunk.includes('AND') || chunk.includes('OR')))
+     );
+     
+     if (hasLogicalOperator) {
+       // Handle compound conditions
+       const individualConditions: any[] = [];
+       let currentCondition: any = null;
        
-       if (columnName && value !== null) {
-         // Map snake_case column names to camelCase property names
-         const propertyName = this.mapColumnNameToProperty(columnName);
-         let actualValue = record[propertyName];
-         let expectedValue = value;
+       for (let i = 0; i < whereCondition.queryChunks.length; i++) {
+         const chunk = whereCondition.queryChunks[i];
          
-         console.log(`[MOCK DB DEBUG] Before comparison:`);
-         console.log(`[MOCK DB DEBUG]   Column: ${columnName} -> Property: ${propertyName}`);
-         console.log(`[MOCK DB DEBUG]   Expected: ${expectedValue} (${typeof expectedValue})`);
-         console.log(`[MOCK DB DEBUG]   Actual: ${actualValue} (${typeof actualValue})`);
+         // Skip logical operators
+         if (chunk === 'and' || chunk === 'or') {
+           continue;
+         }
          
-         // Handle boolean comparisons with detailed logging
-         if (typeof expectedValue === 'boolean' || typeof actualValue === 'boolean') {
-           console.log(`[MOCK DB DEBUG] Boolean comparison detected:`);
-           console.log(`[MOCK DB DEBUG]   Column: ${columnName}, Property: ${propertyName}`);
-           console.log(`[MOCK DB DEBUG]   Expected: ${expectedValue} (${typeof expectedValue})`);
-           console.log(`[MOCK DB DEBUG]   Actual: ${actualValue} (${typeof actualValue})`);
+         // Collect condition parts (column and value pairs)
+         if (chunk && typeof chunk === 'object') {
+           if (chunk.name && chunk.dataType) {
+             // This is a column chunk, start a new condition
+             if (currentCondition) {
+               individualConditions.push(currentCondition);
+             }
+             currentCondition = { queryChunks: [chunk] };
+           } else if (chunk.hasOwnProperty('value') && currentCondition) {
+             // This is a value chunk, add to current condition
+             currentCondition.queryChunks.push(chunk);
+             individualConditions.push(currentCondition);
+             currentCondition = null;
+           }
+         }
+       }
+       
+       // Add any remaining condition
+       if (currentCondition) {
+         individualConditions.push(currentCondition);
+       }
+       
+       // Find records that match all conditions (AND logic)
+       return tableData.filter(record => {
+         let matchesAll = true;
+         
+         for (const cond of individualConditions) {
+           let columnName = null;
+           let value = null;
            
-           // Convert boolean to integer for database storage (SQLite boolean mode)
-           if (typeof expectedValue === 'boolean') {
-             expectedValue = expectedValue ? 1 : 0;
-             console.log(`[MOCK DB DEBUG]   Expected converted to: ${expectedValue}`);
+           for (const chunk of cond.queryChunks) {
+             if (chunk && typeof chunk === 'object' && chunk.name && chunk.dataType) {
+               columnName = chunk.name;
+             }
+             if (chunk && typeof chunk === 'object' && chunk.hasOwnProperty('value')) {
+               value = chunk.value;
+             }
            }
            
-           if (typeof actualValue === 'boolean') {
-             actualValue = actualValue ? 1 : 0;
-             console.log(`[MOCK DB DEBUG]   Actual converted to: ${actualValue}`);
-           }
-           
-           // Also handle string representations
-           if (typeof actualValue === 'string') {
-             if (actualValue === 'true') actualValue = 1;
-             else if (actualValue === 'false') actualValue = 0;
-             else actualValue = parseInt(actualValue) || 0;
-           }
-           
-           if (typeof expectedValue === 'string') {
-             if (expectedValue === 'true') expectedValue = 1;
-             else if (expectedValue === 'false') expectedValue = 0;
-             else expectedValue = parseInt(expectedValue) || 0;
+           if (columnName && value !== null) {
+             const propertyName = columnName.replace(/_([a-z])/g, (_: string, letter: string) => letter.toUpperCase());
+             if (record[propertyName] !== value) {
+               matchesAll = false;
+               break;
+             }
            }
          }
          
-         const result = actualValue === expectedValue;
-         console.log(`[MOCK DB DEBUG] Final comparison result: ${result}`);
-         return result;
-       } else {
-         console.log('[MOCK DB DEBUG] Could not extract columnName or value, returning true');
+         return matchesAll;
+       });
+     } else {
+       // Handle single conditions
+       let columnName = null;
+       let value = null;
+       
+       // Extract column name and value from queryChunks
+       for (const chunk of whereCondition.queryChunks) {
+         if (chunk && typeof chunk === 'object' && chunk.name && chunk.dataType) {
+           columnName = chunk.name;
+         }
+         if (chunk && typeof chunk === 'object' && chunk.hasOwnProperty('value')) {
+           value = chunk.value;
+         }
        }
-    }
-    
-    // Handle direct Drizzle operator objects (legacy support)
-    if (condition && typeof condition === 'object') {
-      // Check if it's a Drizzle operator (has left, right, operator properties)
-      if (condition.left && condition.right !== undefined && condition.operator) {
-        const columnName = this.extractColumnNameFromDrizzle(condition.left);
-        const value = condition.right;
-        const operator = condition.operator;
-        
-        if (columnName) {
-          const propertyName = this.mapColumnNameToProperty(columnName);
-          let result = false;
-          switch (operator) {
-            case '=':
-              result = record[propertyName] === value;
-              break;
-            case '!=':
-            case '<>':
-              result = record[propertyName] !== value;
-              break;
-            case '>':
-              result = record[propertyName] > value;
-              break;
-            case '>=':
-              result = record[propertyName] >= value;
-              break;
-            case '<':
-              result = record[propertyName] < value;
-              break;
-            case '<=':
-              result = record[propertyName] <= value;
-              break;
-            default:
-              result = false;
-          }
-          return result;
-        }
-      }
-      
-      // Parse the SQL structure to extract column name and expected value (legacy)
-      if (condition.sql && condition.queryChunks && condition.params) {
-        const columnName = this.extractColumnName(condition);
-        const expectedValue = condition.params[0];
-        
-        if (columnName && expectedValue !== undefined) {
-          const propertyName = this.mapColumnNameToProperty(columnName);
-          return record[propertyName] === expectedValue;
-        }
-      }
-      
-      // Handle SQL expressions
-      if (condition.sql && typeof condition.sql === 'string') {
-        // Simple string-based SQL parsing for basic conditions
-        const sqlStr = condition.sql;
-        if (sqlStr.includes('=')) {
-          const parts = sqlStr.split('=');
-          if (parts.length === 2) {
-            const columnName = parts[0].trim().replace(/["'`]/g, '');
-            const propertyName = this.mapColumnNameToProperty(columnName);
-            const expectedValue = parts[1].trim().replace(/["'`]/g, '');
-            return record[propertyName] === expectedValue;
-          }
-        }
-      }
-      
-      // Handle direct object conditions
-      for (const [key, value] of Object.entries(condition)) {
-        if (key !== 'left' && key !== 'right' && key !== 'operator' && key !== 'sql') {
-          if (record[key] !== value) {
-            return false;
-          }
-        }
-      }
-      return true;
-    }
-    
-    return true;
-  }
-
-  private extractColumnNameFromDrizzle(left: any): string | null {
-    // Handle Drizzle column objects
-    if (left && typeof left === 'object') {
-      // Check for column name property
-      if (left.name) return left.name;
-      if (left.columnName) return left.columnName;
-      if (left.fieldName) return left.fieldName;
-      
-      // Check for table.column structure
-      if (left.table && left.table.name && left.name) {
-        return left.name;
-      }
-    }
-    
-    // Fallback to string parsing
-    if (typeof left === 'string') {
-      return this.extractColumnNameFromString(left);
-    }
-    
-    return null;
-  }
-
-  private extractColumnName(condition: any): string | null {
-    if (!condition.queryChunks || !Array.isArray(condition.queryChunks)) {
-      return null;
-    }
-    
-    // Look for column references in query chunks
-    for (const chunk of condition.queryChunks) {
-      if (chunk && typeof chunk === 'object' && chunk.name) {
-        return chunk.name;
-      }
-      if (typeof chunk === 'string' && chunk.includes('.')) {
-        const parts = chunk.split('.');
-        return parts[parts.length - 1].replace(/["'`]/g, '');
-      }
-    }
-    
-    return null;
-  }
-
-  private extractColumnNameFromString(chunk: string): string | null {
-    // Extract column name from string like '"invitation_codes"."id"'
-    const match = chunk.match(/"([^"]+)"\."([^"]+)"/); 
-    return match ? match[2] : null;
-  }
-
-  private applyOrdering(data: any[], orderColumn: any): any[] {
-    if (!orderColumn) return data;
-    
-    let columnName = '';
-    let isDescending = false;
-    
-    if (orderColumn && typeof orderColumn === 'object') {
-      // Handle desc() wrapper
-      if (orderColumn.column && orderColumn.column.name) {
-        columnName = orderColumn.column.name;
-        isDescending = orderColumn.desc === true;
-      } else if (orderColumn.name) {
-        columnName = orderColumn.name;
-      }
-    }
-    
-    if (!columnName) return data;
-    
-    return [...data].sort((a, b) => {
-      const propertyName = this.mapColumnNameToProperty(columnName);
-      let aValue = a[propertyName];
-      let bValue = b[propertyName];
-      
-      // Handle date fields
-      if (propertyName === 'changedAt' || propertyName === 'createdAt' || propertyName === 'updatedAt') {
-        aValue = new Date(aValue || '1970-01-01T00:00:00.000Z').getTime();
-        bValue = new Date(bValue || '1970-01-01T00:00:00.000Z').getTime();
-      }
-      
-      // Handle numeric fields
-      if (typeof aValue === 'string' && !isNaN(Number(aValue))) {
-        aValue = Number(aValue);
-      }
-      if (typeof bValue === 'string' && !isNaN(Number(bValue))) {
-        bValue = Number(bValue);
-      }
-      
-      if (aValue < bValue) return isDescending ? 1 : -1;
-      if (aValue > bValue) return isDescending ? -1 : 1;
-      return 0;
-    });
-  }
-
-  // INSERT implementation
-  insert(table: any) {
-    this.currentTable = this.detectTableName(table);
-    
-    return {
-      values: (data: any) => {
-        const tableData = this.getTableData(this.currentTable);
-        
-        // Handle single record or array of records
-        const records = Array.isArray(data) ? data : [data];
-        const insertedRecords: any[] = [];
-        
-        for (const record of records) {
-          // Check unique constraints for users table
-          if (this.currentTable === 'users') {
-            // Check telegramId uniqueness
-            if (record.telegramId && tableData.some(u => u.telegramId === record.telegramId)) {
-              throw new Error(`UNIQUE constraint failed: users.telegramId`);
-            }
-            // Check email uniqueness (if provided)
-            if (record.email && tableData.some(u => u.email === record.email)) {
-              throw new Error(`UNIQUE constraint failed: users.email`);
-            }
-            // Check username uniqueness (if provided)
-            if (record.username && tableData.some(u => u.username === record.username)) {
-              throw new Error(`UNIQUE constraint failed: users.username`);
-            }
+       
+       if (columnName && value !== null) {
+         // Convert snake_case column name to camelCase property name
+         const propertyName = columnName.replace(/_([a-z])/g, (_: string, letter: string) => letter.toUpperCase());
+         
+         // Find matching records
+         const filtered = tableData.filter(record => {
+           const actualValue = record[propertyName];
+           const matches = actualValue === value;
+           return matches;
+         });
+         
+         return filtered;
+       }
+     }
+     
+     return tableData;
+   };
+   
+   const mockDrizzleDb = {
+    // Add the query property that Drizzle expects
+    query: {
+      users: {
+        findFirst: vi.fn().mockImplementation(async (options: any = {}) => {
+          const tableData = dataStore.get('users');
+          if (!tableData || tableData.size === 0) {
+            console.log('[TEST HELPERS DEBUG] No users table data found');
+            return null;
           }
           
-          const newRecord = {
-            id: this.generateId(),
-            ...record,
-            createdAt: record.createdAt || new Date().toISOString(),
-            updatedAt: record.updatedAt || new Date().toISOString(),
+          const allData = Array.from(tableData.values());
+          console.log(`[TEST HELPERS DEBUG] Users table has ${allData.length} records`);
+          
+          if (options.where) {
+            console.log('[TEST HELPERS DEBUG] Applying where condition:', options.where);
+            const filtered = getFilteredResults(allData, options.where);
+            console.log(`[TEST HELPERS DEBUG] Filtered results: ${filtered.length} records`);
+            return filtered.length > 0 ? filtered[0] : null;
+          }
+          return allData[0] || null;
+        }),
+        findMany: vi.fn().mockImplementation(async (options: any = {}) => {
+          const tableData = dataStore.get('users');
+          if (!tableData || tableData.size === 0) return [];
+          
+          const allData = Array.from(tableData.values());
+          if (options.where) {
+            return getFilteredResults(allData, options.where);
+          }
+          return allData;
+        })
+      },
+      invitationCodes: {
+        findFirst: vi.fn().mockImplementation(async (options: any = {}) => {
+          const tableData = dataStore.get('invitation_codes');
+          if (!tableData || tableData.size === 0) return null;
+          
+          const allData = Array.from(tableData.values());
+          if (options.where) {
+            const filtered = getFilteredResults(allData, options.where);
+            return filtered.length > 0 ? filtered[0] : null;
+          }
+          return allData[0] || null;
+        }),
+        findMany: vi.fn().mockImplementation(async (options: any = {}) => {
+          const tableData = dataStore.get('invitation_codes');
+          if (!tableData || tableData.size === 0) return [];
+          
+          const allData = Array.from(tableData.values());
+          if (options.where) {
+            return getFilteredResults(allData, options.where);
+          }
+          return allData;
+        })
+      }
+    },
+    select: vi.fn().mockReturnValue({
+        from: vi.fn().mockImplementation((table: any) => {
+          const tableName = detectTableName(table);
+          console.log('[MOCK DB] SELECT - Table name detected:', tableName);
+          console.log('[MOCK DB] SELECT - Table object:', table);
+          console.log('[TEST HELPERS DEBUG] Detected table name:', tableName);
+          console.log('[TEST HELPERS DEBUG] Available tables in dataStore:', Array.from(dataStore.keys()));
+         
+         const getResult = async () => {
+            const tableData = dataStore.get(tableName);
+            if (tableData && tableData.size > 0) {
+              // For users table, return the last inserted user or first available
+              if (tableName === 'users' && lastInsertedUser) {
+                return lastInsertedUser;
+              }
+              return Array.from(tableData.values())[0];
+            }
+            return null;
           };
           
-          tableData.push(newRecord);
-          insertedRecords.push(newRecord);
-          this.lastInsertedRecord = newRecord;
-        }
-        
-        return {
-          returning: (columns?: any) => ({
-            execute: () => Promise.resolve(insertedRecords)
-          }),
-          execute: () => Promise.resolve({ success: true, meta: { changes: insertedRecords.length } })
-        };
-      }
-    };
-  }
-
-  // SELECT implementation
-  select(columns?: any) {
-    const createQueryBuilder = () => {
-      const builder = {
-        from: (table: any) => {
-          this.currentTable = this.detectTableName(table);
-
-          const baseQuery = {
-            where: (whereCondition: any) => {
-              return {
-                orderBy: (orderColumn: any) => ({
-                  limit: (limitValue: number) => {
-                    const tableData = this.getTableData(this.currentTable);
-                    let filteredData = this.applyWhereFilter(tableData, whereCondition);
-                    
-                    if (orderColumn) {
-                      filteredData = this.applyOrdering(filteredData, orderColumn);
-                    }
-                    
-                    return Promise.resolve(filteredData.slice(0, limitValue));
-                  },
-                  execute: () => {
-                    const tableData = this.getTableData(this.currentTable);
-                    let filteredData = this.applyWhereFilter(tableData, whereCondition);
-                    
-                    if (orderColumn) {
-                      filteredData = this.applyOrdering(filteredData, orderColumn);
-                    }
-                    
-                    return Promise.resolve(filteredData);
-                  },
-                  get: () => {
-                    const tableData = this.getTableData(this.currentTable);
-                    let filteredData = this.applyWhereFilter(tableData, whereCondition);
-                    
-                    if (orderColumn) {
-                      filteredData = this.applyOrdering(filteredData, orderColumn);
-                    }
-                    
-                    const result = filteredData[0] || null;
-                    return Promise.resolve(result);
-                  },
-                  then: (resolve: any, reject: any) => {
-                    const tableData = this.getTableData(this.currentTable);
-                    let filteredData = this.applyWhereFilter(tableData, whereCondition);
-                    
-                    if (orderColumn) {
-                      filteredData = this.applyOrdering(filteredData, orderColumn);
-                    }
-                    
-                    return Promise.resolve(filteredData).then(resolve, reject);
-                  }
-                }),
-                limit: (limitValue: number) => ({
-                  execute: () => {
-                    const tableData = this.getTableData(this.currentTable);
-                    const filteredData = this.applyWhereFilter(tableData, whereCondition);
-                    return Promise.resolve(filteredData.slice(0, limitValue));
-                  },
-                  then: (resolve: any, reject: any) => {
-                    const tableData = this.getTableData(this.currentTable);
-                    const filteredData = this.applyWhereFilter(tableData, whereCondition);
-                    return Promise.resolve(filteredData.slice(0, limitValue)).then(resolve, reject);
-                  }
-                }),
-                execute: () => {
-                  const tableData = this.getTableData(this.currentTable);
-                  const filteredData = this.applyWhereFilter(tableData, whereCondition);
-                  return Promise.resolve(filteredData);
-                },
-                get: () => {
-                  const tableData = this.getTableData(this.currentTable);
-                  const filteredData = this.applyWhereFilter(tableData, whereCondition);
-                  const result = filteredData[0] || null;
-                  return Promise.resolve(result);
-                },
-                then: (resolve: any, reject: any) => {
-                  const tableData = this.getTableData(this.currentTable);
-                  const filteredData = this.applyWhereFilter(tableData, whereCondition);
-                  return Promise.resolve(filteredData).then(resolve, reject);
-                }
-              };
-            },
-            orderBy: (orderColumn: any) => {
-              const applySorting = (data: any[]) => {
-                if (!orderColumn) return data;
-                
-                let columnName = '';
-                let isDescending = false;
-                
-                if (orderColumn && typeof orderColumn === 'object') {
-                  if (orderColumn.column && orderColumn.column.name) {
-                    columnName = orderColumn.column.name;
-                    isDescending = orderColumn.desc === true;
-                  } else if (orderColumn.name) {
-                    columnName = orderColumn.name;
-                  }
-                }
-                
-                if (!columnName) return data;
-                
-                return [...data].sort((a, b) => {
-                  let aValue = a[columnName];
-                  let bValue = b[columnName];
-                  
-                  if (columnName === 'changedAt' || columnName === 'createdAt' || columnName === 'updatedAt') {
-                    aValue = new Date(aValue || '1970-01-01T00:00:00.000Z').getTime();
-                    bValue = new Date(bValue || '1970-01-01T00:00:00.000Z').getTime();
-                  }
-                  
-                  if (typeof aValue === 'string' && !isNaN(Number(aValue))) {
-                    aValue = Number(aValue);
-                  }
-                  if (typeof bValue === 'string' && !isNaN(Number(bValue))) {
-                    bValue = Number(bValue);
-                  }
-                  
-                  if (aValue < bValue) return isDescending ? 1 : -1;
-                  if (aValue > bValue) return isDescending ? -1 : 1;
-                  return 0;
-                });
-              };
-              
-              return {
-                where: (whereCondition: any) => ({
-                  limit: (limitValue: number) => ({
-                    execute: () => {
-                      const tableData = this.getTableData(this.currentTable);
-                      const filteredData = this.applyWhereFilter(tableData, whereCondition);
-                      const sortedData = applySorting(filteredData);
-                      return Promise.resolve(sortedData.slice(0, limitValue));
-                    },
-                    then: (resolve: any, reject: any) => {
-                      const tableData = this.getTableData(this.currentTable);
-                      const filteredData = this.applyWhereFilter(tableData, whereCondition);
-                      const sortedData = applySorting(filteredData);
-                      return Promise.resolve(sortedData.slice(0, limitValue)).then(resolve, reject);
-                    }
-                  }),
-                  execute: () => {
-                    const tableData = this.getTableData(this.currentTable);
-                    const filteredData = this.applyWhereFilter(tableData, whereCondition);
-                    const sortedData = applySorting(filteredData);
-                    return Promise.resolve(sortedData);
-                  },
-                  then: (resolve: any, reject: any) => {
-                    const tableData = this.getTableData(this.currentTable);
-                    const filteredData = this.applyWhereFilter(tableData, whereCondition);
-                    const sortedData = applySorting(filteredData);
-                    return Promise.resolve(sortedData).then(resolve, reject);
-                  }
-                }),
-                limit: (limitValue: number) => ({
-                  execute: () => {
-                    const tableData = this.getTableData(this.currentTable);
-                    const sortedData = applySorting(tableData);
-                    return Promise.resolve(sortedData.slice(0, limitValue));
-                  },
-                  then: (resolve: any, reject: any) => {
-                    const tableData = this.getTableData(this.currentTable);
-                    const sortedData = applySorting(tableData);
-                    return Promise.resolve(sortedData.slice(0, limitValue)).then(resolve, reject);
-                  }
-                }),
-                execute: () => {
-                  const tableData = this.getTableData(this.currentTable);
-                  const sortedData = applySorting(tableData);
-                  return Promise.resolve(sortedData);
-                },
-                then: (resolve: any, reject: any) => {
-                  const tableData = this.getTableData(this.currentTable);
-                  const sortedData = applySorting(tableData);
-                  return Promise.resolve(sortedData).then(resolve, reject);
-                }
-              };
-            },
-            limit: (limitValue: number) => ({
-              execute: () => {
-                const tableData = this.getTableData(this.currentTable);
-                return Promise.resolve(tableData.slice(0, limitValue));
-              },
-              then: (resolve: any, reject: any) => {
-                const tableData = this.getTableData(this.currentTable);
-                return Promise.resolve(tableData.slice(0, limitValue)).then(resolve, reject);
-              }
-            }),
-            execute: () => {
-              const tableData = this.getTableData(this.currentTable);
-              return Promise.resolve(tableData);
-            },
-            then: (resolve: any, reject: any) => {
-              const tableData = this.getTableData(this.currentTable);
-              return Promise.resolve(tableData).then(resolve, reject);
+          const getAllResults = async () => {
+            const tableData = dataStore.get(tableName);
+            if (tableData && tableData.size > 0) {
+              return Array.from(tableData.values());
             }
+            return [];
           };
+          
 
-          return baseQuery;
-        }
-      };
-      
-      (builder as any).then = (resolve: any, reject: any) => {
-        return Promise.resolve([]).then(resolve, reject);
-      };
-      
-      return builder;
-    };
 
-    return createQueryBuilder();
-  }
-
-  // UPDATE implementation
-  update(table: any) {
-    this.currentTable = this.detectTableName(table);
-    let accumulatedData = {};
-
-    const createChainableUpdate = () => ({
-      set: (updateData: any) => {
-        accumulatedData = { ...accumulatedData, ...updateData };
-
-        return {
-          ...createChainableUpdate(),
-          where: (whereCondition: any) => ({
-            returning: (columns?: any) => ({
-              execute: () => {
-                const tableData = this.getTableData(this.currentTable);
-                let filteredData = tableData;
-                if (whereCondition) {
-                  filteredData = this.applyWhereFilter(tableData, whereCondition);
+          const getFilteredResult = async (condition: any) => {
+            const tableData = dataStore.get(tableName);
+            if (!tableData || tableData.size === 0) {
+              console.log('[TEST HELPERS DEBUG] No table data found for:', tableName);
+              return null;
+            }
+            
+            console.log('[TEST HELPERS DEBUG] Table data size:', tableData.size);
+            console.log('[TEST HELPERS DEBUG] Table data keys:', Array.from(tableData.keys()));
+            
+            // Parse Drizzle condition with queryChunks using enhanced logic
+            if (condition && condition.queryChunks && Array.isArray(condition.queryChunks)) {
+              console.log('[TEST HELPERS DEBUG] Filtering with queryChunks:', condition.queryChunks.length);
+              
+              // Check if this is a compound condition
+              const hasLogicalOperator = condition.queryChunks.some((chunk: any) => 
+                chunk === 'and' || chunk === 'or' || 
+                (typeof chunk === 'string' && (chunk.includes('AND') || chunk.includes('OR')))
+              );
+              
+              if (hasLogicalOperator) {
+                // Handle compound conditions
+                const individualConditions: any[] = [];
+                let currentCondition: any = null;
+                
+                for (let i = 0; i < condition.queryChunks.length; i++) {
+                  const chunk = condition.queryChunks[i];
+                  
+                  // Skip logical operators
+                  if (chunk === 'and' || chunk === 'or') {
+                    continue;
+                  }
+                  
+                  // Collect condition parts (column and value pairs)
+                  if (chunk && typeof chunk === 'object') {
+                    if (chunk.name && chunk.dataType) {
+                      // This is a column chunk, start a new condition
+                      if (currentCondition) {
+                        individualConditions.push(currentCondition);
+                      }
+                      currentCondition = { queryChunks: [chunk] };
+                    } else if (chunk.hasOwnProperty('value') && currentCondition) {
+                      // This is a value chunk, add to current condition
+                      currentCondition.queryChunks.push(chunk);
+                      individualConditions.push(currentCondition);
+                      currentCondition = null;
+                    }
+                  }
                 }
                 
-                if (filteredData.length > 0) {
-                  let processedData = { ...accumulatedData } as any;
-                  if (this.currentTable === 'users' && processedData.accountBalance && typeof processedData.accountBalance === 'string') {
-                    processedData.accountBalance = parseFloat(processedData.accountBalance);
-                  }
-
-                  const recordToUpdate = filteredData[0];
-                  Object.assign(recordToUpdate, processedData, { updatedAt: new Date().toISOString() });
-                  return Promise.resolve([recordToUpdate]);
+                // Add any remaining condition
+                if (currentCondition) {
+                  individualConditions.push(currentCondition);
                 }
-                return Promise.resolve([]);
+                
+                console.log('[TEST HELPERS DEBUG] Parsed individual conditions:', individualConditions.length);
+                
+                // Find records that match all conditions (AND logic)
+                for (const record of Array.from(tableData.values())) {
+                  let matchesAll = true;
+                  
+                  for (const cond of individualConditions) {
+                    let columnName = null;
+                    let value = null;
+                    
+                    for (const chunk of cond.queryChunks) {
+                      if (chunk && typeof chunk === 'object' && chunk.name && chunk.dataType) {
+                        columnName = chunk.name;
+                      }
+                      if (chunk && typeof chunk === 'object' && chunk.hasOwnProperty('value')) {
+                        value = chunk.value;
+                      }
+                    }
+                    
+                    if (columnName && value !== null) {
+                      const propertyName = columnName.replace(/_([a-z])/g, (_: string, letter: string) => letter.toUpperCase());
+                      if (record[propertyName] !== value) {
+                        matchesAll = false;
+                        break;
+                      }
+                    }
+                  }
+                  
+                  if (matchesAll) {
+                    console.log('[TEST HELPERS DEBUG] Found matching record:', record);
+                    return record;
+                  }
+                }
+              } else {
+                // Handle single conditions
+                let columnName = null;
+                let value = null;
+                
+                console.log('[TEST HELPERS DEBUG] Processing single condition...');
+                
+                // Extract column name and value from queryChunks
+                for (const chunk of condition.queryChunks) {
+                  console.log('[TEST HELPERS DEBUG] Processing chunk type:', typeof chunk, chunk?.name || 'unknown');
+                  if (chunk && typeof chunk === 'object' && chunk.name && chunk.dataType) {
+                    columnName = chunk.name;
+                    console.log('[TEST HELPERS DEBUG] Found column name:', columnName);
+                  }
+                  if (chunk && typeof chunk === 'object' && chunk.hasOwnProperty('value')) {
+                    value = chunk.value;
+                    console.log('[TEST HELPERS DEBUG] Found value:', value);
+                  }
+                }
+                
+                if (columnName && value !== null) {
+                  // Convert snake_case column name to camelCase property name
+                  const propertyName = columnName.replace(/_([a-z])/g, (_: string, letter: string) => letter.toUpperCase());
+                  
+                  console.log(`[TEST HELPERS DEBUG] Single condition: ${columnName}(${propertyName}) = ${value}`);
+                  
+                  // Find matching record based on the column and value
+                  for (const record of Array.from(tableData.values())) {
+                    const actualValue = record[propertyName];
+                    const matches = actualValue === value;
+                    console.log(`[TEST HELPERS DEBUG] Record ${propertyName}=${actualValue} vs expected=${value}, matches: ${matches}`);
+                    if (matches) {
+                      console.log('[TEST HELPERS DEBUG] Found matching record:', record);
+                      return record;
+                    }
+                  }
+                } else {
+                  console.log('[TEST HELPERS DEBUG] No valid column/value found in single condition');
+                }
               }
-            }),
-            execute: () => {
-              const tableData = this.getTableData(this.currentTable);
-              
-              let filteredData = tableData;
-              if (whereCondition) {
-                filteredData = this.applyWhereFilter(tableData, whereCondition);
-              }
-              
-              if (filteredData.length > 0) {
-                const recordToUpdate = filteredData[0];
-                Object.assign(recordToUpdate, accumulatedData, { updatedAt: new Date().toISOString() });
-                return Promise.resolve({ changes: 1 });
-              }
-              return Promise.resolve({ changes: 0 });
             }
+            
+            console.log('[TEST HELPERS DEBUG] No matching record found');
+            return null;
+          };
+         
+         return {
+           where: vi.fn().mockImplementation((condition: any) => {
+             const whereResult = {
+               get: vi.fn().mockImplementation(() => {
+                 const tableData = dataStore.get(tableName);
+                 if (tableData && tableData.size > 0) {
+                   const allData = Array.from(tableData.values());
+                   const results = getFilteredResults(allData, condition);
+                   return results.length > 0 ? results[0] : null;
+                 }
+                 return null;
+               }),
+               all: vi.fn().mockImplementation(async () => {
+                 const tableData = dataStore.get(tableName);
+                 if (tableData && tableData.size > 0) {
+                   const allData = Array.from(tableData.values());
+                   return getFilteredResults(allData, condition);
+                 }
+                 return [];
+               })
+             };
+             
+             // Make the where result itself awaitable and return an array
+             // This handles cases where .all() is not explicitly called
+             Object.defineProperty(whereResult, 'then', {
+               value: function(resolve: any) {
+                 console.log(`[TEST HELPERS SELECT DEBUG] Making ${tableName} where result awaitable`);
+                 const tableData = dataStore.get(tableName);
+                 console.log(`[TEST HELPERS SELECT DEBUG] Table ${tableName} has ${tableData ? tableData.size : 0} records`);
+                 if (tableData && tableData.size > 0) {
+                   const allData = Array.from(tableData.values());
+                   console.log(`[TEST HELPERS SELECT DEBUG] All data for ${tableName}:`, allData);
+                   const results = getFilteredResults(allData, condition);
+                   console.log(`[TEST HELPERS SELECT DEBUG] Filtered results for ${tableName}:`, results);
+                   resolve(results);
+                 } else {
+                   console.log(`[TEST HELPERS SELECT DEBUG] No data found for ${tableName}, returning empty array`);
+                   resolve([]);
+                 }
+               },
+               writable: false,
+               enumerable: false
+             });
+             
+             return whereResult;
+           }),
+           get: vi.fn().mockImplementation(getResult),
+           all: vi.fn().mockImplementation(getAllResults)
+         };
+       })
+     }),
+     insert: vi.fn().mockImplementation((table: any) => {
+        // Detect table name using Symbol or fallback methods
+        const tableName = detectTableName(table);
+        console.log('[MOCK DB] INSERT - Table name detected:', tableName);
+        return {
+          values: vi.fn().mockImplementation((data: any) => {
+            console.log('[MOCK DB] INSERT - Data to insert:', JSON.stringify(data, null, 2));
+            return {
+              execute: vi.fn().mockImplementation(async () => {
+                // Store the actual data being inserted
+                const insertedData = {
+                  ...data,
+                  createdAt: data.createdAt || new Date(),
+                  updatedAt: data.updatedAt || new Date(),
+                  ...(tableName === 'users' && { lastActiveAt: data.lastActiveAt || new Date() })
+                };
+                
+                // Store in our mock database based on table
+                const tableStore = dataStore.get(tableName);
+                if (tableStore) {
+                  const key = data.id || data.code || data.userId || Math.random().toString();
+                  console.log(`[TEST HELPERS INSERT DEBUG] Storing in ${tableName} with key ${key}:`, insertedData);
+                  tableStore.set(key, insertedData);
+                  console.log(`[TEST HELPERS INSERT DEBUG] Table ${tableName} now has ${tableStore.size} records`);
+                  console.log('[MOCK DB] INSERT - Data stored in table', tableName, ':', JSON.stringify(Array.from(tableStore.values()), null, 2));
+                  console.log('[MOCK DB] INSERT - All dataStore keys:', Array.from(dataStore.keys()));
+                } else {
+                  console.log(`[TEST HELPERS INSERT DEBUG] No table store found for ${tableName}`);
+                }
+                
+                // Keep track of last inserted user for backward compatibility
+                if (tableName === 'users') {
+                  lastInsertedUser = insertedData;
+                }
+                
+                return [insertedData];
+              }),
+              returning: vi.fn().mockImplementation(async () => {
+                // Store the actual data being inserted
+                const insertedData = {
+                  ...data,
+                  createdAt: data.createdAt || new Date(),
+                  updatedAt: data.updatedAt || new Date(),
+                  ...(tableName === 'users' && { lastActiveAt: data.lastActiveAt || new Date() })
+                };
+                
+                // Store in our mock database based on table
+                const tableStore = dataStore.get(tableName);
+                if (tableStore) {
+                  const key = data.id || data.code || data.userId || Math.random().toString();
+                  console.log(`[TEST HELPERS INSERT DEBUG] Storing in ${tableName} with key ${key}:`, insertedData);
+                  tableStore.set(key, insertedData);
+                  console.log(`[TEST HELPERS INSERT DEBUG] Table ${tableName} now has ${tableStore.size} records`);
+                  console.log('[MOCK DB] INSERT - Data stored in table', tableName, ':', JSON.stringify(Array.from(tableStore.values()), null, 2));
+                  console.log('[MOCK DB] INSERT - All dataStore keys:', Array.from(dataStore.keys()));
+                } else {
+                  console.log(`[TEST HELPERS INSERT DEBUG] No table store found for ${tableName}`);
+                }
+                
+                // Keep track of last inserted user for backward compatibility
+                if (tableName === 'users') {
+                  lastInsertedUser = insertedData;
+                }
+                
+                return [insertedData];
+              })
+            };
           })
         };
-      }
-    });
-
-    return createChainableUpdate();
-  }
-
-  // DELETE implementation
-  delete(table: any) {
-    this.currentTable = this.detectTableName(table);
-
-    return {
-      where: (whereCondition: any) => ({
-        execute: () => {
-          const tableData = this.getTableData(this.currentTable);
-          let toDelete = tableData;
-          if (whereCondition) {
-            toDelete = this.applyWhereFilter(tableData, whereCondition);
+      }),
+    update: vi.fn().mockImplementation((table: any) => {
+       const tableName = detectTableName(table);
+       let updateData: any = {};
+       let whereCondition: any = null;
+       
+      return {
+        set: vi.fn().mockImplementation((data: any) => {
+          updateData = data;
+          return {
+            where: vi.fn().mockImplementation((condition: any) => {
+              whereCondition = condition;
+              return {
+                execute: vi.fn().mockImplementation(async () => {
+                  // Actually update the data in dataStore with proper filtering
+                  const tableStore = dataStore.get(tableName);
+                  if (tableStore && whereCondition && whereCondition.queryChunks && Array.isArray(whereCondition.queryChunks)) {
+                    console.log('[TEST HELPERS UPDATE DEBUG] Updating with queryChunks:', whereCondition.queryChunks.length);
+                    
+                    // Check if this is a compound condition
+                    const hasLogicalOperator = whereCondition.queryChunks.some((chunk: any) => 
+                      chunk === 'and' || chunk === 'or' || 
+                      (typeof chunk === 'string' && (chunk.includes('AND') || chunk.includes('OR')))
+                    );
+                    
+                    let rowsAffected = 0;
+                    
+                    if (hasLogicalOperator) {
+                      // Handle compound conditions
+                      const individualConditions: any[] = [];
+                      let currentCondition: any = null;
+                      
+                      for (let i = 0; i < whereCondition.queryChunks.length; i++) {
+                        const chunk = whereCondition.queryChunks[i];
+                        
+                        // Skip logical operators
+                        if (chunk === 'and' || chunk === 'or') {
+                          continue;
+                        }
+                        
+                        // Collect condition parts (column and value pairs)
+                        if (chunk && typeof chunk === 'object') {
+                          if (chunk.name && chunk.dataType) {
+                            // This is a column chunk, start a new condition
+                            if (currentCondition) {
+                              individualConditions.push(currentCondition);
+                            }
+                            currentCondition = { queryChunks: [chunk] };
+                          } else if (chunk.hasOwnProperty('value') && currentCondition) {
+                            // This is a value chunk, add to current condition
+                            currentCondition.queryChunks.push(chunk);
+                            individualConditions.push(currentCondition);
+                            currentCondition = null;
+                          }
+                        }
+                      }
+                      
+                      // Add any remaining condition
+                      if (currentCondition) {
+                        individualConditions.push(currentCondition);
+                      }
+                      
+                      console.log('[TEST HELPERS UPDATE DEBUG] Parsed individual conditions:', individualConditions.length);
+                      
+                      // Find and update records that match all conditions (AND logic)
+                      for (const [key, record] of Array.from(tableStore.entries())) {
+                        let matchesAll = true;
+                        
+                        for (const cond of individualConditions) {
+                          let columnName = null;
+                          let value = null;
+                          
+                          for (const chunk of cond.queryChunks) {
+                            if (chunk && typeof chunk === 'object' && chunk.name && chunk.dataType) {
+                              columnName = chunk.name;
+                            }
+                            if (chunk && typeof chunk === 'object' && chunk.hasOwnProperty('value')) {
+                              value = chunk.value;
+                            }
+                          }
+                          
+                          if (columnName && value !== null) {
+                            const propertyName = columnName.replace(/_([a-z])/g, (_: string, letter: string) => letter.toUpperCase());
+                            if (record[propertyName] !== value) {
+                              matchesAll = false;
+                              break;
+                            }
+                          }
+                        }
+                        
+                        if (matchesAll) {
+                          const updatedRecord = { ...record, ...updateData, updatedAt: new Date() };
+                          tableStore.set(key, updatedRecord);
+                          rowsAffected++;
+                          console.log('[TEST HELPERS UPDATE DEBUG] Updated record:', updatedRecord);
+                        }
+                      }
+                    } else {
+                      // Handle single conditions
+                      let columnName = null;
+                      let value = null;
+                      
+                      // Extract column name and value from queryChunks
+                      for (const chunk of whereCondition.queryChunks) {
+                        if (chunk && typeof chunk === 'object' && chunk.name && chunk.dataType) {
+                          columnName = chunk.name;
+                        }
+                        if (chunk && typeof chunk === 'object' && chunk.hasOwnProperty('value')) {
+                          value = chunk.value;
+                        }
+                      }
+                      
+                      if (columnName && value !== null) {
+                        // Convert snake_case column name to camelCase property name
+                        const propertyName = columnName.replace(/_([a-z])/g, (_: string, letter: string) => letter.toUpperCase());
+                        
+                        console.log(`[TEST HELPERS UPDATE DEBUG] Single condition: ${columnName}(${propertyName}) = ${value}`);
+                        
+                        // Find and update matching records
+                        for (const [key, record] of Array.from(tableStore.entries())) {
+                          if (record[propertyName] === value) {
+                            const updatedRecord = { ...record, ...updateData, updatedAt: new Date() };
+                            tableStore.set(key, updatedRecord);
+                            rowsAffected++;
+                            console.log('[TEST HELPERS UPDATE DEBUG] Updated record:', updatedRecord);
+                          }
+                        }
+                      }
+                    }
+                    
+                    console.log('[TEST HELPERS UPDATE DEBUG] Rows affected:', rowsAffected);
+                    return { rowsAffected };
+                  }
+                  return { rowsAffected: 0 };
+                })
+              };
+            })
+          };
+        }),
+        where: vi.fn().mockReturnThis(),
+        execute: vi.fn().mockImplementation(async () => {
+          return { rowsAffected: 1 };
+        }),
+        returning: vi.fn().mockImplementation(async () => {
+          // Return mock updated data based on table
+          if (tableName === 'invitation_codes') {
+            return [{
+              id: 'mock-invitation-id',
+              code: 'BETA2024',
+              currentUses: 1,
+              maxUses: 5,
+              isActive: true,
+              createdAt: new Date(),
+              updatedAt: new Date()
+            }];
           }
-          
-          for (let i = tableData.length - 1; i >= 0; i--) {
-            if (toDelete.some(record => record.id === tableData[i].id)) {
-              tableData.splice(i, 1);
-            }
+          if (tableName === 'users') {
+            return [{
+              id: 'mock-user-id',
+              name: 'Mock User',
+              createdAt: new Date(),
+              updatedAt: new Date()
+            }];
           }
-          
-          return Promise.resolve({
-            success: true,
-            meta: {
-              changes: toDelete.length
-            }
-          });
-        }
-      })
-    };
-  }
-
-  // Query interface
-  query = {
-    users: {
-      findFirst: (options?: any) => {
-        const tableData = this.getTableData('users');
-        let filteredData = tableData;
-        
-        if (options?.where) {
-          filteredData = this.applyWhereFilter(tableData, options.where);
-        }
-        
-        const result = filteredData.length > 0 ? filteredData[0] : null;
-        return Promise.resolve(result);
-      }
-    },
-    invitationCodes: {
-      findFirst: (options?: any) => {
-        const tableData = this.getTableData('invitation_codes');
-        let filteredData = tableData;
-        
-        if (options?.where) {
-          filteredData = this.applyWhereFilter(tableData, options.where);
-        }
-        
-        const result = filteredData.length > 0 ? filteredData[0] : null;
-        return Promise.resolve(result);
-      }
-    },
-    invitationUsage: {
-      findFirst: (options?: any) => {
-        const tableData = this.getTableData('invitation_usage');
-        let filteredData = tableData;
-        
-        if (options?.where) {
-          filteredData = this.applyWhereFilter(tableData, options.where);
-        }
-        
-        const result = filteredData.length > 0 ? filteredData[0] : null;
-        return Promise.resolve(result);
-      }
-    },
-    positions: {
-      findFirst: (options?: any) => {
-        const tableData = this.getTableData('positions');
-        let filteredData = tableData;
-        
-        if (options?.where) {
-          filteredData = this.applyWhereFilter(tableData, options.where);
-        }
-        
-        const result = filteredData.length > 0 ? filteredData[0] : null;
-        return Promise.resolve(result);
-      }
-    },
-    opportunities: {
-      findFirst: (options?: any) => {
-        const tableData = this.getTableData('opportunities');
-        let filteredData = tableData;
-        
-        if (options?.where) {
-          filteredData = this.applyWhereFilter(tableData, options.where);
-        }
-        
-        const result = filteredData.length > 0 ? filteredData[0] : null;
-        return Promise.resolve(result);
-      },
-      findMany: (options?: any) => {
-        const tableData = this.getTableData('opportunities');
-        let filteredData = tableData;
-        
-        if (options?.where) {
-          filteredData = this.applyWhereFilter(tableData, options.where);
-        }
-        
-        const now = Math.floor(Date.now() / 1000);
-        filteredData = filteredData.filter((record: any) => {
-          const expiresAt = record.expiresAt;
-          if (typeof expiresAt === 'string') {
-            const expiresTimestamp = Math.floor(new Date(expiresAt).getTime() / 1000);
-            return expiresTimestamp > now;
-          } else if (typeof expiresAt === 'number') {
-            return expiresAt > now;
-          }
-          return true;
-        });
-        
-        filteredData = [...filteredData].sort((a, b) => {
-          const aProfitPercentage = a.profitPercentage || 0;
-          const bProfitPercentage = b.profitPercentage || 0;
-          return bProfitPercentage - aProfitPercentage;
-        });
-        
-        if (options?.limit) {
-          filteredData = filteredData.slice(0, options.limit);
-        }
-        
-        return Promise.resolve(filteredData);
-      }
-    },
-    userUsernameHistory: {
-      findFirst: (options?: any) => {
-        const tableData = this.getTableData('userUsernameHistory');
-        let filteredData = tableData;
-        
-        if (options?.where) {
-          filteredData = this.applyWhereFilter(tableData, options.where);
-        }
-        
-        filteredData = [...filteredData].sort((a, b) => {
-          const aValue = a.changedAt || a.createdAt || '1970-01-01T00:00:00.000Z';
-          const bValue = b.changedAt || b.createdAt || '1970-01-01T00:00:00.000Z';
-          return new Date(bValue).getTime() - new Date(aValue).getTime();
-        });
-        
-        const result = filteredData.length > 0 ? filteredData[0] : null;
-        return Promise.resolve(result);
-      }
-    }
+          return [{ rowsAffected: 1 }];
+        })
+      };
+    }),
+    delete: vi.fn().mockReturnValue({
+      where: vi.fn().mockResolvedValue([])
+    }),
+    transaction: vi.fn().mockImplementation(async (callback: any) => {
+      // Mock transaction - just execute the callback with the same db instance
+      return await callback(mockDrizzleDb);
+    })
   };
-
-  // Transaction support
-  transaction(callback: (db: any) => Promise<any>) {
-    const snapshot = JSON.parse(JSON.stringify(this.mockDataStore));
-    const mockInstance = this;
-    
-    const transactionContext = {
-      select: (...args: any[]) => mockInstance.select(...args),
-      insert: (table: any) => mockInstance.insert(table),
-      update: (table: any) => mockInstance.update(table),
-      delete: (table: any) => mockInstance.delete(table),
-      query: {
-        invitationCodes: {
-          findFirst: (options?: any) => {
-            const tableData = mockInstance.getTableData('invitation_codes');
-            let filteredData = tableData;
-            
-            if (options?.where) {
-              filteredData = mockInstance.applyWhereFilter(tableData, options.where);
-            }
-            
-            const result = filteredData.length > 0 ? filteredData[0] : null;
-            return Promise.resolve(result);
-          }
-        },
-        invitationUsage: {
-          findFirst: (options?: any) => {
-            const tableData = mockInstance.getTableData('invitation_usage');
-            let filteredData = tableData;
-            
-            if (options?.where) {
-              filteredData = mockInstance.applyWhereFilter(tableData, options.where);
-            }
-            
-            const result = filteredData.length > 0 ? filteredData[0] : null;
-            return Promise.resolve(result);
-          }
-        },
-        users: {
-          findFirst: (options?: any) => {
-            const tableData = mockInstance.getTableData('users');
-            let filteredData = tableData;
-            
-            if (options?.where) {
-              filteredData = mockInstance.applyWhereFilter(tableData, options.where);
-            }
-            
-            const result = filteredData.length > 0 ? filteredData[0] : null;
-            return Promise.resolve(result);
-          }
-        },
-        positions: mockInstance.query.positions,
-        opportunities: mockInstance.query.opportunities,
-        userUsernameHistory: mockInstance.query.userUsernameHistory
-      }
-    };
-    
-    return callback(transactionContext)
-      .then(result => result)
-      .catch(error => {
-        mockInstance.mockDataStore = snapshot;
-        throw error;
-      });
-  }
+  
+  return {
+    mockD1: mockD1 as any,
+    drizzleDb: mockDrizzleDb as any,
+    dataStore
+  };
 }
 
-// Global mock instance
-let globalMockDb: ProductionDrizzleMock;
+// Helper to get just the Drizzle database instance
+export async function createTestDrizzleDatabase() {
+  const { drizzleDb } = await createTestDatabase();
+  return drizzleDb;
+}
 
-export const createMockDatabase = (): ProductionDrizzleMock => {
-  globalMockDb = new ProductionDrizzleMock();
-  return globalMockDb;
-};
+// Test user creation helper
+export function createMockUser(overrides = {}) {
+  return {
+    id: 123,
+    telegramId: '123456789',
+    username: 'testuser',
+    firstName: 'Test',
+    lastName: 'User',
+    languageCode: 'en',
+    email: undefined,
+    role: 'free' as const,
+    status: 'active' as const,
+    createdAt: new Date('2024-01-01T00:00:00Z'), // Date object for 2024-01-01
+    updatedAt: new Date('2024-01-01T00:00:00Z'), // Date object for 2024-01-01
+    lastActiveAt: new Date('2024-01-01T00:00:00Z'), // Date object for 2024-01-01
+    settings: { notifications: true, theme: 'light' as const, language: 'en', timezone: 'UTC' }, // JSON object
+    apiLimits: {}, // JSON object
+    accountBalance: '0.00',
+    betaExpiresAt: undefined,
+    tradingPreferences: {}, // JSON object
+    ...overrides,
+  };
+}
 
-// Helper for updating feature flags in tests
-export const updateFeatureFlags = async (kv: any, flags: Record<string, any>) => {
-  for (const [key, value] of Object.entries(flags)) {
-    await kv.put(`feature_flags:${key}`, JSON.stringify(value));
-  }
-};
+// Mock environment for Cloudflare Workers
+export async function createMockEnv(): Promise<Env> {
+  const { drizzleDb } = await createTestDatabase();
+  return {
+    DB: drizzleDb as any,
+    SESSIONS: createMockKV(),
+    CELEBRUM_KV: createMockKV(),
+    PROD_BOT_MARKET_CACHE: createMockKV(),
+    PROD_BOT_SESSION_STORE: createMockKV(),
+    FEATURE_REGISTRATION_INVITATION_REQUIRED: 'false',
+    CELEBRUM_CONTAINERS: {} as any,
+    CELEBRUM_STORAGE: {} as any,
+    API_SERVICE_URL: 'http://localhost:3000',
+    WEB_SERVICE_URL: 'http://localhost:3001',
+    DISCORD_BOT_SERVICE_URL: 'http://localhost:3002',
+    TELEGRAM_BOT_SERVICE_URL: 'http://localhost:3003',
+    TELEGRAM_BOT_TOKEN: 'test-bot-token',
+    ADMIN_TELEGRAM_IDS: '123456789',
+    RATE_LIMIT_REQUESTS_PER_MINUTE: '100',
+    ALCHEMY_MANAGED: 'false',
+    CONTAINER_VERSION: '1.0.0',
+    DEPLOYMENT_STRATEGY: 'rolling',
+    ENVIRONMENT: 'test',
+  };
+}
 
-// Mock user creation functions
-export const createMockUser = (overrides: Partial<any> = {}): any => ({
-  id: 1,
-  telegramId: '123456',
-  username: 'testuser',
-  firstName: 'Test',
-  lastName: 'User',
-  email: 'test@example.com',
-  accountBalance: '1000.00',
-  totalPnl: '0.00',
-  weeklyPnl: '0.00',
-  lastActiveAt: new Date(),
-  createdAt: new Date(),
-  updatedAt: new Date(),
-  ...overrides,
-});
-
-export const createMockUserProfile = (overrides: Partial<any> = {}): any => ({
-  id: 1,
-  userId: 1,
-  bio: 'Test bio',
-  experience: 'beginner',
-  riskTolerance: 'medium',
-  createdAt: new Date(),
-  updatedAt: new Date(),
-  ...overrides,
-});
-
-export const createMockOrder = (overrides: Partial<any> = {}): any => ({
-  id: 1,
-  userId: 1,
-  symbol: 'BTCUSDT',
-  side: 'buy',
-  quantity: '0.1',
-  price: '45000.00',
-  status: 'pending',
-  createdAt: new Date(),
-  updatedAt: new Date(),
-  ...overrides,
-});
-
-// Test setup helpers
-export const setupMockDb = () => {
-  const mockDb = createMockDatabase();
+// Additional mock utilities for Cloudflare Workers
+export function createMockRequest(url = 'https://example.com', options: RequestInit = {}) {
+  const { method = 'GET', body, headers = {}, ...rest } = options;
   
-  beforeEach(() => {
-    mockDb.resetData();
+  return new Request(url, {
+    method,
+    body: typeof body === 'string' ? body : (body ? JSON.stringify(body) : undefined),
+    headers: {
+      'Content-Type': 'application/json',
+      ...headers,
+    },
+    ...rest,
   });
-  
-  return mockDb;
-};
+}
 
-export const createMockCreateDb = () => {
-  const mockDb = createMockDatabase();
+export function createMockResponse(data: any, status = 200) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+}
+
+export async function createMockContext() {
+  const env = await createMockEnv();
+  return {
+    env,
+    request: new Request('https://example.com'),
+    waitUntil: vi.fn(),
+  };
+}
+
+export function createScenarioBasedTelegramApiMock(scenario: {
+  networkError?: boolean;
+  rateLimit?: boolean;
+  invalidToken?: boolean;
+} = {}) {
+  const mockSendMessage = vi.fn();
+  const mockEditMessageText = vi.fn();
+  const mockDeleteMessage = vi.fn();
+  const mockAnswerCallbackQuery = vi.fn();
+
+  if (scenario.networkError) {
+    mockSendMessage.mockRejectedValue(new Error('Network error'));
+    mockEditMessageText.mockRejectedValue(new Error('Network error'));
+    mockDeleteMessage.mockRejectedValue(new Error('Network error'));
+    mockAnswerCallbackQuery.mockRejectedValue(new Error('Network error'));
+  } else if (scenario.rateLimit) {
+    mockSendMessage.mockRejectedValue(new Error('Rate limit exceeded'));
+    mockEditMessageText.mockRejectedValue(new Error('Rate limit exceeded'));
+    mockDeleteMessage.mockRejectedValue(new Error('Rate limit exceeded'));
+    mockAnswerCallbackQuery.mockRejectedValue(new Error('Rate limit exceeded'));
+  } else if (scenario.invalidToken) {
+    mockSendMessage.mockRejectedValue(new Error('Unauthorized'));
+    mockEditMessageText.mockRejectedValue(new Error('Unauthorized'));
+    mockDeleteMessage.mockRejectedValue(new Error('Unauthorized'));
+    mockAnswerCallbackQuery.mockRejectedValue(new Error('Unauthorized'));
+  } else {
+    // Default successful responses
+    mockSendMessage.mockResolvedValue({ ok: true, result: { message_id: 123 } });
+    mockEditMessageText.mockResolvedValue({ ok: true, result: { message_id: 123 } });
+    mockDeleteMessage.mockResolvedValue({ ok: true, result: true });
+    mockAnswerCallbackQuery.mockResolvedValue({ ok: true, result: true });
+  }
+
+  // Mock the global fetch or telegram API calls
+  global.fetch = vi.fn().mockImplementation((url: string) => {
+    if (scenario.networkError) {
+      return Promise.reject(new Error('Network error'));
+    }
+    if (scenario.rateLimit) {
+      return Promise.reject(new Error('Rate limit exceeded'));
+    }
+    if (scenario.invalidToken) {
+      return Promise.reject(new Error('Unauthorized'));
+    }
+    
+    if (url.includes('sendMessage')) {
+      return Promise.resolve({
+        ok: true,
+        json: () => mockSendMessage(),
+      });
+    }
+    if (url.includes('editMessageText')) {
+      return Promise.resolve({
+        ok: true,
+        json: () => mockEditMessageText(),
+      });
+    }
+    if (url.includes('deleteMessage')) {
+      return Promise.resolve({
+        ok: true,
+        json: () => mockDeleteMessage(),
+      });
+    }
+    if (url.includes('answerCallbackQuery')) {
+      return Promise.resolve({
+        ok: true,
+        json: () => mockAnswerCallbackQuery(),
+      });
+    }
+    return Promise.resolve({ ok: true, json: () => Promise.resolve({}) });
+  });
+
+  return {
+    sendMessage: mockSendMessage,
+    sendPhoto: vi.fn().mockResolvedValue({ ok: true }),
+    sendDocument: vi.fn().mockResolvedValue({ ok: true }),
+    answerCallbackQuery: mockAnswerCallbackQuery,
+    editMessageText: mockEditMessageText,
+    editMessageReplyMarkup: vi.fn().mockResolvedValue({ ok: true }),
+    deleteMessage: mockDeleteMessage,
+    getChat: vi.fn().mockResolvedValue({ ok: true }),
+    getChatMember: vi.fn().mockResolvedValue({ ok: true }),
+  };
+}
+
+// Enhanced test database helper with proper cleanup
+export async function getTestDb(options: {
+  users?: any[];
+  invitations?: any[];
+  sessions?: any[];
+  opportunities?: any[];
+} = {}) {
+  const { mockD1, drizzleDb, dataStore } = await createTestDatabase();
+  const kv = createMockKV();
   
-  vi.mock('../../db/index', () => ({
-    createDb: vi.fn().mockReturnValue(mockDb),
-  }));
+  // Pre-populate the database with test data if provided
+  if (options.users) {
+    const usersTable = dataStore.get('users')!;
+    options.users.forEach((user, index) => {
+      usersTable.set(user.id || `user_${index}`, user);
+    });
+    console.log('[TEST HELPERS] Populated users table with', options.users.length, 'records');
+  }
   
-  return mockDb;
-};
+  if (options.invitations) {
+    const invitationsTable = dataStore.get('invitation_codes')!;
+    options.invitations.forEach((invitation, index) => {
+      invitationsTable.set(invitation.code || `invitation_${index}`, invitation);
+    });
+    console.log('[TEST HELPERS] Populated invitation_codes table with', options.invitations.length, 'records');
+  }
+  
+  if (options.sessions) {
+    const sessionsTable = dataStore.get('sessions')!;
+    options.sessions.forEach((session, index) => {
+      sessionsTable.set(session.id || `session_${index}`, session);
+    });
+    console.log('[TEST HELPERS] Populated sessions table with', options.sessions.length, 'records');
+  }
+  
+  return {
+    db: drizzleDb,
+    mockD1,
+    kv,
+    dispose: async () => {
+      vi.clearAllMocks();
+    },
+  };
+}
+
+// Cleanup utility
+export async function cleanupDb() {
+  vi.clearAllMocks();
+}
+
+// Backward compatibility
+export function createMockKVNamespace(): ExtendedKVNamespace {
+  return createMockKV();
+}
+
+// Legacy function for backward compatibility - now uses proper Drizzle mock
+export { createTestDatabase as createMockD1Database };

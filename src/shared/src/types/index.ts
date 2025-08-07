@@ -6,6 +6,11 @@
 import { z } from 'zod';
 import type { D1Database, KVNamespace, DurableObjectNamespace } from '@cloudflare/workers-types';
 
+// Extended KV interface for testing with clear method
+export interface ExtendedKVNamespace extends KVNamespace {
+  clear(): Promise<void>;
+}
+
 // API types
 export * from './api';
 
@@ -42,7 +47,7 @@ export interface Env {
   
   // KV Stores
   SESSIONS: KVNamespace;
-  CELEBRUM_KV: KVNamespace;
+  CELEBRUM_KV: ExtendedKVNamespace;
   PROD_BOT_MARKET_CACHE: KVNamespace;
   PROD_BOT_SESSION_STORE: KVNamespace;
   FEATURE_REGISTRATION_INVITATION_REQUIRED?: string;
@@ -55,6 +60,7 @@ export interface Env {
   DISCORD_BOT_SERVICE_URL?: string;
   TELEGRAM_BOT_SERVICE_URL?: string;
   TELEGRAM_BOT_TOKEN?: string;
+  TELEGRAM_WEBHOOK_SECRET?: string;
   ADMIN_TELEGRAM_IDS?: string;
   RATE_LIMIT_REQUESTS_PER_MINUTE?: string;
   

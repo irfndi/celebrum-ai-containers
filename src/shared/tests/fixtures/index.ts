@@ -17,7 +17,9 @@ import type {
   User,
   UserProfile,
   UserSubscription
-} from '@celebrum-ai/shared/types';
+} from '../../src/types';
+
+import { getTestDb, createMockEnv, createMockD1Database, createMockKVNamespace, cleanupDb, createMockContext, createMockRequest, createMockUser, createMockResponse, createScenarioBasedTelegramApiMock } from '../utils/test-helpers';
 
 // =============================================================================
 // MARKET DATA FIXTURES
@@ -398,13 +400,6 @@ export function createMockTradingSignal(overrides: Partial<TradingSignal> = {}):
   };
 }
 
-export function createMockUser(overrides: Partial<User> = {}): User {
-  return {
-    ...mockUser,
-    ...overrides
-  };
-}
-
 export function createMockPortfolio(overrides: Partial<Portfolio> = {}): Portfolio {
   return {
     ...mockPortfolio,
@@ -487,3 +482,17 @@ export function generateMockTradingSignals(count: number): TradingSignal[] {
     entryPrice: mockTradingSignal.entryPrice + i * 10 - 5
   }));
 }
+
+// Explicitly re-export all test helpers to ensure named exports are available
+export {
+  getTestDb,
+  createMockEnv,
+  createMockD1Database,
+  createMockKVNamespace,
+  cleanupDb,
+  createMockContext,
+  createMockRequest,
+  createMockUser,
+  createMockResponse,
+  createScenarioBasedTelegramApiMock
+} from '../utils/test-helpers';

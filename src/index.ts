@@ -3,20 +3,25 @@ import type { DurableObjectNamespace, DurableObjectState, Request as CloudflareR
 import type { Env } from "@celebrum-ai/shared";
 import { handleTelegramUpdate } from "./telegram-bot/src";
 
-// Define DurableObject base class for compatibility
-class DurableObject {
-  constructor(protected ctx: DurableObjectState, protected env: Env) {}
+// Conditional import for Container
+let Container: any;
+try {
+  // In production, use the real implementation
+  const containers = require("@cloudflare/containers");
+  Container = containers.Container;
+} catch (e) {
+  // In test environment, use a mock class
+  Container = class {};
 }
+
 
 // Types for Cloudflare Workers
 interface ExportedHandler {
   fetch(request: CloudflareRequest, env: unknown, ctx: unknown): Promise<Response>;
 }
 
-export class CelebrumAIStorage extends DurableObject {
-  constructor(ctx: DurableObjectState, env: Env) {
-    super(ctx, env);
-  }
+export class CelebrumAIStorage {
+  constructor(protected ctx: DurableObjectState, protected env: Env) {}
 
   async fetch(_request: CloudflareRequest): Promise<Response> {
     return new Response("CelebrumAIStorage is running", { status: 200 });
@@ -25,38 +30,24 @@ export class CelebrumAIStorage extends DurableObject {
 
 // Container class will be conditionally defined based on build-time environment
 // This avoids runtime process.env access which is not available in Workers
-export let CelebrumContainer: unknown = undefined;
+export class CelebrumContainer extends Container {
+  defaultPort = 8080;
+  sleepAfter = 60000; // 60 seconds
+  envVars = {
+    MESSAGE: "Hello from Celebrum AI Container!",
+  };
 
-// Only define container class if containers are enabled at build time
-// Note: This check happens at build time, not runtime
-if (typeof process !== 'undefined' && process.env && process.env.ENABLE_CONTAINERS !== "false") {
-  try {
-    // Try to import Container dynamically
-    const { Container } = require("@cloudflare/containers");
-    
-    CelebrumContainer = class extends Container {
-      defaultPort = 8080;
-      sleepAfter = 60000; // 60 seconds
-      envVars = {
-        MESSAGE: "Hello from Celebrum AI Container!",
-      };
+  async onStart() {
+    console.log("CelebrumContainer started");
+  }
 
-      async onStart() {
-        console.log("CelebrumContainer started");
-      }
+  async onStop() {
+    console.log("CelebrumContainer stopped");
+  }
 
-      async onStop() {
-        console.log("CelebrumContainer stopped");
-      }
-
-      async onError(error: Error) {
-        console.error("CelebrumContainer error:", error);
-      }
-    };
-  } catch (error) {
-     console.warn("Container support not available, containers disabled:", (error as Error).message);
-     CelebrumContainer = undefined;
-   }
+  async onError(error: Error) {
+    console.error("CelebrumContainer error:", error);
+  }
 }
 
 // Initialize Hono app with proper bindings

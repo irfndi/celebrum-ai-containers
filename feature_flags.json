@@ -54,6 +54,10 @@
     "deduplication_window_seconds": 60,
     "escalation_check_interval_seconds": 30
   },
+  "registration": {
+    "invitation_required": true,
+    "bypass_for_existing": true
+  },
 
   "trading_manual": true,
   "ai_features": true,

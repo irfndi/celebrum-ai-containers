@@ -34,7 +34,7 @@
     <div class="container">
         <div class="header">
             <h1>🧪 Celebrum AI Test Report</h1>
-            <p>Generated on 7/12/2025, 9:14:32 AM</p>
+            <p>Generated on 7/21/2025, 1:23:16 PM</p>
         </div>
         
         <div class="summary">
@@ -44,46 +44,108 @@
             </div>
             <div class="summary-card">
                 <h3>Passed</h3>
-                <div class="value passed">3</div>
+                <div class="value passed">0</div>
             </div>
             <div class="summary-card">
                 <h3>Failed</h3>
-                <div class="value failed">0</div>
+                <div class="value failed">3</div>
             </div>
             <div class="summary-card">
                 <h3>Duration</h3>
-                <div class="value duration">18914ms</div>
+                <div class="value duration">13945ms</div>
             </div>
         </div>
         
         <div class="results">
             <h2>Test Results</h2>
             
-                <div class="result-item result-success">
+                <div class="result-item result-failure">
                     <div class="result-header">
-                        <span class="result-name">✅ Unit Tests</span>
-                        <span class="result-duration">10487ms</span>
+                        <span class="result-name">❌ Unit Tests</span>
+                        <span class="result-duration">7713ms</span>
                     </div>
                     
-                    
+                    <div class="error-output">
+⎯⎯⎯⎯⎯⎯ Failed Suites 19 ⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/tests/unit.test.ts [ src/tests/unit.test.ts ]
+ FAIL  src/api-service/tests/unit/routes.test.ts [ src/api-service/tests/unit/routes.test.ts ]
+ FAIL  src/db/tests/unit/connection.test.ts [ src/db/tests/unit/connection.test.ts ]
+ FAIL  src/db/tests/unit/database-queries.test.ts [ src/db/tests/unit/database-queries.test.ts ]
+ FAIL  src/db/tests/unit/debug-test.test.ts [ src/db/tests/unit/debug-test.test.ts ]
+ FAIL  src/db/tests/unit/invitation-queries.test.ts [ src/db/tests/unit/invitation-queries.test.ts ]
+ FAIL  src/db/tests/unit/queries.test.ts [ src/db/tests/unit/queries.test.ts ]
+ FAIL  src/db/tests/unit/schema.test.ts [ src/db/tests/unit/schema.test.ts ]
+ FAIL  src/db/tests/unit/user-queries.test.ts [ src/db/tests/unit/user-queries.test.ts ]
+ FAIL  src/db/tests/unit/utils.test.ts [ src/db/tests/unit/utils.test.ts ]
+ FAIL  src/services/tests/unit/user.service.test.ts [ src/services/tests/unit/user.service.test.ts ]
+ FAIL  src/shared/tests/unit/ccxt-data-source.test.ts [ src/shared/tests/unit/ccxt-data-source.test.ts ]
+ FAIL  src/shared/tests/unit/services.test.ts [ src/shared/tests/unit/services.test.ts ]
+ FAIL  src/shared/tests/unit/user-service-username-tracking.test.ts [ src/shared/tests/unit/user-service-username-tracking.test.ts ]
+ FAIL  src/shared/tests/unit/utils.test.ts [ src/shared/tests/unit/utils.test.ts ]
+ FAIL  src/shared/tests/unit/validation.test.ts [ src/shared/tests/unit/validation.test.ts ]
+ FAIL  src/telegram-bot/tests/unit/handlers.test.ts [ src/telegram-bot/tests/unit/handlers.test.ts ]
+ FAIL  src/telegram-bot/tests/unit/start-command.test.ts [ src/telegram-bot/tests/unit/start-command.test.ts ]
+ FAIL  src/telegram-bot/tests/unit/telegram-webhook.test.ts [ src/telegram-bot/tests/unit/telegram-webhook.test.ts ]
+TypeError: The "original" argument must be of type function. Received undefined
+ ❯ validateFunction node-internal:validators:156:15
+ ❯ Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/better-sqlite3@12.2.0/node_modules/better-sqlite3/lib/methods/backup.js?mf_vitest_no_cjs_esm_shim:6:18
+ ❯ Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/better-sqlite3@12.2.0/node_modules/better-sqlite3/lib/database.js?mf_vitest_no_cjs_esm_shim:78:29
+ ❯ Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/better-sqlite3@12.2.0/node_modules/better-sqlite3/lib/index.js?mf_vitest_no_cjs_esm_shim:2:18
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/19]⎯
+
+</div>
                 </div>
             
-                <div class="result-item result-success">
+                <div class="result-item result-failure">
                     <div class="result-header">
-                        <span class="result-name">✅ Integration Tests</span>
-                        <span class="result-duration">4683ms</span>
+                        <span class="result-name">❌ Integration Tests</span>
+                        <span class="result-duration">1747ms</span>
                     </div>
                     
-                    
+                    <div class="error-output">
+⎯⎯⎯⎯⎯⎯ Failed Suites 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/db/tests/integration/database.test.ts [ src/db/tests/integration/database.test.ts ]
+ FAIL  src/shared/tests/integration/cloudflare-workers.test.ts [ src/shared/tests/integration/cloudflare-workers.test.ts ]
+ FAIL  src/shared/tests/integration/database.test.ts [ src/shared/tests/integration/database.test.ts ]
+ FAIL  src/telegram-bot/tests/integration/start-command.test.ts [ src/telegram-bot/tests/integration/start-command.test.ts ]
+ FAIL  src/web/tests/integration/api-endpoints.test.ts [ src/web/tests/integration/api-endpoints.test.ts ]
+TypeError: The "original" argument must be of type function. Received undefined
+ ❯ validateFunction node-internal:validators:156:15
+ ❯ Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/better-sqlite3@12.2.0/node_modules/better-sqlite3/lib/methods/backup.js?mf_vitest_no_cjs_esm_shim:6:18
+ ❯ Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/better-sqlite3@12.2.0/node_modules/better-sqlite3/lib/database.js?mf_vitest_no_cjs_esm_shim:78:29
+ ❯ Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/better-sqlite3@12.2.0/node_modules/better-sqlite3/lib/index.js?mf_vitest_no_cjs_esm_shim:2:18
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+</div>
                 </div>
             
-                <div class="result-item result-success">
+                <div class="result-item result-failure">
                     <div class="result-header">
-                        <span class="result-name">✅ End-to-End Tests</span>
-                        <span class="result-duration">3744ms</span>
+                        <span class="result-name">❌ End-to-End Tests</span>
+                        <span class="result-duration">4485ms</span>
                     </div>
                     
-                    
+                    <div class="error-output">
+⎯⎯⎯⎯⎯⎯ Failed Suites 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/api-service/tests/e2e/api-endpoints.test.ts [ src/api-service/tests/e2e/api-endpoints.test.ts ]
+ FAIL  src/telegram-bot/tests/e2e/bot-workflow.test.ts [ src/telegram-bot/tests/e2e/bot-workflow.test.ts ]
+ FAIL  src/shared/tests/e2e/database-scenarios.test.ts [ src/shared/tests/e2e/database-scenarios.test.ts ]
+ FAIL  src/web/tests/e2e/landing-page.test.ts [ src/web/tests/e2e/landing-page.test.ts ]
+ FAIL  src/web/tests/e2e/user-flow.test.ts [ src/web/tests/e2e/user-flow.test.ts ]
+TypeError: The "original" argument must be of type function. Received undefined
+ ❯ validateFunction node-internal:validators:156:15
+ ❯ Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/better-sqlite3@12.2.0/node_modules/better-sqlite3/lib/methods/backup.js?mf_vitest_no_cjs_esm_shim:6:18
+ ❯ Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/better-sqlite3@12.2.0/node_modules/better-sqlite3/lib/database.js?mf_vitest_no_cjs_esm_shim:78:29
+ ❯ Users/irfandi/Coding/2025/celebrum-ai/node_modules/.pnpm/better-sqlite3@12.2.0/node_modules/better-sqlite3/lib/index.js?mf_vitest_no_cjs_esm_shim:2:18
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+</div>
                 </div>
             
         </div>

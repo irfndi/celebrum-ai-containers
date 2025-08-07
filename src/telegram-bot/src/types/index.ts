@@ -1,6 +1,6 @@
 // Telegram API types and interfaces
 
-import type { Env } from '@celebrum-ai/shared';
+import type { Env } from '../../../shared/src/types';
 
 export interface TelegramUpdate {
   update_id: number;

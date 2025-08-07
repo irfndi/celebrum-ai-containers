@@ -37,7 +37,7 @@ export function getDatabase(env: Env): Database {
  */
 export async function withTransaction<T>(
   db: Database,
-  fn: (tx: Parameters<Parameters<Database['transaction']>[0]>[0]) => Promise<T>
+  fn: (tx: any) => Promise<T>
 ): Promise<T> {
-  return await db.transaction(fn);
+  return await (db as any).transaction(fn);
 }

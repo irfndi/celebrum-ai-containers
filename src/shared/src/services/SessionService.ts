@@ -4,7 +4,7 @@ import type { User } from '../../../db/src/schema';
 export interface Session {
   id: string;
   sessionId: string;
-  userId: number;
+  userId: string;
   telegramId: string;
   createdAt: Date;
   expiresAt: Date;

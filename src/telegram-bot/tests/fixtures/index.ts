@@ -242,11 +242,6 @@ export const mockBotErrorResponse = {
 };
 
 // Helper functions for creating test data
-export const createMockUser = (overrides: Partial<User> = {}): User => ({
-  ...mockTelegramUser,
-  ...overrides
-});
-
 export const createMockChat = (overrides: Partial<typeof mockPrivateChat> = {}) => ({
   ...mockPrivateChat,
   ...overrides

@@ -17,6 +17,20 @@ export interface CCXTManagerConfig {
   config?: Record<string, unknown>;
 }
 
+function supportsSandbox(exchange: ccxt.Exchange): boolean {
+  // Some exchanges expose .features.spot.sandbox, others may have .has['sandbox'] or .has['testnet']
+  // Check all possible locations for sandbox/testnet support
+  if (exchange.features && exchange.features.spot && typeof exchange.features.spot.sandbox === 'boolean') {
+    return exchange.features.spot.sandbox;
+  }
+  if (exchange.has && (exchange.has['sandbox'] === true || exchange.has['testnet'] === true)) {
+    return true;
+  }
+  // Fallback: known list of exchanges with sandbox support (binance, bybit, okx, bitmex, etc.)
+  const sandboxSupported = ['binance', 'binanceusdm', 'binancecoinm', 'bybit', 'okx', 'bitmex', 'ftx', 'gate', 'kucoin', 'mexc', 'deribit'];
+  return sandboxSupported.includes(exchange.id);
+}
+
 /**
  * CCXT-based data source that supports 100+ exchanges
  * Provides robust error handling and automatic failover
@@ -26,7 +40,7 @@ export class CCXTDataSource extends MarketDataSource {
   private exchangeId: string;
   private status: 'healthy' | 'error' | 'initializing' = 'initializing';
 
-  constructor(exchangeId: string, config?: Partial<DataSourceConfig>) {
+  constructor(exchangeId: string, config?: Partial<CCXTConfig>) {
     const exchangeClass = (ccxt as unknown as Record<string, unknown>)[exchangeId];
     if (!exchangeClass) {
       throw new Error(`Exchange ${exchangeId} not supported by CCXT`);
@@ -36,12 +50,19 @@ export class CCXTDataSource extends MarketDataSource {
       apiKey: config?.apiKey,
       secret: config?.apiSecret,
       password: config?.passphrase, // For some exchanges like OKX
-      sandbox: process.env.NODE_ENV !== 'production',
       enableRateLimit: true,
       timeout: 30000,
       ...config?.exchangeOptions,
     };
     const exchange = new (exchangeClass as { new (opts: Record<string, unknown>): ccxt.Exchange })(opts);
+
+    // Only enable sandbox mode if supported
+    if (config?.sandbox && supportsSandbox(exchange)) {
+      const ex = exchange as unknown as { setSandboxMode?: (enabled: boolean) => void };
+      if (typeof ex.setSandboxMode === 'function') {
+        ex.setSandboxMode(true);
+      }
+    }
 
     let baseUrl = '';
     if (exchange.urls && typeof exchange.urls === 'object' && exchange.urls.api && typeof exchange.urls.api === 'object' && 'public' in exchange.urls.api) {

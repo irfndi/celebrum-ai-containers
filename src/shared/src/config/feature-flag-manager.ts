@@ -57,9 +57,9 @@ export class FeatureFlagManager {
    */
   getDefaultFlags(): Record<string, boolean> {
     const result: Record<string, boolean> = {};
-    for (const [key, value] of this.defaultFlags.entries()) {
+    this.defaultFlags.forEach((value, key) => {
       result[key] = value as boolean;
-    }
+    });
     return result;
   }
 

@@ -1,82 +1,30 @@
-import { defineWorkersConfig } from '@cloudflare/vitest-pool-workers/config';
+import { defineConfig } from 'vitest/config';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
-export default defineWorkersConfig({
-	plugins: [tsconfigPaths()],
-	test: {
-		watch: false,
-		// Replace basic reporter with JUnit for CI test results
-		reporters: [
-			'default',
-			['junit', { outputFile: 'test-results.xml' }]
-		],
-		// Enable proper mock management
-		clearMocks: true,
-		restoreMocks: true,
-		mockReset: true,
-		// Include test files explicitly
-		include: ['**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
-		exclude: [
-			'**/node_modules/**',
-			'**/dist/**',
-			'**/.temporary-code/**',
-			'**/dist-test/**',
-		],
-		server: {
-			deps: {
-				external: [
-					// Externalize Node.js built-in modules that are not available in Workers runtime
-					"node:readline",
-					"node:domain", 
-					"node:inspector",
-					"node:fs",
-					"node:path",
-					"node:util",
-					"node:crypto",
-					"node:buffer",
-					"node:stream",
-					"node:url",
-				],
-			},
-		},
-		deps: {
-			optimizer: {
-				ssr: {
-					enabled: true,
-					include: [
-						"hono", 
-						"grammy", 
-						"drizzle-orm", 
-						"@cloudflare/workers-types",
-						"@cloudflare/vitest-pool-workers",
-						"src/db/src/schema/**",
-					],
-				},
-			},
-		},
-		poolOptions: {
-			workers: {
-				wrangler: { configPath: "./wrangler.jsonc" },
-				miniflare: {
-					// Use compatibility date that supports modern Workers features
-					compatibilityDate: "2024-07-01",
-					// Disable wrangler CLI in test environment to avoid terminal issues
-					logLevel: "debug",
-					// Add process polyfill for stdout.columns access
-					bindings: {
-						process: {
-							stdout: {
-								columns: 80, // Default terminal width
-							},
-						},
-					},
-				},
-			},
-		},
-	},
-	resolve: {
-		alias: {
-			// Clean alias configuration - no polyfills needed
-		},
-	},
+export default defineConfig({
+  plugins: [tsconfigPaths()],
+  test: {
+	watch: false,
+    reporters: [
+      'default',
+      ['junit', { outputFile: 'test-results.xml' }],
+      ['json', { outputFile: 'test-results.json' }]
+    ],
+    include: [
+      'src/**/*.test.ts',
+      'tests/**/*.test.ts'
+    ],
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json', 'html'],
+      exclude: [
+        '**/node_modules/**',
+        '**/dist/**',
+        '**/.temporary-code/**',
+      ],
+    },
+    setupFiles: ['tests/setup/setup.ts'],
+    environment: 'node',
+    globals: true,
+  },
 });

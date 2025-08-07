@@ -1,5 +1,5 @@
 // @celebrum-ai/shared - Configuration
-import featureFlags from './feature_flags.json';
+const featureFlags = require('./feature_flags.json');
 
 export const FEATURE_FLAGS_CONFIG = featureFlags;
 

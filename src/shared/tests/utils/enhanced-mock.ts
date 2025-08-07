@@ -6,6 +6,7 @@ import { vi } from 'vitest';
 
 /**
  * Sets up a robust, production-grade mock for the 'ccxt' module.
+ * This is the ONLY allowed way to mock CCXT in tests. Do not use ad-hoc or partial mocks.
  * Covers all major exchanges and unified methods, simulates both success and error cases.
  * Call this at the top of any test file that uses ccxt.
  */
@@ -128,7 +129,7 @@ export class EnhancedProductionDrizzleMock {
       orders: [],
       positions: [],
       portfolios: [],
-      invitationCodes: [],
+      invitation_codes: [],
       invitationUsage: [],
       sessions: [],
       trades: [],

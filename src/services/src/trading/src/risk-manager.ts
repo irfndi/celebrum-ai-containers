@@ -148,27 +148,10 @@ export class RiskManager {
         break;
 
       case 'atr':
-        // TODO: Implement ATR-based stop loss
-        // This would require historical price data to calculate ATR
-        const atrMultiplier = 2.0;
-        const estimatedATR = entryPrice * 0.02; // Placeholder
-        
-        if (side === 'long') {
-          stopLossPrice = entryPrice - (estimatedATR * atrMultiplier);
-        } else {
-          stopLossPrice = entryPrice + (estimatedATR * atrMultiplier);
-        }
-        actualRiskPercentage = Math.abs(stopLossPrice - entryPrice) / entryPrice;
-        break;
+        throw new Error('ATR-based stop loss is not implemented. Please provide a production implementation using historical price data.');
 
       case 'support_resistance':
-        // TODO: Implement support/resistance based stop loss
-        // This would require technical analysis of price levels
-        stopLossPrice = side === 'long' 
-          ? entryPrice * 0.95 // Placeholder: 5% below entry
-          : entryPrice * 1.05; // Placeholder: 5% above entry
-        actualRiskPercentage = 0.05;
-        break;
+        throw new Error('Support/resistance-based stop loss is not implemented. Please provide a production implementation using technical analysis.');
 
       default:
         throw new Error(`Unknown stop loss method: ${method}`);

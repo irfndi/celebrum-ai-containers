@@ -132,8 +132,14 @@ export function getUserId(update: TelegramUpdate): number | null {
   return update.message?.from?.id || update.callback_query?.from?.id || null;
 }
 
+/**
+ * Extracts the chat_id from a Telegram update (message or callback_query).
+ * Returns null if not found (never 0).
+ */
 export function getChatId(update: TelegramUpdate): number | null {
-  return update.message?.chat.id || update.callback_query?.message?.chat.id || null;
+  if (update.message?.chat?.id) return update.message.chat.id;
+  if (update.callback_query?.message?.chat?.id) return update.callback_query.message.chat.id;
+  return null;
 }
 
 export function formatUserMention(userId: number, firstName: string): string {
@@ -183,4 +189,8 @@ export function isRateLimited(userId: number, maxRequests: number = 10, windowMs
 
 export function clearRateLimit(userId: number): void {
   rateLimitMap.delete(userId);
+}
+
+export function clearAllRateLimits(): void {
+  rateLimitMap.clear();
 }

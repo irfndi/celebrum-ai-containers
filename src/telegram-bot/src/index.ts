@@ -25,3 +25,4 @@ export async function handleTelegramUpdate(update: TelegramUpdate, context: Tele
 }
 
 export * from './types';
+export { handleStartCommand } from './handlers/start-command';

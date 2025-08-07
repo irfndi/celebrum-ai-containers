@@ -14,7 +14,7 @@ jobs:
     
     strategy:
       matrix:
-        node-version: [22.x]
+        node-version: [20.x]
     
     steps:
     - name: Checkout code
@@ -63,14 +63,21 @@ jobs:
     - name: Linting
       run: pnpm lint
       
+    - name: Print environment variables
+      run: printenv | sort
+    - name: Install MCP Playwright browsers
+      run: pnpm exec playwright install --with-deps
+    - name: Check Playwright browsers install
+      run: pnpm exec playwright install --check
+    - name: Ensure E2E tests are headless (fail if headed)
+      run: |
+        grep -r --include '*.test.ts' 'headless: false' src/web/tests/e2e/ && { echo 'ERROR: Headed mode detected in E2E tests!'; exit 1; } || echo 'All E2E tests are headless.'
     - name: Run unit tests
-      run: pnpm test:unit
-      
+      run: pnpm test:unit -- --run --reporter=verbose
     - name: Run integration tests
-      run: pnpm test:integration
-      
+      run: pnpm test:integration -- --run --reporter=verbose
     - name: Run E2E tests
-      run: pnpm test:e2e
+      run: pnpm test:e2e -- --run --reporter=verbose
       
     - name: Generate coverage report
       run: pnpm test:coverage
@@ -141,8 +148,17 @@ jobs:
     - name: Approve native builds
       run: pnpm approve-builds
       
+    - name: Print environment variables
+      run: printenv | sort
+    - name: Install MCP Playwright browsers
+      run: pnpm exec playwright install --with-deps
+    - name: Check Playwright browsers install
+      run: pnpm exec playwright install --check
+    - name: Ensure E2E tests are headless (fail if headed)
+      run: |
+        grep -r --include '*.test.ts' 'headless: false' src/web/tests/e2e/ && { echo 'ERROR: Headed mode detected in E2E tests!'; exit 1; } || echo 'All E2E tests are headless.'
     - name: Run ${{ matrix.test-type }} tests
-      run: pnpm test:${{ matrix.test-type }}
+      run: pnpm test:${{ matrix.test-type }} -- --run --reporter=verbose
       
   performance:
     name: Performance Tests
@@ -190,8 +206,17 @@ jobs:
     - name: Approve native builds
       run: pnpm approve-builds
       
+    - name: Print environment variables
+      run: printenv | sort
+    - name: Install MCP Playwright browsers
+      run: pnpm exec playwright install --with-deps
+    - name: Check Playwright browsers install
+      run: pnpm exec playwright install --check
+    - name: Ensure E2E tests are headless (fail if headed)
+      run: |
+        grep -r --include '*.test.ts' 'headless: false' src/web/tests/e2e/ && { echo 'ERROR: Headed mode detected in E2E tests!'; exit 1; } || echo 'All E2E tests are headless.'
     - name: Run performance tests
-      run: pnpm test:e2e --reporter=json --outputFile=performance-results.json
+      run: pnpm test:e2e -- --run --reporter=json --outputFile=performance-results.json
       
     - name: Upload performance results
       uses: actions/upload-artifact@v4

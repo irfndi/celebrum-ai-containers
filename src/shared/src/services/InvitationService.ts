@@ -40,20 +40,13 @@ export class InvitationService {
     if (!invitation) {
       throw new NotFoundError('Invalid or inactive invitation code');
     }
-
-    // Additional check for isActive in case mock database filtering didn't work
-    if (!invitation.isActive) {
-      throw new NotFoundError('Invalid or inactive invitation code');
+    if (invitation.expiresAt && new Date(invitation.expiresAt) < new Date()) {
+      throw new NotFoundError('Invitation code has expired');
     }
-
-    // Check if expired
-    if (invitation.expiresAt && invitation.expiresAt.getTime() < Date.now()) {
-      throw new ValidationError('Invitation code has expired');
-    }
-
-    // Check if max uses reached
-    if (invitation.maxUses && invitation.currentUses >= invitation.maxUses) {
-      throw new ValidationError('Invitation code has reached maximum uses');
+    const maxUses = Number(invitation.maxUses ?? 0);
+    const currentUses = Number(invitation.currentUses ?? 0);
+    if (!isNaN(maxUses) && maxUses > 0 && currentUses >= maxUses) {
+      throw new NotFoundError('Invitation code has reached maximum uses');
     }
 
     return invitation;

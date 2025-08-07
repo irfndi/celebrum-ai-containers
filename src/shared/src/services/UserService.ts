@@ -28,7 +28,7 @@ export class UserService {
     return this.userQueries.create(newUser);
   }
 
-  async updateUser(id: number, updates: Partial<NewUser>): Promise<User | undefined> {
+  async updateUser(id: string, updates: Partial<NewUser>): Promise<User | undefined> {
     return this.userQueries.update(id, updates);
   }
 
@@ -81,7 +81,7 @@ export class UserService {
    * Does NOT update Telegram-controlled fields
    */
   async updateManualFields(
-    id: number, 
+    id: string, 
     updates: {
       email?: string;
       settings?: unknown;
@@ -101,7 +101,7 @@ export class UserService {
    * Tracks username changes in the history table
    */
   private async trackUsernameChange(
-    userId: number,
+    userId: string,
     telegramId: string,
     newUsername: string | null,
     changeSource: 'telegram_update' | 'manual_correction' | 'system_migration' = 'telegram_update'
