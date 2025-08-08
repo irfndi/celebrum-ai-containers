@@ -51,6 +51,9 @@ describe('UserService', () => {
     mockEnv = createMockEnv();
     mockEnv.DB = testDb;
     mockEnv.KV = testContext.kv;
+    console.log('[TEST DEBUG] testDb type:', typeof testDb);
+    console.log('[TEST DEBUG] testDb.select type:', typeof testDb.select);
+    console.log('[TEST DEBUG] testDb.query type:', typeof testDb.query);
     userService = new UserService(testDb);
   });
 
@@ -60,6 +63,11 @@ describe('UserService', () => {
   });
 
   test('should create a new user', async () => {
+    console.log('[TEST DEBUG] testDb type:', typeof testDb);
+    console.log('[TEST DEBUG] testDb.select type:', typeof testDb.select);
+    console.log('[TEST DEBUG] testDb.query type:', typeof testDb.query);
+    console.log('[TEST DEBUG] testDb keys:', Object.keys(testDb));
+    
     const newUser: Partial<NewUser> = {
       telegramId: '12345',
       firstName: 'John',
@@ -340,9 +348,16 @@ describe('InvitationService', () => {
   });
   
   test('should test direct update operation', async () => {
-    console.log('=== TEST: Starting direct update test ===');
-    console.log('=== TEST: testDb type:', typeof testDb);
-    console.log('=== TEST: testDb methods:', Object.keys(testDb));
+    // Clear any existing invitation codes first
+    console.log('=== BEFORE DELETE ===');
+    const beforeDelete = await testDb.select().from(schema.invitationCodes).all();
+    console.log('Before delete, codes count:', beforeDelete.length);
+    
+    await testDb.delete(schema.invitationCodes);
+    
+    console.log('=== AFTER DELETE ===');
+    const afterDelete = await testDb.select().from(schema.invitationCodes).all();
+    console.log('After delete, codes count:', afterDelete.length);
     
     const mockInvitation = {
       code: 'TESTUPDATE',
@@ -354,34 +369,34 @@ describe('InvitationService', () => {
       isActive: true,
       createdAt: new Date(),
     };
-    await testDb.insert(schema.invitationCodes).values(mockInvitation);
     
-    console.log('=== TEST: Inserted test data ===');
+    console.log('=== INSERTING ===');
+    console.log('Mock invitation to insert:', JSON.stringify(mockInvitation, null, 2));
+    const insertResult = await testDb.insert(schema.invitationCodes).values(mockInvitation);
+    console.log('Insert result:', insertResult);
     
     // Check what was actually inserted
-    const allCodesAfterInsert = await testDb.select().from(schema.invitationCodes);
-    console.log('=== TEST: All codes after insert:', JSON.stringify(allCodesAfterInsert, null, 2));
+    console.log('=== AFTER INSERT ===');
+    const allCodesAfterInsert = await testDb.select().from(schema.invitationCodes).all();
+    console.log('After insert, codes count:', allCodesAfterInsert.length);
+    console.log('After insert, all codes:', JSON.stringify(allCodesAfterInsert, null, 2));
+    expect(allCodesAfterInsert).toBeDefined();
+    expect(Array.isArray(allCodesAfterInsert)).toBe(true);
+    expect(allCodesAfterInsert.length).toBeGreaterThan(0);
+    expect(allCodesAfterInsert[0].code).toBe('TESTUPDATE');
+    expect(allCodesAfterInsert[0].currentUses).toBe(1);
     
     // Test direct update
-    console.log('=== TEST: About to call update ===');
     const updateResult = await testDb.update(schema.invitationCodes)
       .set({ currentUses: 5 })
       .where(eq(schema.invitationCodes.code, 'TESTUPDATE'))
       .execute();
     
-    console.log('=== TEST: Update completed, result:', updateResult);
-    
-    // Check all codes after update
-    const allCodesAfterUpdate = await testDb.select().from(schema.invitationCodes);
-    console.log('=== TEST: All codes after update:', JSON.stringify(allCodesAfterUpdate, null, 2));
+    expect(updateResult.rowsAffected).toBe(1);
     
     // Check if update worked
     const updatedCode = await testDb.select().from(schema.invitationCodes)
-      .where(eq(schema.invitationCodes.code, 'TESTUPDATE'));
-    
-    console.log('=== TEST: Retrieved updated code:', JSON.stringify(updatedCode, null, 2));
-    console.log('=== TEST: updatedCode length:', updatedCode?.length);
-    console.log('=== TEST: updatedCode type:', typeof updatedCode);
+      .where(eq(schema.invitationCodes.code, 'TESTUPDATE')).all();
     
     expect(updatedCode).toBeDefined();
     expect(Array.isArray(updatedCode)).toBe(true);

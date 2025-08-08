@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { drizzle } from 'drizzle-orm/d1';
 import type { D1Database } from '@cloudflare/workers-types';
-import { invitationCodes, invitationUsage } from '@/schema/invitations';
+import { invitationCodes, invitationUsage } from '../../../../../src/db/src/schema/invitations.js';
 import { eq, and, lt, gt, sql } from 'drizzle-orm';
 import { getTestDb, createMockEnv, createMockUser, cleanupDb, createMockD1Database } from '../../../../../src/shared/tests/utils/test-helpers';
 

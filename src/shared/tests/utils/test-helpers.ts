@@ -92,7 +92,7 @@ export async function createTestDatabase() {
   dataStore.set('positions', new Map());
   dataStore.set('invitation_codes', new Map());
   dataStore.set('sessions', new Map());
-  dataStore.set('invitationUsage', new Map());
+  dataStore.set('invitation_usage', new Map());
   
   // Use a mock D1 database that works with Drizzle and stores data
   const mockD1 = {
@@ -293,10 +293,7 @@ export async function createTestDatabase() {
       users: {
         findFirst: vi.fn().mockImplementation(async (options: any = {}) => {
           const tableData = dataStore.get('users');
-          if (!tableData || tableData.size === 0) {
-            console.log('[TEST HELPERS DEBUG] No users table data found');
-            return null;
-          }
+          if (!tableData || tableData.size === 0) return null;
           
           const allData = Array.from(tableData.values());
           console.log(`[TEST HELPERS DEBUG] Users table has ${allData.length} records`);
@@ -318,6 +315,43 @@ export async function createTestDatabase() {
             return getFilteredResults(allData, options.where);
           }
           return allData;
+        }),
+        findById: vi.fn().mockImplementation(async (id: any) => {
+          console.log(`[FINDBYID DEBUG] Called with id: ${id} (type: ${typeof id})`);
+          console.log(`[FINDBYID DEBUG] DataStore keys:`, Array.from(dataStore.keys()));
+          
+          const tableData = dataStore.get('users');
+          console.log(`[FINDBYID DEBUG] Table data exists:`, !!tableData);
+          console.log(`[FINDBYID DEBUG] Table data size:`, tableData ? tableData.size : 0);
+          
+          if (!tableData || tableData.size === 0) {
+            console.log(`[FINDBYID DEBUG] No table data found, returning null`);
+            return null;
+          }
+          
+          // Convert search ID to string for consistent comparison
+          const searchId = String(id);
+          console.log(`[FINDBYID DEBUG] Searching for ID: ${searchId} (converted to string)`);
+          
+          // First try direct key lookup (most efficient)
+          if (tableData.has(searchId)) {
+            const user = tableData.get(searchId);
+            console.log(`[FINDBYID DEBUG] Found user via direct key lookup:`, user);
+            return user;
+          }
+          
+          // Fallback to value search
+          const allData = Array.from(tableData.values());
+          console.log(`[FINDBYID DEBUG] All data count:`, allData.length);
+          console.log(`[FINDBYID DEBUG] Available user ids:`, allData.map(u => `${u.id} (${typeof u.id})`));
+          console.log(`[FINDBYID DEBUG] Available users:`, allData.map(u => ({ id: u.id, telegramId: u.telegramId })));
+          
+          const user = allData.find(record => String(record.id) === searchId);
+          console.log(`[FINDBYID DEBUG] Found user via value search:`, user ? 'YES' : 'NO');
+          if (user) {
+            console.log(`[FINDBYID DEBUG] Found user details:`, { id: user.id, telegramId: user.telegramId });
+          }
+          return user || null;
         })
       },
       invitationCodes: {
@@ -342,10 +376,56 @@ export async function createTestDatabase() {
           }
           return allData;
         })
+      },
+      opportunities: {
+        findFirst: vi.fn().mockImplementation(async (options: any = {}) => {
+          const tableData = dataStore.get('opportunities');
+          if (!tableData || tableData.size === 0) return null;
+          
+          const allData = Array.from(tableData.values());
+          if (options.where) {
+            const filtered = getFilteredResults(allData, options.where);
+            return filtered.length > 0 ? filtered[0] : null;
+          }
+          return allData[0] || null;
+        }),
+        findMany: vi.fn().mockImplementation(async (options: any = {}) => {
+          const tableData = dataStore.get('opportunities');
+          if (!tableData || tableData.size === 0) return [];
+          
+          const allData = Array.from(tableData.values());
+          if (options.where) {
+            return getFilteredResults(allData, options.where);
+          }
+          return allData;
+        }),
+        findById: vi.fn().mockImplementation(async (id: any) => {
+          const tableData = dataStore.get('opportunities');
+          if (!tableData || tableData.size === 0) return null;
+          
+          const allData = Array.from(tableData.values());
+          return allData.find(record => record.id === id) || null;
+        }),
+        findActive: vi.fn().mockImplementation(async (options: any = {}) => {
+          const tableData = dataStore.get('opportunities');
+          if (!tableData || tableData.size === 0) return [];
+          
+          const allData = Array.from(tableData.values());
+          // Filter for active opportunities (assuming isActive property)
+          const activeOpportunities = allData.filter(opp => opp.isActive !== false);
+          
+          if (options.where) {
+            return getFilteredResults(activeOpportunities, options.where);
+          }
+          return activeOpportunities;
+        })
       }
     },
-    select: vi.fn().mockReturnValue({
+    select: vi.fn().mockImplementation(() => {
+      console.log('[MOCK DB] SELECT method called!');
+      return {
         from: vi.fn().mockImplementation((table: any) => {
+          console.log('[MOCK DB] FROM method called with table:', table);
           const tableName = detectTableName(table);
           console.log('[MOCK DB] SELECT - Table name detected:', tableName);
           console.log('[MOCK DB] SELECT - Table object:', table);
@@ -372,6 +452,16 @@ export async function createTestDatabase() {
             return [];
           };
           
+          // Add get method for single result queries (like .get() in Drizzle)
+          const getSingleResult = async () => {
+            const tableData = dataStore.get(tableName);
+            if (tableData && tableData.size > 0) {
+              const allData = Array.from(tableData.values());
+              return allData[0] || null;
+            }
+            return null;
+          };
+          
 
 
           const getFilteredResult = async (condition: any) => {
@@ -387,6 +477,7 @@ export async function createTestDatabase() {
             // Parse Drizzle condition with queryChunks using enhanced logic
             if (condition && condition.queryChunks && Array.isArray(condition.queryChunks)) {
               console.log('[TEST HELPERS DEBUG] Filtering with queryChunks:', condition.queryChunks.length);
+              console.log('[TEST HELPERS DEBUG] QueryChunks content:', condition.queryChunks);
               
               // Check if this is a compound condition
               const hasLogicalOperator = condition.queryChunks.some((chunk: any) => 
@@ -463,22 +554,43 @@ export async function createTestDatabase() {
                   }
                 }
               } else {
-                // Handle single conditions
+                // Handle single conditions - improved logic for eq() conditions
                 let columnName = null;
                 let value = null;
                 
                 console.log('[TEST HELPERS DEBUG] Processing single condition...');
                 
                 // Extract column name and value from queryChunks
-                for (const chunk of condition.queryChunks) {
-                  console.log('[TEST HELPERS DEBUG] Processing chunk type:', typeof chunk, chunk?.name || 'unknown');
-                  if (chunk && typeof chunk === 'object' && chunk.name && chunk.dataType) {
-                    columnName = chunk.name;
-                    console.log('[TEST HELPERS DEBUG] Found column name:', columnName);
+                // Look for patterns like: [columnChunk, valueChunk] or [columnChunk, operatorChunk, valueChunk]
+                for (let i = 0; i < condition.queryChunks.length; i++) {
+                  const chunk = condition.queryChunks[i];
+                  console.log(`[TEST HELPERS DEBUG] Processing chunk ${i}:`, typeof chunk, chunk?.name || chunk?.value || 'unknown');
+                  
+                  if (chunk && typeof chunk === 'object') {
+                    if (chunk.name && chunk.dataType) {
+                      columnName = chunk.name;
+                      console.log('[TEST HELPERS DEBUG] Found column name:', columnName);
+                    } else if (chunk.hasOwnProperty('value')) {
+                      value = chunk.value;
+                      console.log('[TEST HELPERS DEBUG] Found value:', value);
+                    }
                   }
-                  if (chunk && typeof chunk === 'object' && chunk.hasOwnProperty('value')) {
-                    value = chunk.value;
-                    console.log('[TEST HELPERS DEBUG] Found value:', value);
+                }
+                
+                // Special handling for eq() conditions - look for adjacent column and value
+                if (!columnName || value === null) {
+                  console.log('[TEST HELPERS DEBUG] Trying alternative parsing for eq() condition');
+                  for (let i = 0; i < condition.queryChunks.length - 1; i++) {
+                    const chunk1 = condition.queryChunks[i];
+                    const chunk2 = condition.queryChunks[i + 1];
+                    
+                    if (chunk1 && typeof chunk1 === 'object' && chunk1.name && chunk1.dataType &&
+                        chunk2 && typeof chunk2 === 'object' && chunk2.hasOwnProperty('value')) {
+                      columnName = chunk1.name;
+                      value = chunk2.value;
+                      console.log('[TEST HELPERS DEBUG] Found adjacent column/value:', columnName, value);
+                      break;
+                    }
                   }
                 }
                 
@@ -492,7 +604,8 @@ export async function createTestDatabase() {
                   for (const record of Array.from(tableData.values())) {
                     const actualValue = record[propertyName];
                     const matches = actualValue === value;
-                    console.log(`[TEST HELPERS DEBUG] Record ${propertyName}=${actualValue} vs expected=${value}, matches: ${matches}`);
+                    console.log(`[TEST HELPERS DEBUG] Record ${propertyName}=${actualValue} (type: ${typeof actualValue}) vs expected=${value} (type: ${typeof value}), matches: ${matches}`);
+                    console.log('[TEST HELPERS DEBUG] Full record:', JSON.stringify(record, null, 2));
                     if (matches) {
                       console.log('[TEST HELPERS DEBUG] Found matching record:', record);
                       return record;
@@ -500,6 +613,7 @@ export async function createTestDatabase() {
                   }
                 } else {
                   console.log('[TEST HELPERS DEBUG] No valid column/value found in single condition');
+                  console.log('[TEST HELPERS DEBUG] columnName:', columnName, 'value:', value);
                 }
               }
             }
@@ -510,24 +624,33 @@ export async function createTestDatabase() {
          
          return {
            where: vi.fn().mockImplementation((condition: any) => {
-             const whereResult = {
-               get: vi.fn().mockImplementation(() => {
-                 const tableData = dataStore.get(tableName);
-                 if (tableData && tableData.size > 0) {
-                   const allData = Array.from(tableData.values());
-                   const results = getFilteredResults(allData, condition);
-                   return results.length > 0 ? results[0] : null;
-                 }
-                 return null;
-               }),
-               all: vi.fn().mockImplementation(async () => {
-                 const tableData = dataStore.get(tableName);
-                 if (tableData && tableData.size > 0) {
-                   const allData = Array.from(tableData.values());
-                   return getFilteredResults(allData, condition);
-                 }
+             console.log('[MOCK DB] WHERE condition called for table:', tableName);
+             console.log('[MOCK DB] WHERE condition:', condition);
+             console.log('[MOCK DB] WHERE condition type:', typeof condition);
+             console.log('[MOCK DB] WHERE condition queryChunks:', condition?.queryChunks);
+             
+             // Apply filtering based on where condition
+             const getFilteredSingleResult = async () => {
+               console.log(`[MOCK DB] WHERE.GET - Filtering ${tableName} with condition:`, condition);
+               return await getFilteredResult(condition);
+             };
+             
+             const getAllFilteredResults = async () => {
+               console.log(`[MOCK DB] WHERE.ALL - Filtering ${tableName} with condition:`, condition);
+               const tableData = dataStore.get(tableName);
+               if (!tableData || tableData.size === 0) {
                  return [];
-               })
+               }
+               
+               const allData = Array.from(tableData.values());
+               const filtered = getFilteredResults(allData, condition);
+               console.log('[MOCK DB] All filtered results:', filtered);
+               return filtered;
+             };
+             
+             const whereResult = {
+               get: vi.fn().mockImplementation(getFilteredSingleResult),
+               all: vi.fn().mockImplementation(getAllFilteredResults)
              };
              
              // Make the where result itself awaitable and return an array
@@ -554,35 +677,103 @@ export async function createTestDatabase() {
              
              return whereResult;
            }),
-           get: vi.fn().mockImplementation(getResult),
-           all: vi.fn().mockImplementation(getAllResults)
+           get: vi.fn().mockImplementation(async () => {
+             console.error('[MOCK DEBUG] select().get() called for table:', tableName, '(no where condition)');
+             const tableData = dataStore.get(tableName);
+             console.error('[MOCK DEBUG] tableData size:', tableData?.size || 0);
+             
+             if (!tableData || tableData.size === 0) {
+               console.error('[MOCK DEBUG] No data in table, returning null');
+               return null;
+             }
+             
+             const allData = Array.from(tableData.values());
+             console.error('[MOCK DEBUG] allData sample:', allData.slice(0, 2));
+             const result = allData.length > 0 ? allData[0] : null;
+             console.error('[MOCK DEBUG] final result (first record):', result);
+             
+             return result;
+           }),
+           all: vi.fn().mockImplementation(async () => {
+             console.log(`[MOCK DB] ALL called for table: ${tableName}`);
+             const tableData = dataStore.get(tableName);
+             if (!tableData || tableData.size === 0) {
+               console.log(`[MOCK DB] No data found for ${tableName}, returning empty array`);
+               return [];
+             }
+             
+             const allData = Array.from(tableData.values());
+             console.log(`[MOCK DB] Returning ${allData.length} records for ${tableName}`);
+             return allData;
+           })
          };
        })
-     }),
+     };
+   }),
      insert: vi.fn().mockImplementation((table: any) => {
         // Detect table name using Symbol or fallback methods
         const tableName = detectTableName(table);
         console.log('[MOCK DB] INSERT - Table name detected:', tableName);
+        
+        // Helper function to convert snake_case to camelCase
+        const convertSnakeToCamel = (obj: any): any => {
+          if (obj === null || obj === undefined || typeof obj !== 'object') {
+            return obj;
+          }
+          
+          if (Array.isArray(obj)) {
+            return obj.map(convertSnakeToCamel);
+          }
+          
+          const converted: any = {};
+          for (const [key, value] of Object.entries(obj)) {
+            const camelKey = key.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
+            converted[camelKey] = convertSnakeToCamel(value);
+          }
+          return converted;
+        };
+        
         return {
           values: vi.fn().mockImplementation((data: any) => {
             console.log('[MOCK DB] INSERT - Data to insert:', JSON.stringify(data, null, 2));
             return {
               execute: vi.fn().mockImplementation(async () => {
+                // Convert snake_case to camelCase for consistency
+                const processedData = convertSnakeToCamel(data);
+                
                 // Store the actual data being inserted
                 const insertedData = {
-                  ...data,
-                  createdAt: data.createdAt || new Date(),
-                  updatedAt: data.updatedAt || new Date(),
-                  ...(tableName === 'users' && { lastActiveAt: data.lastActiveAt || new Date() })
+                  ...processedData,
+                  createdAt: processedData.createdAt || new Date(),
+                  updatedAt: processedData.updatedAt || new Date(),
+                  ...(tableName === 'users' && { lastActiveAt: processedData.lastActiveAt || new Date() })
                 };
                 
                 // Store in our mock database based on table
                 const tableStore = dataStore.get(tableName);
                 if (tableStore) {
-                  const key = data.id || data.code || data.userId || Math.random().toString();
+                  // Generate a more predictable key based on table type
+                  let key: string;
+                  if (tableName === 'users') {
+                    // Use the provided ID or generate one if not provided
+                    if (!insertedData.id) {
+                      insertedData.id = `user-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+                    }
+                    // Always use the ID as the key for users (convert to string for consistency)
+                    key = String(insertedData.id);
+                  } else if (tableName === 'invitation_codes') {
+                    // Use the code as the key since it's the primary key in the schema
+                    key = String(insertedData.code);
+                  } else if (tableName === 'invitation_usage') {
+                    key = String(insertedData.id || insertedData.userId || Math.random().toString());
+                  } else {
+                    key = String(insertedData.id || Math.random().toString());
+                  }
+                  
                   console.log(`[TEST HELPERS INSERT DEBUG] Storing in ${tableName} with key ${key}:`, insertedData);
                   tableStore.set(key, insertedData);
                   console.log(`[TEST HELPERS INSERT DEBUG] Table ${tableName} now has ${tableStore.size} records`);
+                  console.log(`[TEST HELPERS INSERT DEBUG] All keys in ${tableName}:`, Array.from(tableStore.keys()));
                   console.log('[MOCK DB] INSERT - Data stored in table', tableName, ':', JSON.stringify(Array.from(tableStore.values()), null, 2));
                   console.log('[MOCK DB] INSERT - All dataStore keys:', Array.from(dataStore.keys()));
                 } else {
@@ -597,21 +788,45 @@ export async function createTestDatabase() {
                 return [insertedData];
               }),
               returning: vi.fn().mockImplementation(async () => {
+                // Convert snake_case to camelCase for consistency
+                const processedData = convertSnakeToCamel(data);
+                
                 // Store the actual data being inserted
                 const insertedData = {
-                  ...data,
-                  createdAt: data.createdAt || new Date(),
-                  updatedAt: data.updatedAt || new Date(),
-                  ...(tableName === 'users' && { lastActiveAt: data.lastActiveAt || new Date() })
+                  ...processedData,
+                  createdAt: processedData.createdAt || new Date(),
+                  updatedAt: processedData.updatedAt || new Date(),
+                  ...(tableName === 'users' && { lastActiveAt: processedData.lastActiveAt || new Date() })
                 };
                 
                 // Store in our mock database based on table
                 const tableStore = dataStore.get(tableName);
                 if (tableStore) {
-                  const key = data.id || data.code || data.userId || Math.random().toString();
+                  // Generate a more predictable key based on table type
+                  let key: string;
+                  if (tableName === 'users') {
+                    // Use the provided ID or generate one if not provided
+                    if (!insertedData.id) {
+                      insertedData.id = `user-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+                    }
+                    // Always use the ID as the key for users (convert to string for consistency)
+                    key = String(insertedData.id);
+                  } else if (tableName === 'invitation_codes') {
+                    // Generate a unique ID for invitation codes, don't use code as key
+                    if (!insertedData.id) {
+                      insertedData.id = `invitation-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+                    }
+                    key = String(insertedData.id);
+                  } else if (tableName === 'invitation_usage') {
+                    key = String(insertedData.id || insertedData.userId || Math.random().toString());
+                  } else {
+                    key = String(insertedData.id || Math.random().toString());
+                  }
+                  
                   console.log(`[TEST HELPERS INSERT DEBUG] Storing in ${tableName} with key ${key}:`, insertedData);
                   tableStore.set(key, insertedData);
                   console.log(`[TEST HELPERS INSERT DEBUG] Table ${tableName} now has ${tableStore.size} records`);
+                  console.log(`[TEST HELPERS INSERT DEBUG] All keys in ${tableName}:`, Array.from(tableStore.keys()));
                   console.log('[MOCK DB] INSERT - Data stored in table', tableName, ':', JSON.stringify(Array.from(tableStore.values()), null, 2));
                   console.log('[MOCK DB] INSERT - All dataStore keys:', Array.from(dataStore.keys()));
                 } else {
@@ -629,7 +844,7 @@ export async function createTestDatabase() {
           })
         };
       }),
-    update: vi.fn().mockImplementation((table: any) => {
+     update: vi.fn().mockImplementation((table: any) => {
        const tableName = detectTableName(table);
        let updateData: any = {};
        let whereCondition: any = null;
@@ -642,9 +857,20 @@ export async function createTestDatabase() {
               whereCondition = condition;
               return {
                 execute: vi.fn().mockImplementation(async () => {
+                  console.log(`[TEST HELPERS UPDATE DEBUG] Executing update for table: ${tableName}`);
+                  console.log(`[TEST HELPERS UPDATE DEBUG] Update data:`, updateData);
+                  console.log(`[TEST HELPERS UPDATE DEBUG] Where condition:`, whereCondition);
+                  
                   // Actually update the data in dataStore with proper filtering
                   const tableStore = dataStore.get(tableName);
-                  if (tableStore && whereCondition && whereCondition.queryChunks && Array.isArray(whereCondition.queryChunks)) {
+                  if (!tableStore) {
+                    console.log(`[TEST HELPERS UPDATE DEBUG] No table store found for ${tableName}`);
+                    return { rowsAffected: 0 };
+                  }
+                  
+                  console.log(`[TEST HELPERS UPDATE DEBUG] Table ${tableName} has ${tableStore.size} records before update`);
+                  
+                  if (whereCondition && whereCondition.queryChunks && Array.isArray(whereCondition.queryChunks)) {
                     console.log('[TEST HELPERS UPDATE DEBUG] Updating with queryChunks:', whereCondition.queryChunks.length);
                     
                     // Check if this is a compound condition
@@ -722,7 +948,7 @@ export async function createTestDatabase() {
                           const updatedRecord = { ...record, ...updateData, updatedAt: new Date() };
                           tableStore.set(key, updatedRecord);
                           rowsAffected++;
-                          console.log('[TEST HELPERS UPDATE DEBUG] Updated record:', updatedRecord);
+                          console.log('[TEST HELPERS UPDATE DEBUG] Updated record with key:', key, 'new record:', updatedRecord);
                         }
                       }
                     } else {
@@ -748,56 +974,109 @@ export async function createTestDatabase() {
                         
                         // Find and update matching records
                         for (const [key, record] of Array.from(tableStore.entries())) {
+                          console.log(`[TEST HELPERS UPDATE DEBUG] Checking record with key ${key}:`, record);
+                          console.log(`[TEST HELPERS UPDATE DEBUG] Comparing ${propertyName}: ${record[propertyName]} === ${value}`);
                           if (record[propertyName] === value) {
                             const updatedRecord = { ...record, ...updateData, updatedAt: new Date() };
                             tableStore.set(key, updatedRecord);
                             rowsAffected++;
-                            console.log('[TEST HELPERS UPDATE DEBUG] Updated record:', updatedRecord);
+                            console.log('[TEST HELPERS UPDATE DEBUG] Updated record with key:', key, 'new record:', updatedRecord);
                           }
                         }
                       }
                     }
                     
                     console.log('[TEST HELPERS UPDATE DEBUG] Rows affected:', rowsAffected);
+                    console.log(`[TEST HELPERS UPDATE DEBUG] Table ${tableName} has ${tableStore.size} records after update`);
+                    console.log(`[TEST HELPERS UPDATE DEBUG] All records after update:`, Array.from(tableStore.values()));
                     return { rowsAffected };
                   }
                   return { rowsAffected: 0 };
+                }),
+                returning: vi.fn().mockImplementation(async () => {
+                  console.log(`[TEST HELPERS RETURNING DEBUG] Getting updated records for table: ${tableName}`);
+                  const tableStore = dataStore.get(tableName);
+                  if (!tableStore) {
+                    console.log(`[TEST HELPERS RETURNING DEBUG] No table store found for ${tableName}`);
+                    return [];
+                  }
+                  
+                  // Return all records from the table store (they should be updated)
+                  const allRecords = Array.from(tableStore.values());
+                  console.log(`[TEST HELPERS RETURNING DEBUG] Returning ${allRecords.length} records:`, allRecords);
+                  return allRecords;
                 })
               };
             })
           };
-        }),
-        where: vi.fn().mockReturnThis(),
-        execute: vi.fn().mockImplementation(async () => {
-          return { rowsAffected: 1 };
-        }),
-        returning: vi.fn().mockImplementation(async () => {
-          // Return mock updated data based on table
-          if (tableName === 'invitation_codes') {
-            return [{
-              id: 'mock-invitation-id',
-              code: 'BETA2024',
-              currentUses: 1,
-              maxUses: 5,
-              isActive: true,
-              createdAt: new Date(),
-              updatedAt: new Date()
-            }];
-          }
-          if (tableName === 'users') {
-            return [{
-              id: 'mock-user-id',
-              name: 'Mock User',
-              createdAt: new Date(),
-              updatedAt: new Date()
-            }];
-          }
-          return [{ rowsAffected: 1 }];
         })
       };
     }),
-    delete: vi.fn().mockReturnValue({
-      where: vi.fn().mockResolvedValue([])
+    delete: vi.fn().mockImplementation((table: any) => {
+      const tableName = detectTableName(table);
+      console.log(`[MOCK DELETE] Deleting from table: ${tableName}`);
+      
+      // Support for delete without where clause (clear entire table)
+      const deleteResult = {
+        where: vi.fn().mockImplementation((condition: any) => {
+          console.log(`[MOCK DELETE] Where condition:`, condition);
+          
+          // If no condition, clear the entire table
+          if (!condition) {
+            const tableStore = dataStore.get(tableName);
+            if (tableStore) {
+              const deletedCount = tableStore.size;
+              tableStore.clear();
+              console.log(`[MOCK DELETE] Cleared entire table ${tableName}, deleted ${deletedCount} records`);
+              return Promise.resolve({ rowsAffected: deletedCount });
+            }
+            return Promise.resolve({ rowsAffected: 0 });
+          }
+          
+          // Handle conditional deletes
+          const tableStore = dataStore.get(tableName);
+          if (!tableStore) {
+            console.log(`[MOCK DELETE] Table ${tableName} not found`);
+            return Promise.resolve({ rowsAffected: 0 });
+          }
+          
+          const recordsToDelete = getFilteredResults(Array.from(tableStore.values()), condition);
+          console.log(`[MOCK DELETE] Found ${recordsToDelete.length} records to delete`);
+          
+          // Delete matching records
+          let deletedCount = 0;
+          for (const record of recordsToDelete) {
+            const recordId = record.id || record.code || record.telegramId;
+            if (recordId && tableStore.has(recordId)) {
+              tableStore.delete(recordId);
+              deletedCount++;
+            }
+          }
+          
+          console.log(`[MOCK DELETE] Deleted ${deletedCount} records from ${tableName}`);
+          return Promise.resolve({ rowsAffected: deletedCount });
+        }),
+        
+        // Support for direct execution without where clause
+        execute: vi.fn().mockImplementation(async () => {
+          console.log(`[MOCK DELETE] Direct execute - clearing entire table ${tableName}`);
+          const tableStore = dataStore.get(tableName);
+          if (tableStore) {
+            const deletedCount = tableStore.size;
+            tableStore.clear();
+            console.log(`[MOCK DELETE] Cleared entire table ${tableName}, deleted ${deletedCount} records`);
+            return { rowsAffected: deletedCount };
+          }
+          return { rowsAffected: 0 };
+        })
+      };
+      
+      // Make the delete result thenable to support await without .execute()
+       deleteResult.then = function(onFulfilled, onRejected) {
+         return deleteResult.execute().then(onFulfilled, onRejected);
+       };
+      
+      return deleteResult;
     }),
     transaction: vi.fn().mockImplementation(async (callback: any) => {
       // Mock transaction - just execute the callback with the same db instance
@@ -1008,7 +1287,21 @@ export async function getTestDb(options: {
   if (options.invitations) {
     const invitationsTable = dataStore.get('invitation_codes')!;
     options.invitations.forEach((invitation, index) => {
-      invitationsTable.set(invitation.code || `invitation_${index}`, invitation);
+      // Store invitation with a unique ID as key, not the code
+      const invitationId = invitation.id || `invitation_${index}`;
+      // Ensure the invitation object has all required properties
+      const invitationData = {
+        id: invitationId,
+        code: invitation.code,
+        maxUses: invitation.maxUses || invitation.max_uses,
+        currentUses: invitation.currentUses || invitation.current_uses || 0,
+        expiresAt: invitation.expiresAt || invitation.expires_at,
+        isActive: invitation.isActive !== undefined ? invitation.isActive : (invitation.is_active !== undefined ? invitation.is_active : true),
+        createdAt: invitation.createdAt || invitation.created_at || new Date().toISOString(),
+        updatedAt: invitation.updatedAt || invitation.updated_at || new Date().toISOString(),
+        ...invitation
+      };
+      invitationsTable.set(invitationId, invitationData);
     });
     console.log('[TEST HELPERS] Populated invitation_codes table with', options.invitations.length, 'records');
   }

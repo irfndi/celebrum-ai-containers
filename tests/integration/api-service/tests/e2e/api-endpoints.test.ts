@@ -56,7 +56,13 @@ describe('API Service E2E Tests', () => {
       positions: {
         findByUserId: vi.fn().mockResolvedValue([]),
         create: vi.fn().mockResolvedValue({}),
-        update: vi.fn().mockResolvedValue({})
+        update: vi.fn().mockResolvedValue({}),
+        findById: vi.fn().mockResolvedValue({}),
+        closePosition: vi.fn().mockResolvedValue({})
+      },
+      opportunities: {
+        findById: vi.fn().mockResolvedValue({}),
+        findActive: vi.fn().mockResolvedValue([])
       }
     };
 

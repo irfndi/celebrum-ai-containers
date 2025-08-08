@@ -3,7 +3,7 @@
 
 CREATE TABLE IF NOT EXISTS user_username_history (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  user_id INTEGER NOT NULL,
+  user_id TEXT NOT NULL,
   telegram_id TEXT NOT NULL,
   username TEXT, -- Can be null if user had no username
   changed_at INTEGER NOT NULL DEFAULT (strftime('%s','now') * 1000),

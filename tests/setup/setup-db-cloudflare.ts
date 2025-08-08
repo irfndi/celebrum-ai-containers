@@ -205,7 +205,10 @@ async function createBasicSchema(): Promise<void> {
     
     // Execute each CREATE TABLE statement using the raw D1 client
     for (const statement of createTableStatements) {
-      await db.$client.exec(statement);
+      // Clean up the statement by removing extra whitespace and line breaks
+      const cleanStatement = statement.replace(/\s+/g, ' ').trim();
+      console.log(`Executing SQL: ${cleanStatement.substring(0, 50)}...`);
+      await db.$client.exec(cleanStatement);
     }
     
     console.log('Basic database schema created successfully');

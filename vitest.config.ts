@@ -12,7 +12,11 @@ export default defineConfig({
     ],
     include: [
       'src/**/*.test.ts',
-      'tests/**/*.test.ts'
+      'tests/unit/**/*.test.ts',
+      'tests/setup/**/*.test.ts'
+    ],
+    exclude: [
+      'tests/integration/**/*.test.ts'
     ],
     coverage: {
       provider: 'v8',

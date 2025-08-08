@@ -41,19 +41,25 @@ export class UserQueries {
   }
 
   async findById(id: string): Promise<User | null> {
-    try {
-      // Use Drizzle ORM with the correct schema - it will handle D1 compatibility and JSON parsing
-      const result = await this.db
-        .select()
-        .from(users)
-        .where(eq(users.id, id))
-        .get();
-      
-      return result || null;
-    } catch (error) {
-      console.error(`Error finding user by ID ${id}:`, error);
-      return null;
-    }
+    console.log('[QUERIES DEBUG] findById called with id:', id);
+    console.log('[QUERIES DEBUG] About to call this.db.select()');
+    const selectQuery = this.db.select();
+    console.log('[QUERIES DEBUG] selectQuery created:', typeof selectQuery);
+    
+    console.log('[QUERIES DEBUG] About to call .from(users)');
+    const fromQuery = selectQuery.from(users);
+    console.log('[QUERIES DEBUG] fromQuery created:', typeof fromQuery);
+    
+    console.log('[QUERIES DEBUG] About to call .where(eq(users.id, id))');
+    const whereQuery = fromQuery.where(eq(users.id, id));
+    console.log('[QUERIES DEBUG] whereQuery created:', typeof whereQuery);
+    
+    console.log('[QUERIES DEBUG] About to call .get()');
+    const result = await whereQuery.get();
+    console.log('[QUERIES DEBUG] findById raw result:', result);
+    const user = result as User | null;
+    console.log('[QUERIES DEBUG] findById result:', user);
+    return user;
   }
 
   async create(user: NewUser): Promise<User> {
@@ -65,6 +71,8 @@ export class UserQueries {
     const newId = `user-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
     try {
+      console.error('[QUERIES DEBUG] Starting user creation for telegramId:', user.telegramId);
+      
       // Prepare user data for D1 compatibility
       // JSON fields are automatically handled by Drizzle ORM when using mode: 'json'
       const userData: NewUser = {
@@ -84,9 +92,13 @@ export class UserQueries {
         betaExpiresAt: user.betaExpiresAt ? (user.betaExpiresAt instanceof Date ? user.betaExpiresAt : new Date(user.betaExpiresAt)) : null,
       };
       
-      await this.db.insert(users).values(userData);
+      console.error('[QUERIES DEBUG] About to insert user data:', userData);
       
+      await this.db.insert(users).values(userData).execute();
+      
+      console.error('[QUERIES DEBUG] Insert completed, about to call findById with id:', newId);
       const createdUser = await this.findById(newId);
+      console.error('[QUERIES DEBUG] findById result:', createdUser);
 
       if (!createdUser) {
         throw new Error('Failed to create user: user not found after insert');

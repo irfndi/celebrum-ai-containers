@@ -3,24 +3,7 @@ import { createDb, getDatabase } from '../../../../../src/db/src/utils/connectio
 import type { Env } from '../../../../../src/db/src/utils/connection';
 import { createMockD1Database, createMockEnv } from '../../../../../src/shared/tests/utils/test-helpers';
 
-// Mock drizzle-orm/d1
-vi.mock('drizzle-orm/d1', () => ({
-  drizzle: vi.fn((client, options) => ({
-    select: vi.fn().mockReturnThis(),
-    insert: vi.fn().mockReturnThis(),
-    update: vi.fn().mockReturnThis(),
-    delete: vi.fn().mockReturnThis(),
-    from: vi.fn().mockReturnThis(),
-    where: vi.fn().mockReturnThis(),
-    limit: vi.fn().mockReturnThis(),
-    orderBy: vi.fn().mockReturnThis(),
-    values: vi.fn().mockReturnThis(),
-    returning: vi.fn().mockReturnThis(),
-    set: vi.fn().mockReturnThis(),
-    execute: vi.fn(),
-    ...options
-  }))
-}));
+// Local mock for this test file only - moved inside describe block to avoid global interference
 
 describe('Database Connection Utils', () => {
   let mockEnv: Env;
