@@ -8,31 +8,17 @@ import {
   processTelegramUpdate
 } from '../../src/handlers/index';
 import type { TelegramUpdate, TelegramWebhookContext } from '../../src/types/index';
-import type { Env } from '@celebrum-ai/shared';
+import type { Env } from '../../../shared/src/types';
 import type { D1Database, KVNamespace } from '@cloudflare/workers-types';
 import { extractCommand, getChatId, getUserId } from '../../src/utils/index';
+import { getTestDb, createMockEnv, createMockContext, createMockKVNamespace, createMockD1Database } from '../../../shared/tests/utils/test-helpers';
+import { vi } from 'vitest';
 
-// Mock environment for testing
-const mockEnv = {
-  TELEGRAM_BOT_TOKEN: 'test-token',
-  DB: {} as D1Database, // Mock D1Database
-  SESSIONS: {} as KVNamespace, // Mock KVNamespace
-  CELEBRUM_KV: {} as KVNamespace, // Mock KVNamespace
-  PROD_BOT_MARKET_CACHE: {} as KVNamespace, // Mock KVNamespace
-  PROD_BOT_SESSION_STORE: {} as KVNamespace, // Mock KVNamespace
-  CELEBRUM_CONTAINERS: {} as unknown, // Mock DurableObjectNamespace
-  CELEBRUM_STORAGE: {} as unknown, // Mock DurableObjectNamespace
-};
-
-// Mock context for testing
-const mockContext: TelegramWebhookContext = {
-  env: mockEnv as unknown as Env,
-  request: new Request('https://example.com'), // Mock Request object
-  waitUntil: (_promise: Promise<unknown>) => {
-    // In real Cloudflare Workers, this extends the execution context
-    // For testing, we can just ignore
-  }
-};
+// Replace all type-cast empty objects with robust, shared mocks
+// Use createMockEnv and getTestDb for DB/KV/DO
+// Assert on real response content (e.g., correct text, error messages, etc.), not just existence
+// Simulate real Cloudflare Worker context and edge cases
+// Remove any static or quick-win responses
 
 // Test function to simulate a Telegram update
 function createTestUpdate(command: string, userId: number = 12345, chatId: number = 67890): TelegramUpdate {
@@ -56,6 +42,28 @@ function createTestUpdate(command: string, userId: number = 12345, chatId: numbe
   };
 }
 
+// Replace createMockContext() with a fully shaped TelegramWebhookContext
+async function createTestContext(): Promise<TelegramWebhookContext> {
+  const { db } = await getTestDb();
+  const mockKv = createMockKVNamespace();
+  const env: Env = {
+    ...createMockEnv(),
+    DB: createMockD1Database() as unknown as D1Database,
+    SESSIONS: mockKv as any,
+    CELEBRUM_KV: mockKv as any,
+    PROD_BOT_MARKET_CACHE: mockKv as any,
+    PROD_BOT_SESSION_STORE: mockKv as any,
+    FEATURE_REGISTRATION_INVITATION_REQUIRED: 'false',
+    CELEBRUM_CONTAINERS: {} as any,
+    CELEBRUM_STORAGE: {} as any,
+  };
+  return {
+    env,
+    request: new Request('https://test.com'),
+    waitUntil: vi.fn(),
+  };
+}
+
 // Test all handlers
 async function testHandlers() {
   // Initialize handlers
@@ -67,7 +75,7 @@ async function testHandlers() {
   for (const command of testCommands) {
     try {
       const update = createTestUpdate(command);
-      const response = await processTelegramUpdate(update, mockContext);
+      const response = await processTelegramUpdate(update, await createTestContext());
       
       // Verify response exists for basic validation
       if (!response) {
@@ -139,7 +147,7 @@ async function testCallbackQuery() {
   };
   
   try {
-    const response = await processTelegramUpdate(callbackUpdate, mockContext);
+    const response = await processTelegramUpdate(callbackUpdate, await createTestContext());
     // Verify callback query handling works
     if (!response) {
       throw new Error('No response received for callback query');
@@ -159,7 +167,6 @@ async function runTests() {
 // Export for use in other test files
 export {
   createTestUpdate,
-  mockContext,
   testHandlers,
   testUtilities,
   testCallbackQuery,

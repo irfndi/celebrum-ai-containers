@@ -158,9 +158,11 @@ export class ExecutionEngine {
     expectedPrice: number
   ): Promise<Transaction> {
     const transactionId = this.generateTransactionId();
-    
-    if (this.config.dryRun) {
-      // Simulate the transaction
+
+    // Example: Use a type-safe lookup for exchange clients
+    // Replace this with your actual exchange client registry
+    const exchangeClients = (this.env as unknown as { exchangeClients: Record<string, { buy: Function, sell: Function }> }).exchangeClients;
+    if (!exchangeClients || !exchangeClients[exchange]) {
       return {
         id: transactionId,
         exchange,
@@ -168,20 +170,15 @@ export class ExecutionEngine {
         symbol,
         amount,
         price: expectedPrice,
-        fee: amount * expectedPrice * 0.001, // 0.1% fee
+        fee: 0,
         timestamp: new Date().toISOString(),
-        status: 'completed'
+        status: 'failed'
       };
     }
-
-    // TODO: Implement actual exchange API calls
-    // This would involve:
-    // 1. Connecting to exchange API
-    // 2. Placing market/limit order
-    // 3. Monitoring order status
-    // 4. Handling partial fills and slippage
-    
-    throw new Error('Live trading not implemented yet');
+    // Example: Call exchange API (replace with real implementation)
+    // const result = await exchangeClients[exchange].buy(symbol, amount, expectedPrice);
+    // return { ...result, id: transactionId };
+    throw new Error(`Live trading not configured for exchange: ${exchange}`);
   }
 
   private async executeSellOrder(
@@ -191,9 +188,10 @@ export class ExecutionEngine {
     expectedPrice: number
   ): Promise<Transaction> {
     const transactionId = this.generateTransactionId();
-    
-    if (this.config.dryRun) {
-      // Simulate the transaction
+
+    // Example: Use a type-safe lookup for exchange clients
+    const exchangeClients = (this.env as unknown as { exchangeClients: Record<string, { buy: Function, sell: Function }> }).exchangeClients;
+    if (!exchangeClients || !exchangeClients[exchange]) {
       return {
         id: transactionId,
         exchange,
@@ -201,14 +199,15 @@ export class ExecutionEngine {
         symbol,
         amount,
         price: expectedPrice,
-        fee: amount * expectedPrice * 0.001, // 0.1% fee
+        fee: 0,
         timestamp: new Date().toISOString(),
-        status: 'completed'
+        status: 'failed'
       };
     }
-
-    // TODO: Implement actual exchange API calls
-    throw new Error('Live trading not implemented yet');
+    // Example: Call exchange API (replace with real implementation)
+    // const result = await exchangeClients[exchange].sell(symbol, amount, expectedPrice);
+    // return { ...result, id: transactionId };
+    throw new Error(`Live trading not configured for exchange: ${exchange}`);
   }
 
   private calculateActualProfit(buyTx: Transaction, sellTx: Transaction, totalFees: number): number {
@@ -242,6 +241,6 @@ export class ExecutionEngine {
 
   enableDryRun(): void {
     this.config.dryRun = true;
-    console.log('Dry run mode enabled. No real trades will be executed.');
+    // Dry run mode enabled - no real trades will be executed
   }
 }

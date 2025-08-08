@@ -19,6 +19,7 @@ export type {
   Order,
   Position,
   Portfolio,
+  TradingSignal,
   // User types
   User,
   UserRole as TypesUserRole,

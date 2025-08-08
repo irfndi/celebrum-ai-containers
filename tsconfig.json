@@ -14,6 +14,7 @@
     "resolveJsonModule": true,
     "allowJs": true,
     "esModuleInterop": true,
+    "downlevelIteration": true,
     "declaration": false,
     "declarationMap": false,
     "sourceMap": false,
@@ -22,6 +23,7 @@
     "outDir": "dist",
     "types": [
       "@cloudflare/workers-types",
+      "@cloudflare/vitest-pool-workers",
       "node"
     ],
     "baseUrl": ".",
@@ -38,6 +40,18 @@
       "@celebrum-ai/db/*": [
         "./src/db/src/*"
       ],
+      "@celebrum-ai/db/utils": [
+        "./src/db/src/utils"
+      ],
+      "@celebrum-ai/db/utils/*": [
+        "./src/db/src/utils/*"
+      ],
+      "@celebrum-ai/db/schema": [
+        "./src/db/src/schema"
+      ],
+      "@celebrum-ai/db/schema/*": [
+        "./src/db/src/schema/*"
+      ],
       "@celebrum-ai/telegram-bot": [
         "./src/telegram-bot/src/index.ts"
       ],
@@ -49,17 +63,41 @@
       ],
       "@celebrum-ai/services/*": [
         "./src/services/src/*"
+      ],
+      "@/tests/*": [
+        "./src/tests/*"
+      ],
+      "@celebrum-ai/shared/tests/*": [
+        "./src/shared/tests/*"
+      ],
+      "@celebrum-ai/utils/*": [
+        "./src/shared/src/utils/*"
+      ],
+      "@celebrum-ai/errors": [
+        "./src/shared/src/errors/index.ts"
+      ],
+      "@celebrum-ai/validation": [
+        "./src/shared/src/validation/index.ts"
+      ],
+      "@celebrum-ai/constants": [
+        "./src/shared/src/constants/index.ts"
+      ],
+      "@celebrum-ai/test-utils": [
+        "./src/shared/tests/utils/test-helpers.ts"
+      ],
+      "@/*": [
+        "./src/*"
       ]
     }
   },
   "include": [
-    "src/**/*"
+    "src/**/*",
+    "tests/**/*"
   ],
   "exclude": [
     "node_modules",
     "dist",
-    "**/*.test.ts",
-    "**/*.spec.ts",
+    "dist-test",
     "src/web/**/*",
     "src/web/dist/**/*"
   ],

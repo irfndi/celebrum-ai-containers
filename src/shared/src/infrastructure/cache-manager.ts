@@ -2,6 +2,8 @@
  * Cache management utilities for Cloudflare KV and other storage backends
  */
 
+import type { KVNamespace } from '@cloudflare/workers-types';
+
 export interface CacheEntry<T = unknown> {
   value: T;
   timestamp: number;

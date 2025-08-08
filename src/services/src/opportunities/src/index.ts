@@ -3,3 +3,4 @@
 export * from './arbitrage-detector';
 export * from './opportunity-scorer';
 export * from './execution-engine';
+export * from './opportunity-manager';

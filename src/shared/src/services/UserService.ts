@@ -1,5 +1,5 @@
-import type { User, NewUser, UserUsernameHistory, NewUserUsernameHistory } from '@celebrum-ai/db/schema';
-import { UserQueries, UserUsernameHistoryQueries, type Database } from '@celebrum-ai/db';
+import type { User, NewUser, UserUsernameHistory, NewUserUsernameHistory } from '../../../db/src/schema';
+import { UserQueries, UserUsernameHistoryQueries, type Database } from '../../../db/src/index';
 
 export class UserService {
   private userQueries: UserQueries;
@@ -10,8 +10,9 @@ export class UserService {
     this.usernameHistoryQueries = new UserUsernameHistoryQueries(db);
   }
 
-  async findUserByTelegramId(telegramId: string): Promise<User | undefined> {
-    return this.userQueries.findByTelegramId(telegramId);
+  async findUserByTelegramId(telegramId: string): Promise<User | null> {
+    const result = await this.userQueries.findByTelegramId(telegramId);
+    return result;
   }
 
   async createUser(userData: Partial<NewUser>): Promise<User> {
@@ -27,7 +28,7 @@ export class UserService {
     return this.userQueries.create(newUser);
   }
 
-  async updateUser(id: number, updates: Partial<NewUser>): Promise<User | undefined> {
+  async updateUser(id: string, updates: Partial<NewUser>): Promise<User | undefined> {
     return this.userQueries.update(id, updates);
   }
 
@@ -59,16 +60,20 @@ export class UserService {
       );
     }
 
-    // Update automatic fields only
+    // Update automatic fields only - but preserve existing values if they exist
     const updates: Partial<NewUser> = {
+      // Override firstName and lastName with Telegram data
       firstName: telegramData.firstName,
       lastName: telegramData.lastName,
+      // Always update username as it can change in Telegram
       username: telegramData.username,
+      // Override languageCode with Telegram data
       languageCode: telegramData.languageCode,
       lastActiveAt: new Date(),
     };
 
-    return this.userQueries.update(existingUser.id, updates);
+    const result = await this.userQueries.update(existingUser.id, updates);
+    return result;
   }
 
   /**
@@ -76,7 +81,7 @@ export class UserService {
    * Does NOT update Telegram-controlled fields
    */
   async updateManualFields(
-    id: number, 
+    id: string, 
     updates: {
       email?: string;
       settings?: unknown;
@@ -96,7 +101,7 @@ export class UserService {
    * Tracks username changes in the history table
    */
   private async trackUsernameChange(
-    userId: number,
+    userId: string,
     telegramId: string,
     newUsername: string | null,
     changeSource: 'telegram_update' | 'manual_correction' | 'system_migration' = 'telegram_update'

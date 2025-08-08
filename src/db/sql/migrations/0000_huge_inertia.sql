@@ -1,5 +1,5 @@
 CREATE TABLE `users` (
-	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`id` text PRIMARY KEY NOT NULL,
 	`telegram_id` text NOT NULL,
 	`first_name` text,
 	`last_name` text,
@@ -42,7 +42,7 @@ CREATE INDEX `opportunities_active_idx` ON `opportunities` (`is_active`);--> sta
 CREATE INDEX `opportunities_expires_idx` ON `opportunities` (`expires_at`);--> statement-breakpoint
 CREATE TABLE `positions` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-	`user_id` integer NOT NULL,
+	`user_id` text NOT NULL,
 	`exchange_id` text NOT NULL,
 	`symbol` text NOT NULL,
 	`type` text NOT NULL,
@@ -69,7 +69,7 @@ CREATE INDEX `positions_symbol_idx` ON `positions` (`symbol`);--> statement-brea
 CREATE INDEX `positions_strategy_idx` ON `positions` (`strategy`);--> statement-breakpoint
 CREATE TABLE `trading_strategies` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-	`user_id` integer NOT NULL,
+	`user_id` text NOT NULL,
 	`name` text NOT NULL,
 	`type` text NOT NULL,
 	`is_active` integer DEFAULT true NOT NULL,

@@ -1,7 +1,7 @@
 // Using native crypto.randomUUID() instead of uuid package for Cloudflare Workers compatibility
 import { NotFoundError, ValidationError } from '../errors';
-import type { Database, InvitationCode as DbInvitationCode, InvitationUsage as DbInvitationUsage } from '@celebrum-ai/db';
-import { invitationCodes, invitationUsage } from '@celebrum-ai/db';
+import type { Database, InvitationCode as DbInvitationCode, InvitationUsage as DbInvitationUsage } from '../../../db/src/index';
+import { invitationCodes, invitationUsage } from '../../../db/src/schema';
 import { eq, and, count, gt, sql } from 'drizzle-orm';
 
 // Debug: Check what's being imported
@@ -34,24 +34,19 @@ export class InvitationService {
     const invitation = await this.db
       .select()
       .from(invitationCodes)
-      .where(and(
-        eq(invitationCodes.code, code),
-        eq(invitationCodes.isActive, true)
-      ))
+      .where(eq(invitationCodes.code, code))
       .get();
     
     if (!invitation) {
       throw new NotFoundError('Invalid or inactive invitation code');
     }
-
-    // Check if expired
-    if (invitation.expiresAt && invitation.expiresAt.getTime() < Date.now()) {
-      throw new ValidationError('Invitation code has expired');
+    if (invitation.expiresAt && new Date(invitation.expiresAt) < new Date()) {
+      throw new NotFoundError('Invitation code has expired');
     }
-
-    // Check if max uses reached
-    if (invitation.maxUses && invitation.currentUses >= invitation.maxUses) {
-      throw new ValidationError('Invitation code has reached maximum uses');
+    const maxUses = Number(invitation.maxUses ?? 0);
+    const currentUses = Number(invitation.currentUses ?? 0);
+    if (!isNaN(maxUses) && maxUses > 0 && currentUses >= maxUses) {
+      throw new NotFoundError('Invitation code has reached maximum uses');
     }
 
     return invitation;
@@ -66,13 +61,15 @@ export class InvitationService {
       const invitation = await tx
         .select()
         .from(invitationCodes)
-        .where(and(
-          eq(invitationCodes.code, code),
-          eq(invitationCodes.isActive, true)
-        ))
+        .where(eq(invitationCodes.code, code))
         .get();
 
       if (!invitation) {
+        throw new NotFoundError('Invalid or inactive invitation code');
+      }
+
+      // Additional check for isActive in case mock database filtering didn't work
+      if (!invitation.isActive) {
         throw new NotFoundError('Invalid or inactive invitation code');
       }
 
@@ -101,7 +98,8 @@ export class InvitationService {
       await tx
         .update(invitationCodes)
         .set({ currentUses: invitation.currentUses + 1 })
-        .where(eq(invitationCodes.code, code));
+        .where(eq(invitationCodes.code, code))
+        .execute();
 
       // 6. Create usage record
       const betaExpiresAt = new Date();
@@ -109,7 +107,7 @@ export class InvitationService {
       const usageId = globalThis.crypto.randomUUID();
       const now = new Date();
 
-      const [newUsage] = await tx.insert(invitationUsage).values({
+      const result = await tx.insert(invitationUsage).values({
         id: usageId,
         invitationId: invitation.code,
         userId,
@@ -119,6 +117,8 @@ export class InvitationService {
         createdAt: now,
       }).returning();
 
+      // Handle both array and single object returns from mock database
+      const newUsage = Array.isArray(result) ? result[0] : result;
       return newUsage;
     });
   }

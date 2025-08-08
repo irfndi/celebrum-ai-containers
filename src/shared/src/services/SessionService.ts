@@ -1,10 +1,10 @@
 import type { KVNamespace } from '@cloudflare/workers-types';
-import type { User } from '@celebrum-ai/db/schema';
+import type { User } from '../../../db/src/schema';
 
 export interface Session {
   id: string;
   sessionId: string;
-  userId: number;
+  userId: string;
   telegramId: string;
   createdAt: Date;
   expiresAt: Date;

@@ -8,6 +8,7 @@ import { execSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import fg from 'fast-glob';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -48,55 +49,56 @@ const testConfigs: Record<string, TestConfig> = {
   unit: {
     name: 'Unit Tests',
     description: 'Run unit tests for individual components',
-    command: 'vitest run src/**/tests/unit/**/*.test.ts',
-    pattern: 'src/**/tests/unit/**/*.test.ts',
+    command: 'vitest run src/*/tests/unit/*.test.ts src/**/tests/unit/**/*.test.ts src/tests/unit.test.ts',
+    pattern: '{src/*/tests/unit/*.test.ts,src/**/tests/unit/**/*.test.ts,src/tests/unit.test.ts}',
     coverage: true,
     timeout: 30000
   },
   integration: {
     name: 'Integration Tests',
     description: 'Run integration tests for component interactions',
-    command: 'vitest run src/**/tests/integration/**/*.test.ts',
-    pattern: 'src/**/tests/integration/**/*.test.ts',
+    command: 'vitest run src/*/tests/integration/*.test.ts src/**/tests/integration/**/*.test.ts',
+    pattern: '{src/*/tests/integration/*.test.ts,src/**/tests/integration/**/*.test.ts}',
     coverage: true,
     timeout: 60000
   },
   e2e: {
     name: 'End-to-End Tests',
     description: 'Run end-to-end tests for complete workflows',
-    command: 'vitest run src/**/tests/e2e/**/*.test.ts',
-    pattern: 'src/**/tests/e2e/**/*.test.ts',
+    command: 'vitest run src/*/tests/e2e/*.test.ts src/**/tests/e2e/**/*.test.ts',
+    pattern: '{src/*/tests/e2e/*.test.ts,src/**/tests/e2e/**/*.test.ts}',
     coverage: false,
     timeout: 120000
   },
   telegram: {
     name: 'Telegram Bot Tests',
     description: 'Run tests specific to Telegram bot functionality',
-    command: 'vitest run src/telegram-bot/**/*.test.ts',
-    pattern: 'src/telegram-bot/**/*.test.ts',
+    command: 'vitest run src/telegram-bot/tests/*.test.ts src/telegram-bot/tests/**/*.test.ts',
+    pattern: '{src/telegram-bot/tests/*.test.ts,src/telegram-bot/tests/**/*.test.ts}',
     coverage: true,
     timeout: 45000
   },
   web: {
     name: 'Web API Tests',
     description: 'Run tests for web API endpoints',
-    command: 'vitest run src/web/**/*.test.ts',
-    pattern: 'src/web/**/*.test.ts',
+    command: 'vitest run src/web/tests/*.test.ts src/web/tests/**/*.test.ts',
+    pattern: '{src/web/tests/*.test.ts,src/web/tests/**/*.test.ts}',
     coverage: true,
     timeout: 45000
   },
   shared: {
     name: 'Shared Module Tests',
     description: 'Run tests for shared utilities and services',
-    command: 'vitest run src/shared/**/*.test.ts',
-    pattern: 'src/shared/**/*.test.ts',
+    command: 'vitest run src/shared/tests/*.test.ts src/shared/tests/**/*.test.ts',
+    pattern: '{src/shared/tests/*.test.ts,src/shared/tests/**/*.test.ts}',
     coverage: true,
     timeout: 30000
   },
   all: {
     name: 'All Tests',
     description: 'Run complete test suite',
-    command: 'vitest run',
+    command: 'vitest run src/tests/unit.test.ts src/*/tests/unit/*.test.ts src/**/tests/unit/**/*.test.ts src/*/tests/integration/*.test.ts src/**/tests/integration/**/*.test.ts src/*/tests/e2e/*.test.ts src/**/tests/e2e/**/*.test.ts',
+    pattern: '{src/tests/unit.test.ts,src/*/tests/unit/*.test.ts,src/**/tests/unit/**/*.test.ts,src/*/tests/integration/*.test.ts,src/**/tests/integration/**/*.test.ts,src/*/tests/e2e/*.test.ts,src/**/tests/e2e/**/*.test.ts}',
     coverage: true,
     timeout: 300000
   },
@@ -365,13 +367,9 @@ function generateHtmlReport(report: TestReport): string {
 // Check if test files exist for a given pattern
 function checkTestFiles(pattern?: string): boolean {
   if (!pattern) return true;
-  
-  try {
-    const output = execSync(`find ${rootDir} -path "${pattern}" -type f`, { encoding: 'utf8' });
-    return output.trim().length > 0;
-  } catch {
-    return false;
-  }
+  // Use fast-glob to match files
+  const files = fg.sync(pattern, { cwd: rootDir, absolute: true });
+  return files.length > 0;
 }
 
 // Main execution function

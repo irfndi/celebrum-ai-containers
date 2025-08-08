@@ -242,6 +242,13 @@ export class FeatureFlagService {
   }
 
   /**
+   * Clear the feature flag cache (delegates to FeatureFlagManager)
+   */
+  clearCache(): void {
+    this.manager.clearCache();
+  }
+
+  /**
    * Get available feature flags from JSON configuration and default flags
    */
   getAvailableFlags(): string[] {
@@ -322,4 +329,11 @@ export function createFeatureFlagService(env: unknown): FeatureFlagService {
 
 export function getFeatureFlagService(): FeatureFlagService | null {
   return featureFlagServiceInstance;
+}
+
+/**
+ * Reset the singleton instance (useful for testing)
+ */
+export function resetFeatureFlagService(): void {
+  featureFlagServiceInstance = null;
 }

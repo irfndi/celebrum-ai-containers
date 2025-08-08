@@ -765,49 +765,9 @@ export class TechnicalStrategyManager {
   }
 
   /**
-   * Simulate backtest execution (in production, this would be a real backtest engine)
+   * Backtest execution must use a real engine in production. This method is a development stub only.
    */
-  private async simulateBacktest(backtestId: string, userId: string): Promise<void> {
-    try {
-      // Simulate backtest execution with random results
-      setTimeout(async () => {
-        const backtestKey = `rbac:backtest:${backtestId}`;
-        const backtestData = await (this.env as unknown as { CELEBRUM_KV?: { get: (key: string, type?: string) => Promise<unknown> } }).CELEBRUM_KV?.get(backtestKey, 'json');
-        
-        if (backtestData) {
-          const backtest = backtestData as Backtest;
-          // Generate mock results
-          const results = {
-            totalTrades: Math.floor(Math.random() * 100) + 50,
-            winRate: Math.random() * 0.4 + 0.4, // 40-80%
-            profitLoss: (Math.random() - 0.3) * 10000, // -3000 to 7000
-            maxDrawdown: Math.random() * 0.2, // 0-20%
-            sharpeRatio: Math.random() * 2 + 0.5, // 0.5-2.5
-            trades: [] // In production, this would contain detailed trade data
-          };
-
-          backtest.status = 'completed';
-          backtest.completedAt = Date.now();
-          backtest.results = results;
-          backtest.progress = 100;
-
-          await (this.env as unknown as { CELEBRUM_KV?: { put: (key: string, value: string, options?: { expirationTtl?: number }) => Promise<void> } }).CELEBRUM_KV?.put(backtestKey, JSON.stringify(backtest), {
-            expirationTtl: 7 * 24 * 60 * 60
-          });
-
-          // Update running backtest count
-          const limits = await this.getStrategyLimits(userId);
-          if (limits) {
-            limits.concurrentBacktests = Math.max(0, limits.concurrentBacktests - 1);
-            const limitsKey = `rbac:strategy_limits:${userId}`;
-            await (this.env as unknown as { CELEBRUM_KV?: { put: (key: string, value: string, options?: { expirationTtl?: number }) => Promise<void> } }).CELEBRUM_KV?.put(limitsKey, JSON.stringify(limits), {
-              expirationTtl: 86400
-            });
-          }
-        }
-      }, 30000); // 30 seconds simulation
-    } catch (error) {
-      console.error('Failed to simulate backtest:', error);
-    }
+  private async simulateBacktest(_backtestId: string, _userId: string): Promise<void> {
+    throw new Error('Backtest simulation is not available in production. Please integrate a real backtest engine.');
   }
 }

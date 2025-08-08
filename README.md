@@ -1,59 +1,66 @@
-# Containers Starter
+# Celebrum AI Trading Platform
 
 [![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/cloudflare/templates/tree/main/containers-template)
 
 ![Containers Template Preview](https://imagedelivery.net/_yJ02hpOMj_EnGvsU2aygw/5aba1fb7-b937-46fd-fa67-138221082200/public)
 
-<!-- dash-content-start -->
+---
 
-This is a [Container](https://developers.cloudflare.com/containers/) starter template.
+This is a production-ready, single-package application for Cloudflare Containers.
 
-It demonstrates basic Container coniguration, launching and routing to individual container, load balancing over multiple container, running basic hooks on container status changes.
-
-<!-- dash-content-end -->
-
-Outside of this repo, you can start a new project with this template using [C3](https://developers.cloudflare.com/pages/get-started/c3/) (the `create-cloudflare` CLI):
-
-```bash
-npm create cloudflare@latest -- --template=cloudflare/templates/containers-template
-```
+- **No monorepo or workspace dependencies.**
+- **All dependencies are managed with [pnpm](https://pnpm.io/).**
+- **All debug and test output files are cleaned before production deploys.**
 
 ## Getting Started
 
-First, run:
+Install dependencies (pnpm only):
 
 ```bash
-npm install
-# or
-yarn install
-# or
 pnpm install
-# or
-bun install
 ```
 
-Then run the development server (using the package manager of your choice):
+Run the development server:
 
 ```bash
-npm run dev
+pnpm run dev
 ```
 
 Open [http://localhost:8787](http://localhost:8787) with your browser to see the result.
 
-You can start editing your Worker by modifying `src/index.ts` and you can start
-editing your Container by editing the content of `container_src`.
+Edit your Worker in `src/index.ts` and your Container in `container_src/`.
+
+## Testing & Linting
+
+- Run all tests (unit, integration, e2e):
+  ```bash
+  pnpm run test:all
+  ```
+- Run E2E tests only (headless):
+  ```bash
+  pnpm run test:e2e
+  ```
+- Lint the codebase:
+  ```bash
+  pnpm run lint
+  ```
 
 ## Deploying To Production
 
-| Command          | Action                                |
-| :--------------- | :------------------------------------ |
-| `npm run deploy` | Deploy your application to Cloudflare |
+| Command            | Action                                |
+| :---------------- | :------------------------------------ |
+| `pnpm run deploy` | Deploy your application to Cloudflare |
+
+## Clean Up for Production
+
+Before deploying, ensure all debug and test output files are removed:
+- `test-output*.txt`, `test-results*.xml`, `debug-*.js`, etc.
 
 ## Learn More
 
-To learn more about Containers, take a look at the following resources:
+- [Container Documentation](https://developers.cloudflare.com/containers/)
+- [Container Class](https://github.com/cloudflare/containers)
 
-- [Container Documentation](https://developers.cloudflare.com/containers/) - learn about Containers
-- [Container Class](https://github.com/cloudflare/containers) - learn about the Container helper class
+---
 
 Your feedback and contributions are welcome!

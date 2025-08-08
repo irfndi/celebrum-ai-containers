@@ -21,13 +21,45 @@ export class FeatureFlagManager {
   }
 
   /**
+   * Clear the flag cache
+   */
+  clearCache(): void {
+    this.flagCache.clear();
+  }
+
+  /**
+   * Force read a global flag from KV store without using cache
+   * This is useful for testing scenarios where we need fresh values
+   */
+  async forceReadGlobalFlag(flagName: string): Promise<boolean> {
+    const key = `rbac:global_flag:${flagName}`;
+    try {
+      const kv = (this.env as unknown as { CELEBRUM_KV?: { get: (key: string) => Promise<string | null> } }).CELEBRUM_KV;
+      if (!kv) {
+        return this.defaultFlags.get(flagName) as boolean || false;
+      }
+      
+      const stored = await kv.get(key);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        return parsed.enabled === true;
+      }
+      // If not found in KV, return the default value
+      return this.defaultFlags.get(flagName) as boolean || false;
+    } catch (error) {
+      console.error(`Error force reading global flag ${flagName}:`, error);
+      return this.defaultFlags.get(flagName) as boolean || false;
+    }
+  }
+
+  /**
    * Get default feature flags
    */
   getDefaultFlags(): Record<string, boolean> {
     const result: Record<string, boolean> = {};
-    for (const [key, value] of this.defaultFlags.entries()) {
+    this.defaultFlags.forEach((value, key) => {
       result[key] = value as boolean;
-    }
+    });
     return result;
   }
 
@@ -416,18 +448,24 @@ export class FeatureFlagManager {
       // Check cache first
       const cacheKey = `global:${featureKey}`;
       if (this.flagCache.has(cacheKey)) {
+        console.log(`[DEBUG] FeatureFlagManager: Cache hit for ${featureKey}:`, this.flagCache.get(cacheKey));
         return this.flagCache.get(cacheKey) as boolean | null;
       }
 
       // Get from KV store
       const key = `rbac:global_flag:${featureKey}`;
+      console.log(`[DEBUG] FeatureFlagManager: Reading from KV store key: ${key}`);
       const flagData = await (this.env as unknown as { CELEBRUM_KV?: { get: (key: string, type?: string) => Promise<unknown> } }).CELEBRUM_KV?.get(key, 'json') as unknown;
+      console.log(`[DEBUG] FeatureFlagManager: KV data for ${featureKey}:`, flagData);
       
       if (flagData) {
-        this.flagCache.set(cacheKey, (flagData as unknown as { enabled: boolean }).enabled);
-        return (flagData as unknown as { enabled: boolean }).enabled;
+        const enabled = (flagData as unknown as { enabled: boolean }).enabled;
+        console.log(`[DEBUG] FeatureFlagManager: Setting cache for ${featureKey}:`, enabled);
+        this.flagCache.set(cacheKey, enabled);
+        return enabled;
       }
       
+      console.log(`[DEBUG] FeatureFlagManager: No KV data found for ${featureKey}, returning null`);
       return null;
     } catch (error) {
       console.error('Failed to get global flag:', error);

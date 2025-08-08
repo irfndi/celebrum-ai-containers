@@ -9,6 +9,7 @@ dist
 .vscode
 
 mcp.json
+.kiro/settings/mcp.json
 
 # Logs
 logs
@@ -35,3 +36,13 @@ node_modules/
 # tasks/ 
 
 coverage/
+test-results/
+dist-test
+
+# Test reports and results
+test-results*.xml
+test-results*.json
+test-reports/
+test-results-db.xml
+
+mcp.json

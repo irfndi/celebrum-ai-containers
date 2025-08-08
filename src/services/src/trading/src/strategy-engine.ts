@@ -155,42 +155,15 @@ export class StrategyEngine {
   }
 
   private async executeMeanReversionStrategy(_strategy: TradingStrategy, _marketData: unknown): Promise<TradingSignal[]> {
-    const signals: TradingSignal[] = [];
-
-    // TODO: Implement mean reversion logic
-    // This would involve:
-    // 1. Calculate moving average
-    // 2. Compare current price to MA
-    // 3. Generate buy/sell signals based on deviation
-
-
-    return signals;
+    throw new Error('Mean reversion strategy execution is not implemented. Please provide a production implementation.');
   }
 
   private async executeMomentumStrategy(_strategy: TradingStrategy, _marketData: unknown): Promise<TradingSignal[]> {
-    const signals: TradingSignal[] = [];
-
-    // TODO: Implement momentum logic
-    // This would involve:
-    // 1. Calculate RSI, MACD
-    // 2. Identify momentum patterns
-    // 3. Generate signals based on momentum indicators
-
-    return signals;
+    throw new Error('Momentum strategy execution is not implemented. Please provide a production implementation.');
   }
 
   private async executeArbitrageStrategy(_strategy: TradingStrategy, _marketData: unknown): Promise<TradingSignal[]> {
-    const signals: TradingSignal[] = [];
-
-    // TODO: Implement arbitrage logic
-    // This would involve:
-    // 1. Compare prices across exchanges
-    // 2. Identify arbitrage opportunities
-    // 3. Generate buy/sell signals for profitable spreads
-    // 4. calculate APY / Hourly rate
-    // 5. extend that to trade services (require users add API and API valid)
-
-    return signals;
+    throw new Error('Arbitrage strategy execution is not implemented. Please provide a production implementation.');
   }
 
   private addSignal(signal: TradingSignal): void {

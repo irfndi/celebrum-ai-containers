@@ -52,6 +52,7 @@ export interface DataSourceConfig {
   baseUrl: string;
   apiKey?: string;
   apiSecret?: string;
+  passphrase?: string; // For exchanges like OKX
   rateLimit: {
     requests: number;
     window: number; // milliseconds
@@ -67,6 +68,7 @@ export interface DataSourceConfig {
     url: string;
     channels: Record<string, string>;
   };
+  exchangeOptions?: Record<string, unknown>; // For CCXT-specific options
   isActive: boolean;
 }
 

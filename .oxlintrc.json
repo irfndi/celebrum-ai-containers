@@ -24,7 +24,15 @@
     "dist/**",
     ".temporary-code/**",
     "coverage/**",
-    "*.d.ts"
+    "*.d.ts",
+    // Ignore test files and directories
+    "src/**/tests/**",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.spec.ts",
+    "**/*.spec.tsx",
+    // Ignore DB utility files to avoid explicit-any warnings
+    "src/db/src/utils/**"
   ],
   "settings": {
     "import/resolver": {

@@ -42,6 +42,10 @@ test-verbose: ## Run tests with verbose output
 	@pnpm run test -- --verbose
 	@cd container_src && go test -v ./... || echo "⚠️  No Go modules found yet"
 
+coverage: ## Run tests with coverage
+	@echo "🧪 Running tests with coverage..."
+	@pnpm run test:coverage
+
 unit-tests: ## Run unit tests
 	@echo "🧪 Running TypeScript unit tests..."
 	@pnpm run test:unit

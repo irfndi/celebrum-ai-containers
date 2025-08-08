@@ -1,12 +1,15 @@
 import { sql } from 'drizzle-orm';
 import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
-import { users } from './users.js';
+import { users } from './users';
 
+/**
+ * Production-ready user username history table schema for Cloudflare D1
+ */
 export const userUsernameHistory = sqliteTable(
   'user_username_history',
   {
     id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
-    userId: integer('user_id')
+    userId: text('user_id')
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),
     telegramId: text('telegram_id').notNull(), // For faster lookups
